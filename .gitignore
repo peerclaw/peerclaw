@@ -1,0 +1,54 @@
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+peerclawd
+echo
+
+# Test
+*.test
+*.out
+coverage.html
+coverage.txt
+
+# Dependency directories
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Generated protobuf
+**/*.pb.go
+
+# SQLite
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Config overrides
+**/peerclaw.yaml
+!**/peerclaw.example.yaml
+
+# Environment
+.env
+.env.local
+
+# Keypair seeds
+*.seed
+
+# Sub-repositories (managed separately)
+/core/
+/server/
+/agent/
