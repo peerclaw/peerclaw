@@ -29,30 +29,30 @@
   - Signaling Client
   - Echo Agent 示例
 
-## Phase 2: Transport & Security Hardening
+## Phase 2: Transport & Security Hardening (已完成)
 
 加固传输层和安全机制，提升连接成功率。
 
-- [ ] **Nostr relay 完整实现**
-  - NIP-44 加密
-  - 多 relay 支持与故障切换
-  - relay 健康检查
-- [ ] **NAT 穿越优化**
-  - TURN server 集成
-  - ICE candidate 筛选与排序优化
-  - 连接质量监控
-- [ ] **自动传输选择**
-  - WebRTC → Nostr 自动降级
-  - 连接恢复后自动升级
-  - 传输健康评分
-- [ ] **Trust Store 增强**
-  - CLI 管理工具（列出/撤销/导出信任）
-  - 信任等级（untrusted / tofu / verified / pinned）
-  - 信任事件通知
-- [ ] **端到端加密**
-  - X25519 密钥交换
-  - ChaCha20-Poly1305 消息加密
-  - 前向保密（可选）
+- [x] **Nostr relay 完整实现**
+  - NIP-44 加密（基于 `fiatjaf.com/nostr` 库）
+  - 多 relay 支持与故障切换（发布到全部，订阅去重）
+  - relay 健康检查（指数退避重连，3 次失败移出活跃集）
+- [x] **NAT 穿越优化**
+  - TURN server 集成（信令连接后 Server 推送 ICE config）
+  - ICE candidate 筛选与排序优化（host > srflx > relay）
+  - 连接质量监控（RTT、丢包率、吞吐统计）
+- [x] **自动传输选择**
+  - WebRTC → Nostr 自动降级（Transport Selector）
+  - 连接恢复后自动升级（后台探测）
+  - 传输健康评分（滚动窗口成功/失败计数）
+- [x] **Trust Store 增强**
+  - CLI 管理工具 `peerclaw-trust`（list / verify / pin / revoke / export / import）
+  - 信任等级（Unknown / TOFU / Verified / Blocked / Pinned）
+  - 信任事件通知（OnTrustChange 回调）
+- [x] **端到端加密**
+  - X25519 密钥交换（从 Ed25519 seed 派生，信令阶段交换公钥）
+  - XChaCha20-Poly1305 消息加密（HKDF-SHA256 密钥派生）
+  - Nostr 传输额外使用 NIP-44 格式封装
 
 ## Phase 3: Protocol Ecosystem
 

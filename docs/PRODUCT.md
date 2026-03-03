@@ -54,9 +54,9 @@ Alice                           Signaling Hub                          Bob
   │                                  │                                  │
   │  ◄═══════ WebRTC DataChannel (P2P 直连) ═══════►                   │
   │                                  │                                  │
-  │  Envelope {payload, signature}   │                                  │
+  │  Envelope {encrypted_payload, signature}                           │
   │════════════════════════════════════════════════════════════════════►│
-  │  ◄═════════════════ Envelope {payload, signature} ════════════════ │
+  │  ◄═════════════ Envelope {encrypted_payload, signature} ══════════│
 ```
 
 信令服务器仅用于 WebRTC 握手，实际数据通过 P2P DataChannel 传输。每条消息附带 Ed25519 签名。
@@ -198,7 +198,18 @@ WebRTC ICE 协商完成后，Agent A 和 B 建立 DataChannel 直连。如果 IC
 | 威胁缓解 | 消息篡改、身份伪造 |
 | 性能 | ~76,000 签名/秒，~200,000 验证/秒 |
 
-### 第三层：执行级 — 沙箱
+### 第三层：传输级 — 端到端加密
+
+| 属性 | 说明 |
+|------|------|
+| 密钥交换 | X25519 ECDH（从 Ed25519 seed 派生） |
+| 密钥派生 | HKDF-SHA256 |
+| 对称加密 | XChaCha20-Poly1305（24 字节随机 nonce） |
+| 会话建立 | 信令握手阶段交换 X25519 公钥 |
+| Nostr 适配 | NIP-44 格式封装（secp256k1 会话密钥） |
+| 威胁缓解 | 窃听、中间人、消息泄露 |
+
+### 第四层：执行级 — 沙箱
 
 | 属性 | 说明 |
 |------|------|

@@ -18,7 +18,7 @@ PeerClaw 的回答：
 - **去中心化优先** — WebRTC P2P 直连，Nostr relay 兜底，不依赖任何单一服务
 - **协议桥接** — 内置 A2A / ACP / MCP 适配器，统一转换为 PeerClaw Envelope
 - **密码学身份** — 每个 Agent 拥有 Ed25519 密钥对，公钥即身份
-- **三层安全** — 连接级 TOFU + 消息级签名 + 执行级沙箱
+- **四层安全** — 连接级 TOFU + 消息级签名 + 端到端加密 (XChaCha20-Poly1305) + 执行级沙箱
 
 ## 架构
 
@@ -41,7 +41,7 @@ PeerClaw 的回答：
     WebRTC DataChannel / Nostr relay
 ```
 
-**通信流程：** 注册 → 发现 → 信令握手 → P2P 连接 → 签名消息交换
+**通信流程：** 注册 → 发现 → 信令握手（含 X25519 密钥交换） → P2P 连接（WebRTC 优先，自动降级 Nostr） → 加密签名消息交换
 
 ## 子项目
 
