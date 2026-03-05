@@ -123,27 +123,57 @@
   - `peerclaw health` — 服务器健康检查
   - `peerclaw config show|set` — CLI 配置管理
 
-## Phase 5: Decentralized Evolution
+## Phase 5: Decentralized Evolution (已完成)
 
-向完全去中心化演进，最终实现无 Server 的 Agent 通信。
+向完全去中心化演进，实现无 Server 的 Agent 通信。
 
-- [ ] **DHT 去中心化发现**
-  - Kademlia DHT 实现
-  - Agent Card 分布式存储
-  - DHT bootstrap 节点
-- [ ] **多信令节点联邦**
-  - Server 间信令消息转发
-  - 跨节点 Agent 发现
-  - 联邦协议
-- [ ] **链上身份锚定（可选）**
-  - 公钥哈希上链
-  - 域名绑定验证
-  - 身份恢复机制
-- [ ] **Agent 信誉系统**
-  - 通信行为评分
-  - 信誉传播算法
-  - 恶意 Agent 隔离
-- [ ] **无 Server 纯 P2P 模式**
-  - DHT 发现 + Nostr 信令
-  - 完全无中心节点运行
-  - 离线消息缓存
+- [x] **接口抽象 + Agent Card 扩展**
+  - Discovery 接口（RegistryClient / DHTDiscovery / CompositeDiscovery）
+  - SignalingClient 接口（WebSocket / NostrSignaling / CompositeSignaling）
+  - Agent 结构体改用接口（向后兼容）
+  - PeerClawExtension 新字段（nostr_pubkey / dht_node_id / reputation_score / nostr_relays / identity_anchor）
+  - 新信令消息类型（federation_forward / dht_ping/store/find_node/find_value）
+- [x] **DHT 去中心化发现**
+  - 最小 Kademlia DHT（160-bit NodeID，K=20 k-bucket 路由表）
+  - DHT 协议消息（Ping / Store / FindNode / FindValue RPC）
+  - DHT 传输层（Nostr event kind 20005 + InMemory 测试传输）
+  - DHT 协调器（Bootstrap / Put / Get / FindNode / bucket refresh / data republish）
+  - DHTDiscovery 实现 Discovery 接口（主键 + 能力索引）
+  - CompositeDiscovery（Server 优先 + DHT fallback）
+- [x] **多信令节点联邦**
+  - FederationConfig（静态配置 + DNS SRV 发现）
+  - FederationService（连接对端、ForwardSignal、QueryAgents）
+  - DNS SRV 发现（_peerclaw._tcp.<domain>）
+  - FederationBroker（本地有目标则 local.Publish，否则 federation.ForwardSignal）
+  - Hub.HasAgent() 判断本地连接
+  - 联邦 HTTP 端点（/api/v1/federation/signal、/api/v1/federation/discover）
+  - DiscoverFederated 方法
+- [x] **Agent 信誉系统**
+  - ReputationStore：per-peer EWMA 评分（0.0-1.0），6 种行为类型
+  - RecordEvent / GetScore / IsMalicious（< 0.15 阈值）
+  - TrustStore 集成（SetReputationStore / IsAllowedWithReputation）
+  - 信誉 Gossip（Nostr kind 30078，第二手信誉权重 0.3x，仅接受 TrustVerified+ 的 peer）
+  - JSON 文件持久化
+- [x] **无 Server 纯 P2P 模式**
+  - NostrSignaling（event kind 20006，NIP-44 加密）
+  - CompositeSignaling（WebSocket 优先 + Nostr fallback）
+  - MessageCache 离线消息缓存（per-destination 队列，TTL 过期，JSON 持久化）
+  - OnPeerAdded 回调（新 peer 连接时刷新缓存队列）
+  - Serverless 模式 Options（DHTEnabled / Serverless / ICEServers / MessageCachePath）
+- [x] **链上身份锚定（可选）**
+  - IdentityAnchor 接口（Publish / Verify / Resolve / RecoveryKeys）
+  - NostrAnchor 实现（Nostr kind 10078 replaceable event，双向密钥绑定）
+  - 域名绑定验证（DNS TXT 记录 peerclaw-verify=<fingerprint>）
+  - 多签恢复（threshold-of-n recovery keys）
+- [x] **CLI Phase 5 命令**
+  - `peerclaw dht bootstrap|lookup`
+  - `peerclaw federation status|peers`
+  - `peerclaw reputation show|list`
+  - `peerclaw identity anchor|verify`
+- [x] **集成测试**
+  - DHT-only 发现通信（无 Server）
+  - Server + DHT 混合模式降级
+  - 恶意行为触发信誉隔离
+  - 信誉 Gossip 跨 peer 传播
+  - DHT Agent Card 存取
+  - 离线消息缓存投递

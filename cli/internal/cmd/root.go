@@ -30,11 +30,19 @@ func Run(args []string) int {
 		return RunHealth(args[1:], serverURL)
 	case "config":
 		return RunConfig(args[1:])
+	case "dht":
+		return RunDHT(args[1:], serverURL)
+	case "federation":
+		return RunFederation(args[1:], serverURL)
+	case "reputation":
+		return RunReputation(args[1:], serverURL)
+	case "identity":
+		return RunIdentity(args[1:], serverURL)
 	case "help", "-h", "--help":
 		printUsage()
 		return 0
 	case "version":
-		fmt.Println("peerclaw version 0.4.0")
+		fmt.Println("peerclaw version 0.5.0")
 		return 0
 	default:
 		fmt.Fprintf(os.Stderr, "unknown command: %s\n\n", args[0])
@@ -47,11 +55,15 @@ func printUsage() {
 	fmt.Fprintf(os.Stderr, `Usage: peerclaw <command> [options]
 
 Commands:
-  agent     Manage agents (list, get, register, delete)
-  send      Send a message through the bridge
-  health    Check server health
-  config    Manage CLI configuration
-  version   Print version
+  agent       Manage agents (list, get, register, delete)
+  send        Send a message through the bridge
+  health      Check server health
+  config      Manage CLI configuration
+  dht         DHT operations (bootstrap, lookup)
+  federation  Federation management (status, peers)
+  reputation  Reputation scores (show, list)
+  identity    Identity anchoring (anchor, verify)
+  version     Print version
 
 Environment:
   PEERCLAW_SERVER   Server URL (default: %s)

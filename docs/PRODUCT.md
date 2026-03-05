@@ -105,8 +105,8 @@ Alice                         Nostr Relay                          Bob
 │                      peerclaw-server                           │
 │                                                                │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │           HTTP 入口 + 协议端点                            │   │
-│  │  /api/v1/*  /a2a  /mcp  /acp/*  /.well-known/agent.json │   │
+│  │           HTTP 入口 + 协议端点 + 联邦端点                  │   │
+│  │  /api/v1/*  /a2a  /mcp  /acp/*  /api/v1/federation/*   │   │
 │  └──────┬──────────────┬──────────────┬───────────────────┘   │
 │         │              │              │                        │
 │  ┌──────▼──────┐ ┌─────▼─────┐ ┌─────▼──────┐                │
@@ -116,18 +116,21 @@ Alice                         Nostr Relay                          Bob
 │  │ - 注册/注销  │ │ - 路由表   │ │ - WS 连接  │                │
 │  │ - 发现/查询  │ │ - 路由解析 │ │ - 消息转发  │                │
 │  │ - 心跳管理  │ │ - 能力匹配 │ │ - Ping/Pong│                │
-│  └──────┬──────┘ └───────────┘ │- bridge_msg│                │
-│         │                      └────────────┘                │
-│  ┌──────▼──────┐ ┌────────────────────────────────────────┐   │
-│  │   SQLite    │ │         Bridge Manager                 │   │
-│  │   Store     │ │  ┌──────┐  ┌──────┐  ┌──────┐         │   │
+│  │ - 联邦发现  │ │           │ │- bridge_msg│                │
+│  └──────┬──────┘ └───────────┘ └─────┬──────┘                │
+│         │                            │                        │
+│  ┌──────▼──────┐ ┌───────────────────▼────────────────────┐   │
+│  │   SQLite/   │ │         Bridge Manager                 │   │
+│  │  PostgreSQL │ │  ┌──────┐  ┌──────┐  ┌──────┐         │   │
 │  └─────────────┘ │  │ A2A  │  │ ACP  │  │ MCP  │         │   │
 │                  │  │Adapter│  │Adapter│  │Adapter│         │   │
-│                  │  └──────┘  └──────┘  └──────┘         │   │
-│                  │  ┌────────────┐  ┌──────────────────┐  │   │
-│                  │  │ Negotiator │  │ Bridge Forwarder │  │   │
-│                  │  └────────────┘  └──────────────────┘  │   │
-│                  └────────────────────────────────────────┘   │
+│  ┌─────────────┐ │  └──────┘  └──────┘  └──────┘         │   │
+│  │ Federation  │ │  ┌────────────┐  ┌──────────────────┐  │   │
+│  │  Service    │ │  │ Negotiator │  │ Bridge Forwarder │  │   │
+│  │ - 对端连接  │ │  └────────────┘  └──────────────────┘  │   │
+│  │ - 信令转发  │ └────────────────────────────────────────┘   │
+│  │ - DNS SRV   │                                              │
+│  └─────────────┘                                              │
 └────────────────────────────────────────────────────────────────┘
 
 ┌────────────────────────────────────────────────────────────────┐
@@ -135,16 +138,26 @@ Alice                         Nostr Relay                          Bob
 │                                                                │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐ │
 │  │   Agent API  │  │  Discovery   │  │     Signaling        │ │
-│  │              │  │  Client      │  │     Client           │ │
+│  │              │  │  (接口)       │  │     (接口)           │ │
+│  │              │  │ Registry     │  │  WebSocket Client    │ │
+│  │              │  │ DHTDiscovery │  │  NostrSignaling      │ │
+│  │              │  │ Composite    │  │  Composite           │ │
 │  └──────────────┘  └──────────────┘  └──────────────────────┘ │
 │  ┌──────────────┐  ┌──────────────────────────────────────┐   │
 │  │ Peer Manager │  │            Security                  │   │
-│  │              │  │  Trust Store + Message Validator +    │   │
-│  │              │  │  Sandbox                              │   │
+│  │ - OnPeerAdded│  │  Trust Store + Message Validator +    │   │
+│  │              │  │  Reputation + Sandbox                 │   │
 │  └──────────────┘  └──────────────────────────────────────┘   │
+│  ┌──────────────┐  ┌──────────────────────────────────────┐   │
+│  │     DHT      │  │            Identity                  │   │
+│  │  (Kademlia)  │  │  IdentityAnchor + NostrAnchor +      │   │
+│  │ - 路由表     │  │  Domain Verify + Recovery             │   │
+│  │ - KV Store   │  └──────────────────────────────────────┘   │
+│  │ - Bootstrap  │                                              │
+│  └──────────────┘                                              │
 │  ┌────────────────────────────────────────────────────────┐   │
 │  │                    Transport                           │   │
-│  │        WebRTC DataChannel  ◄──►  Nostr Relay           │   │
+│  │  WebRTC DataChannel ◄──► Nostr Relay ◄──► MessageCache │   │
 │  └────────────────────────────────────────────────────────┘   │
 └────────────────────────────────────────────────────────────────┘
 
@@ -263,12 +276,57 @@ WebRTC ICE 协商完成后，Agent A 和 B 建立 DataChannel 直连。如果 IC
 Middleware chain (per request):
 `Recovery → RequestID → Tracing → Logging → Metrics → RateLimit → MaxBody`
 
-### 去中心化（Phase 5）
+### 去中心化（Phase 5 已实现）
 
 ```
 [ Agent A ] ◄═══ P2P (WebRTC) ═══► [ Agent B ]
      │                                   │
-     └──── DHT Discovery ────────────────┘
+     └──── DHT Discovery (Kademlia) ─────┘
      │                                   │
-     └──── Nostr Relay (fallback) ───────┘
+     └──── Nostr Signaling (kind 20006) ─┘
+     │                                   │
+     └──── Nostr Relay (kind 20004) ─────┘
 ```
+
+### 联邦模式（Phase 5 已实现）
+
+```
+[ Agent A ] ──► [ Server 1 ] ◄══ Federation ══► [ Server 2 ] ◄── [ Agent B ]
+                     │         (HTTP + Auth)          │
+              [ DNS SRV 发现 ]                 [ DNS SRV 发现 ]
+```
+
+### 无 Server 模式（Phase 5 已实现）
+
+```
+[ Agent A ]                                    [ Agent B ]
+     │  1. DHT Bootstrap (Nostr kind 20005)         │
+     │──────────────►  Nostr Relays  ◄──────────────│
+     │  2. Agent Card 存入 DHT                       │
+     │  3. Nostr 信令 (kind 20006)                   │
+     │──────────────►  Nostr Relays  ◄──────────────│
+     │  4. WebRTC P2P 直连                           │
+     │◄════════════ DataChannel ═══════════════════►│
+     │  5. 离线消息缓存 (MessageCache)                │
+```
+
+## 信誉模型（Phase 5）
+
+| 属性 | 说明 |
+|------|------|
+| 评分算法 | 指数加权移动平均（EWMA，alpha=0.1） |
+| 评分范围 | 0.0 (恶意) ~ 1.0 (可信) |
+| 恶意阈值 | < 0.15 自动隔离 |
+| 行为类型 | success (+1.0), timeout (-0.3), error (-0.2), invalid_signature (-0.8), spam (-0.5), protocol_violation (-0.7) |
+| 存储 | 本地 JSON 文件持久化 |
+| Gossip | 可选 Nostr kind 30078，第二手权重 0.3x，仅接受 TrustVerified+ |
+
+## 身份锚定（Phase 5）
+
+| 属性 | 说明 |
+|------|------|
+| 接口 | IdentityAnchor (Publish/Verify/Resolve/RecoveryKeys) |
+| 首选实现 | Nostr kind 10078 replaceable event |
+| 密钥绑定 | 双向：Ed25519 签 Nostr key + Nostr key 签 Ed25519 key |
+| 域名验证 | DNS TXT 记录 peerclaw-verify=<fingerprint> |
+| 身份恢复 | threshold-of-n 多签 recovery keys |
