@@ -239,7 +239,7 @@ WebRTC ICE 协商完成后，Agent A 和 B 建立 DataChannel 直连。如果 IC
 
 ## 部署架构
 
-### 单节点（当前）
+### 单节点
 
 ```
 [ Agent A ] ──► [ PeerClaw Server (SQLite) ] ◄── [ Agent B ]
@@ -247,13 +247,21 @@ WebRTC ICE 协商完成后，Agent A 和 B 建立 DataChannel 直连。如果 IC
                    [ Agent A ] ◄═══ P2P ═══► [ Agent B ]
 ```
 
-### 多节点（Phase 4）
+### 多节点（Phase 4 已实现）
 
 ```
-[ Agent ] ──► [ Server 1 ] ◄──Redis Pub/Sub──► [ Server 2 ] ◄── [ Agent ]
-                  │                                  │
-            [ SQLite/PostgreSQL ]             [ SQLite/PostgreSQL ]
+                        ┌── OTel Collector ── Grafana
+                        │
+[ CLI ] ──► [ Server 1 ] ◄── Redis Pub/Sub ──► [ Server 2 ] ◄── [ Agent ]
+   │            │   │                               │   │
+   │     Rate Limiter │                        Rate Limiter │
+   │          Audit Log                           Audit Log
+   │            │                                   │
+[ Agent ] [ PostgreSQL / SQLite ]           [ PostgreSQL / SQLite ]
 ```
+
+Middleware chain (per request):
+`Recovery → RequestID → Tracing → Logging → Metrics → RateLimit → MaxBody`
 
 ### 去中心化（Phase 5）
 

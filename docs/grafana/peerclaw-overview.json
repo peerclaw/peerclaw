@@ -1,0 +1,163 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "peerclaw-overview",
+    "title": "PeerClaw Overview",
+    "tags": ["peerclaw"],
+    "timezone": "browser",
+    "refresh": "10s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "HTTP Request Rate",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+        "targets": [
+          {
+            "expr": "rate(peerclaw_http_requests_total[5m])",
+            "legendFormat": "{{http_method}} {{http_status_code}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "HTTP Error Rate",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+        "targets": [
+          {
+            "expr": "rate(peerclaw_http_requests_total{http_status_code=~\"4..|5..\"}[5m])",
+            "legendFormat": "{{http_status_code}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "color": { "mode": "palette-classic" }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "HTTP Latency (p50/p95/p99)",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, rate(peerclaw_http_request_duration_bucket[5m]))",
+            "legendFormat": "p50"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(peerclaw_http_request_duration_bucket[5m]))",
+            "legendFormat": "p95"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(peerclaw_http_request_duration_bucket[5m]))",
+            "legendFormat": "p99"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Active HTTP Requests",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 8 },
+        "targets": [
+          {
+            "expr": "peerclaw_http_requests_active"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "WebSocket Connections",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 8 },
+        "targets": [
+          {
+            "expr": "peerclaw_signaling_connections"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Registered Agents",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 12 },
+        "targets": [
+          {
+            "expr": "peerclaw_registry_agents"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Signaling Messages Rate",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 12 },
+        "targets": [
+          {
+            "expr": "rate(peerclaw_signaling_messages_total[5m])"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "msg/s"
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "Bridge Message Throughput",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+        "targets": [
+          {
+            "expr": "rate(peerclaw_bridge_messages_total[5m])",
+            "legendFormat": "messages/sec"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "msg/s"
+          }
+        }
+      },
+      {
+        "id": 9,
+        "title": "Bridge Message Latency",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, rate(peerclaw_bridge_message_duration_bucket[5m]))",
+            "legendFormat": "p50"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(peerclaw_bridge_message_duration_bucket[5m]))",
+            "legendFormat": "p95"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s"
+          }
+        }
+      }
+    ]
+  }
+}

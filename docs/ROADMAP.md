@@ -95,35 +95,33 @@
   - Bridge Forwarder（bridge inbox → signaling hub → agent）
   - bridge_message 信令消息类型
 
-## Phase 4: Production Readiness
+## Phase 4: Production Readiness (已完成)
 
 面向生产环境的稳定性、可观测性和运维能力。
 
-- [ ] **可观测性**
-  - OpenTelemetry traces
-  - OpenTelemetry metrics（连接数、消息吞吐、延迟分位数）
-  - 结构化日志增强
-  - Grafana dashboard 模板
-- [ ] **水平扩展**
-  - 多 Server 节点部署
-  - Redis Pub/Sub 跨节点信令
-  - PostgreSQL 后端（替代 SQLite）
-  - Session affinity
-- [ ] **审计日志**
+- [x] **可观测性**
+  - OpenTelemetry traces（可选启用，OTLP gRPC 推送）
+  - OpenTelemetry metrics（HTTP 请求率/延迟、WebSocket 连接数、Agent 注册数、Bridge 消息吞吐）
+  - 结构化日志增强（中间件链：Recovery → RequestID → Tracing → Logging → RateLimit → MaxBody）
+  - Grafana dashboard 模板（docs/grafana/peerclaw-overview.json）
+- [x] **水平扩展**
+  - Redis Pub/Sub 跨节点信令（Broker 接口 + LocalBroker + RedisBroker）
+  - PostgreSQL 后端（JSONB + GIN 索引，通过 factory.go 按配置选择驱动）
+  - 增强健康检查（组件级状态：database、signaling）
+- [x] **审计日志**
   - Agent 注册/注销记录
-  - 消息路由审计
-  - 安全事件记录
-- [ ] **速率限制与防护**
-  - 请求速率限制
-  - 连接数限制
-  - 消息大小限制
-  - 异常流量检测
-- [ ] **CLI 工具 (peerclaw-cli)**
-  - `peerclaw agent list` — 查看在线 Agent
-  - `peerclaw agent register` — 手动注册
-  - `peerclaw send` — 发送消息
-  - `peerclaw trust` — 管理信任
-  - `peerclaw config` — 配置管理
+  - 消息路由审计（Bridge send）
+  - 安全事件记录（速率限制、信令连接/断开）
+  - 独立 slog.Logger 实例（stdout 或文件输出）
+- [x] **速率限制与防护**
+  - Per-IP token bucket 请求速率限制（golang.org/x/time/rate）
+  - WebSocket 连接数限制（Hub.maxConns）
+  - 消息大小限制（http.MaxBytesReader 中间件）
+- [x] **CLI 工具 (peerclaw-cli)**
+  - `peerclaw agent list|get|register|delete` — Agent 管理
+  - `peerclaw send` — 通过 Bridge 发送消息
+  - `peerclaw health` — 服务器健康检查
+  - `peerclaw config show|set` — CLI 配置管理
 
 ## Phase 5: Decentralized Evolution
 
