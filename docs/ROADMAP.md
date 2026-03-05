@@ -54,30 +54,46 @@
   - XChaCha20-Poly1305 消息加密（HKDF-SHA256 密钥派生）
   - Nostr 传输额外使用 NIP-44 格式封装
 
-## Phase 3: Protocol Ecosystem
+## Phase 3: Protocol Ecosystem (已完成)
 
 完整实现三大协议桥接，让 PeerClaw 成为协议互操作中枢。
 
-- [ ] **A2A 完整适配**
-  - Task 生命周期（create / update / complete / cancel）
-  - Artifact 模型
-  - Streaming 支持
-  - Agent Card 标准兼容
-- [ ] **MCP 完整适配**
-  - Tool 模型（list / call / result）
-  - Resource 模型（list / read）
-  - Prompt 模型
-  - Stdio 传输适配
-- [ ] **ACP 完整适配**
-  - 完整消息类型
-  - 会话管理
-- [ ] **协议自动协商**
-  - Agent 间自动选择最佳协议
-  - 能力对齐与兼容检测
-- [ ] **Agent 能力声明增强**
-  - 结构化能力描述（JSON Schema）
-  - 能力版本管理
-  - 运行时能力更新
+- [x] **JSON-RPC 2.0 共享库**
+  - Request / Response / Error / Notification 类型
+  - ParseMessage 自动识别消息类型
+  - 标准错误码（-32700 ~ -32600）
+  - A2A 和 MCP 共用
+- [x] **A2A 完整适配**
+  - Task 生命周期（create / working / complete / cancel / fail）
+  - Artifact 模型（多 Part 支持：text / file / structured data）
+  - Agent Card 标准兼容（GET /.well-known/agent.json）
+  - JSON-RPC 入站 Handler（message/send / tasks/get / tasks/cancel）
+  - 出站 SendMessage → Task 响应 → Envelope 转换
+- [x] **MCP 完整适配（Streamable HTTP）**
+  - Tool 模型（tools/list / tools/call）
+  - Resource 模型（resources/list / resources/read）
+  - Prompt 模型（prompts/list / prompts/get）
+  - Session 管理（initialize 握手 + Mcp-Session-Id）
+  - Streamable HTTP 传输（POST + GET SSE 端点）
+- [x] **ACP 完整适配**
+  - 完整消息类型（MessagePart 含 content_type / content / content_url）
+  - 会话管理（Session + Run 生命周期追踪）
+  - Agent Manifest 查询（GET /acp/agents/{name}）
+  - Run 管理（create / get / cancel）
+- [x] **协议自动协商**
+  - Negotiator 自动选择最佳协议路径
+  - 同协议直连 > 跨协议翻译（优先级：A2A > MCP > ACP）
+  - 跨协议翻译（A2A ↔ MCP ↔ ACP）
+- [x] **Agent 能力声明增强**
+  - 结构化 Skills 声明（A2A 兼容：name / description / input_modes / output_modes）
+  - 结构化 Tools 声明（MCP 兼容：name / description / input_schema）
+  - HasSkill() / HasTool() 查询方法
+  - SQLite 持久化（JSON 序列化存储）
+- [x] **Server 路由集成**
+  - 协议端点路由（POST /a2a, POST /mcp, GET/POST /acp/*）
+  - 通用桥接发送端点（POST /api/v1/bridge/send）
+  - Bridge Forwarder（bridge inbox → signaling hub → agent）
+  - bridge_message 信令消息类型
 
 ## Phase 4: Production Readiness
 
