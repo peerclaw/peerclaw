@@ -2,62 +2,40 @@
 
 # PeerClaw
 
-**让 AI Agent 像人一样自由通信。**
+**开源的 AI Agent 网关 — 注册、发现、连接、跨协议通信。**
 
-PeerClaw 是一个去中心化优先的 AI Agent 通信框架。Agent 通过密码学身份互相识别，通过 WebRTC 直连对话，在 NAT 穿越失败时回退到 Nostr relay，并通过协议桥接实现 A2A / ACP / MCP 互操作。
+今天的 AI Agent 困在各自的协议孤岛里。用 Google A2A 构建的 Agent 无法与 Anthropic MCP 的 Agent 对话，也无法与 IBM ACP 的 Agent 协作。没有统一的注册中心、没有标准的身份体系、没有办法让 Agent 简单地*找到彼此并开始协作*。
 
-## 愿景
+PeerClaw 解决这个问题。你可以把它理解为 **AI Agent 的 DNS + HTTPS**：Agent 注册一次就能被按能力发现，跨协议通信自动完成转换，内置密码学身份和端到端加密。
 
-当前 AI Agent 生态面临严重的通信碎片化问题：
-
-- **协议割裂** — A2A、ACP、MCP 各自为政，Agent 无法跨协议交流
-- **中心化依赖** — Agent 通信必须经过平台服务器中转，增加延迟和单点故障
-- **身份缺失** — Agent 缺少统一的密码学身份，无法验证消息来源
-- **安全薄弱** — 大多数 Agent 通信方案缺少端到端的安全保障
-
-PeerClaw 的回答：
-
-- **去中心化优先** — WebRTC P2P 直连，Nostr relay 兜底，不依赖任何单一服务
-- **协议桥接** — 内置 A2A / ACP / MCP 适配器，统一转换为 PeerClaw Envelope
-- **密码学身份** — 每个 Agent 拥有 Ed25519 密钥对，公钥即身份
-- **四层安全** — 连接级 TOFU + 消息级签名 + 端到端加密 (XChaCha20-Poly1305) + 执行级沙箱
-
-## 架构
+## PeerClaw 做什么
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        peerclaw-server                      │
+│ 你的 MCP Agent          PeerClaw 网关          A2A Agent    │
 │                                                             │
-│   ┌────────────┐  ┌──────────────┐  ┌───────────────────┐  │
-│   │  Registry  │  │   Signaling  │  │  Bridge Manager   │  │
-│   │  (发现)     │  │   Hub (信令)  │  │  A2A / ACP / MCP  │  │
-│   └────────────┘  └──────────────┘  └───────────────────┘  │
-│         │                │                    │             │
-└─────────┼────────────────┼────────────────────┼─────────────┘
-          │                │                    │
-    ┌─────┴─────┐    ┌─────┴─────┐        ┌────┴────┐
-    │  Agent A  │◄──►│  Agent B  │   外部  │ A2A/MCP │
-    │ (SDK)     │P2P │ (SDK)     │  Agent  │ Agent   │
-    └───────────┘    └───────────┘        └─────────┘
-         │                │
-    WebRTC DataChannel / Nostr relay
+│  "我需要一个能搜索   →  注册中心：找到       → "我能搜索"    │
+│   的 Agent"              3 个匹配                           │
+│                                                             │
+│  发送 MCP 请求      →  桥接器：自动翻译     → 收到 A2A      │
+│                          MCP → A2A              消息        │
+│                                                             │
+│  收到 MCP 响应      ←  桥接器：自动翻译     ← 发送 A2A      │
+│                          A2A → MCP              响应        │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-**通信流程：** 注册 → 发现 → 信令握手（含 X25519 密钥交换） → P2P 连接（WebRTC 优先，自动降级 Nostr） → 加密签名消息交换
+**简单来说：**
 
-## 子项目
+1. **注册** — Agent 告诉 PeerClaw 自己能做什么（能力、协议、端点）
+2. **发现** — 任何 Agent 都可以按能力搜索：*"帮我找一个会翻译的 Agent"*
+3. **连接** — Agent 之间建立直接连接，服务器负责信令中转
+4. **桥接** — 使用不同协议（A2A、MCP、ACP）的 Agent 通过自动翻译无缝通信
+5. **信任** — 每个 Agent 拥有 Ed25519 密码学身份，消息签名加密，无法冒充、无法篡改
 
-| 仓库 | 说明 | 状态 |
-|------|------|------|
-| [peerclaw-core](https://github.com/peerclaw/peerclaw-core) | 核心共享类型库（身份、信封、协议常量） | Active |
-| [peerclaw-server](https://github.com/peerclaw/peerclaw-server) | 中心化平台（注册/发现/信令/桥接） | Active |
-| [peerclaw-agent](https://github.com/peerclaw/peerclaw-agent) | P2P Agent SDK（WebRTC + Nostr + 安全） | Active |
+## 快速开始
 
-## 快速体验
-
-5 分钟跑通 P2P 通信 demo：
-
-### 1. 克隆并构建
+5 分钟内让两个 Agent 互相通信：
 
 ```bash
 git clone https://github.com/peerclaw/peerclaw.git
@@ -71,59 +49,211 @@ git clone https://github.com/peerclaw/peerclaw-agent.git agent
 # 构建
 cd server && go build -o peerclawd ./cmd/peerclawd && cd ..
 cd agent && go build -o echo ./examples/echo && cd ..
+cd cli && go build -o peerclaw ./cmd/peerclaw && cd ..
 ```
 
-### 2. 启动 Server
-
 ```bash
+# 终端 1：启动网关
 ./server/peerclawd
-# 输出: PeerClaw gateway started  http=:8080  grpc=:9090
-```
+# → PeerClaw gateway started  http=:8080  grpc=:9090
 
-### 3. 启动两个 Echo Agent
-
-```bash
-# 终端 1
+# 终端 2：启动 Agent Alice
 ./agent/echo -name alice -server http://localhost:8080
 
-# 终端 2
+# 终端 3：启动 Agent Bob
 ./agent/echo -name bob -server http://localhost:8080
+
+# 终端 4：查看谁在线
+./cli/peerclaw agent list
 ```
 
-两个 Agent 将自动注册到 Server，通过信令建立 WebRTC P2P 连接。
+Alice 和 Bob 会自动注册、发现对方、并建立加密的 P2P 连接。
 
-## 本地开发
+## 架构
+
+PeerClaw 由四个模块组成：
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                     peerclaw-server（网关）                       │
+│                                                                  │
+│  ┌────────────┐   ┌───────────────┐   ┌───────────────────────┐ │
+│  │  注册中心   │   │    信令中心    │   │      协议桥接器        │ │
+│  │  按能力     │   │   WebSocket   │   │                       │ │
+│  │  发现 Agent │   │   中转 WebRTC │   │  ┌─────┬─────┬─────┐ │ │
+│  │            │   │   信令        │   │  │ A2A │ MCP │ ACP │ │ │
+│  └────────────┘   └───────────────┘   │  └─────┴─────┴─────┘ │ │
+│                                       └───────────────────────┘ │
+│  ┌────────────┐   ┌───────────────┐   ┌───────────────────────┐ │
+│  │  认证鉴权   │   │    限速保护    │   │      可观测性         │ │
+│  │  Ed25519 + │   │   Per-IP      │   │   OpenTelemetry       │ │
+│  │  API Key   │   │   令牌桶      │   │   链路追踪 + 指标     │ │
+│  └────────────┘   └───────────────┘   └───────────────────────┘ │
+│                                                                  │
+│  存储：SQLite（默认）或 PostgreSQL                                │
+│  扩展：Redis Pub/Sub 多节点信令                                   │
+└──────────────────────────────────────────────────────────────────┘
+        │ REST API              │ WebSocket             │ 协议端点
+        │ 注册/发现              │ 信令                  │ A2A/MCP/ACP
+        ▼                       ▼                       ▼
+┌──────────────────┐    ┌──────────────────┐    ┌──────────────┐
+│  peerclaw-agent  │    │  peerclaw-agent  │    │   外部        │
+│  (Go SDK)        │◄══►│  (Go SDK)        │    │  A2A/MCP/ACP │
+│                  │P2P │                  │    │  Agent       │
+│  WebRTC 首选     │    │  WebRTC 首选     │    │              │
+│  Nostr 兜底      │    │  Nostr 兜底      │    │              │
+└──────────────────┘    └──────────────────┘    └──────────────┘
+        │                       │
+        └───── peerclaw-core ───┘
+              （共享类型：身份、信封、协议）
+```
+
+### Agent 如何通信
+
+```
+Alice                     网关                      Bob
+  │                        │                          │
+  ├─ POST /agents ────────►│  注册 Alice               │
+  │                        │◄──────── POST /agents ───┤  注册 Bob
+  │                        │                          │
+  ├─ POST /discover ──────►│  "谁能搜索？"              │
+  │◄── [{Bob, caps:search}]│                          │
+  │                        │                          │
+  ├─ WS: offer + X25519 ─►│──── 中转 ───────────────►│
+  │◄─── WS: answer + X25519│◄─── 中转 ───────────────┤
+  │                        │                          │
+  │◄═══════════ WebRTC P2P（加密直连）═══════════════►│
+  │        Ed25519 签名 + XChaCha20 加密              │
+```
+
+## 项目结构
+
+| 模块 | 做什么 | 关键技术 |
+|------|--------|---------|
+| [**peerclaw-core**](https://github.com/peerclaw/peerclaw-core) | 共享类型库 — 身份、信封、Agent Card、协议常量 | Ed25519, X25519, 零外部依赖 |
+| [**peerclaw-server**](https://github.com/peerclaw/peerclaw-server) | 网关 — 注册、发现、信令中转、协议桥接 | SQLite/PostgreSQL, WebSocket, OTel |
+| [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | P2P Agent SDK — 连接、发送、接收，自动传输选择 | WebRTC (Pion), Nostr, TOFU 信任 |
+| **cli/** | 命令行工具 — 管理 Agent、检查健康、发送消息 | Cobra 风格子命令 |
+
+## 核心概念
+
+### Agent Card（Agent 名片）
+
+每个 Agent 发布一张 Agent Card — 一份机器可读的能力描述：
+
+```json
+{
+  "name": "search-agent",
+  "public_key": "base64-ed25519-pubkey",
+  "capabilities": ["web-search", "summarize"],
+  "protocols": ["a2a", "mcp"],
+  "endpoint": { "url": "https://my-agent.example.com", "port": 443 },
+  "skills": [{ "id": "search", "name": "Web Search" }],
+  "tools": [{ "name": "search", "description": "Search the web" }]
+}
+```
+
+兼容 A2A Agent Card 标准，扩展了 PeerClaw 字段（公钥、NAT 类型、DHT 节点 ID）。
+
+### 协议桥接
+
+PeerClaw 通过统一的 **Envelope（信封）** 格式在协议间翻译：
+
+```
+A2A Agent ──► A2A 适配器 ──► Envelope ──► MCP 适配器 ──► MCP Agent
+                                │
+                           统一格式：
+                           source, destination,
+                           protocol, payload,
+                           signature, trace_id
+```
+
+| 协议 | 用途 | PeerClaw 支持 |
+|------|------|-------------|
+| **A2A**（Google） | 基于任务的 Agent 协作 | 完整：任务、制品、流式 |
+| **MCP**（Anthropic） | 工具/资源访问 | 完整：工具、资源、提示词 |
+| **ACP**（IBM） | 企业级 Agent 运行 | 完整：运行、会话、清单 |
+
+### 密码学身份
+
+每个 Agent 拥有一个 Ed25519 密钥对。公钥**就是**身份。
+
+- **注册**：Agent 通过签名证明身份所有权
+- **消息**：每条 Envelope 都被签名 — 接收方验证来源
+- **加密**：从 Ed25519 派生 X25519 密钥，XChaCha20-Poly1305 加密载荷
+- **信任**：TOFU（首次使用信任）模型，5 个等级：未知 → TOFU → 已验证 → 已固定 → 已封禁
+
+### 传输层降级
+
+Agent SDK 自动选择最佳传输方式：
+
+```
+1. WebRTC DataChannel（首选 — 低延迟，P2P 直连）
+       │ 失败（严格 NAT）？
+       ▼
+2. Nostr 中继（兜底 — NIP-44 加密，多中继）
+       │ WebRTC 恢复？
+       ▼
+3. 自动升级回 WebRTC
+```
+
+## 高级功能
+
+这些功能已实现，但基础使用不需要：
+
+| 功能 | 说明 |
+|------|------|
+| **DHT 发现** | 通过 Kademlia DHT 无服务器发现 Agent（Nostr 传输） |
+| **联邦** | 多服务器信令中转，DNS SRV 发现 |
+| **信誉系统** | EWMA 行为评分 + Nostr Gossip 协议 |
+| **身份锚定** | 将 Ed25519 身份绑定到 Nostr/DNS 进行公开验证 |
+| **离线消息** | 带 TTL 的消息缓存，对端上线自动投递 |
+| **无服务器模式** | 完全 P2P，无需任何中心服务器 |
+
+## CLI 参考
 
 ```bash
-# 项目使用 Go workspace 管理多模块
-# 确保三个子仓库在正确位置：core/ server/ agent/
+peerclaw health                                  # 检查网关状态
+peerclaw agent list                              # 列出所有 Agent
+peerclaw agent list -protocol mcp -output json   # 过滤 + JSON 输出
+peerclaw agent get <id>                          # Agent 详情
+peerclaw agent register -name "My Agent" ...     # 注册 Agent
+peerclaw send -from a -to b -payload '{}'        # 发送消息
+peerclaw config set server http://host:8080      # 设置网关地址
+```
 
-# 同步 workspace
+## 开发
+
+```bash
+# 项目使用 Go workspace（go.work）管理多模块
 go work sync
 
-# 构建所有模块
+# 构建全部
 cd core && go build ./... && cd ..
-cd server && go build ./... && cd ..
 cd agent && go build ./... && cd ..
+cd server && go build ./... && cd ..
+cd cli && go build ./... && cd ..
 
-# 运行测试
-cd server && CGO_ENABLED=1 go test ./... && cd ..
+# 测试全部
+cd core && go test ./... && cd ..
 cd agent && go test ./... && cd ..
+cd server && CGO_ENABLED=1 go test ./... && cd ..
+cd cli && go test ./... && cd ..
 ```
 
 ## 文档
 
-- [产品文档](docs/PRODUCT_zh.md) — 详细的产品设计、架构和安全模型
-- [路线图](docs/ROADMAP_zh.md) — 从当前到去中心化演进的五阶段计划
+- [产品文档](docs/PRODUCT_zh.md) — 详细的产品设计和安全模型
+- [路线图](docs/ROADMAP_zh.md) — 开发阶段和里程碑
 
-## 社区与贡献
+## 参与贡献
 
-PeerClaw 正处于早期阶段，欢迎参与：
+PeerClaw 正在积极开发中，欢迎参与：
 
-- 提交 Issue 报告问题或建议功能
-- 提交 Pull Request 贡献代码
-- 参与讨论 Agent 通信的未来
+- **Issues** — 报告 Bug、提出功能建议、提问
+- **Pull Requests** — 向任意模块贡献代码
+- **Discussions** — 讨论 Agent 通信的未来
 
-## License
+## 许可证
 
 MIT
