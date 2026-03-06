@@ -1,69 +1,71 @@
+**English** | [中文](README_zh.md)
+
 # peerclaw-cli
 
-PeerClaw 命令行工具。通过 REST API 与 PeerClaw Server 交互，管理 Agent、发送消息、检查服务状态。
+The PeerClaw command-line tool. Interact with PeerClaw Server via REST API to manage agents, send messages, and check service status.
 
-## 安装
+## Installation
 
 ```bash
 cd cli
 go build -o peerclaw ./cmd/peerclaw
 ```
 
-## 使用
+## Usage
 
-### 配置
+### Configuration
 
-默认连接 `http://localhost:8080`。可通过环境变量或配置文件修改：
+Connects to `http://localhost:8080` by default. You can change this with an environment variable or the config file:
 
 ```bash
-# 环境变量
+# Environment variable
 export PEERCLAW_SERVER=http://my-server:8080
 
-# 或配置文件
+# Or config file
 peerclaw config set server http://my-server:8080
 peerclaw config show
 ```
 
-### Agent 管理
+### Agent Management
 
 ```bash
-# 列出所有 Agent
+# List all agents
 peerclaw agent list
 
-# 按协议过滤
+# Filter by protocol
 peerclaw agent list -protocol a2a
 
-# 查看 Agent 详情
+# View agent details
 peerclaw agent get <agent-id>
 
-# 注册 Agent
+# Register an agent
 peerclaw agent register -name "MyAgent" -url http://localhost:3000 -protocols a2a,mcp
 
-# 删除 Agent
+# Delete an agent
 peerclaw agent delete <agent-id>
 ```
 
-### 发送消息
+### Sending Messages
 
 ```bash
 peerclaw send -from agent-a -to agent-b -protocol a2a -payload '{"message": "hello"}'
 ```
 
-### 健康检查
+### Health Check
 
 ```bash
 peerclaw health
 
-# JSON 输出
+# JSON output
 peerclaw health -output json
 ```
 
-### 输出格式
+### Output Formats
 
-所有列表命令支持 `-output` 参数：
+All list commands support the `-output` flag:
 
-- `table`（默认）：表格格式
-- `json`：JSON 格式
+- `table` (default): table format
+- `json`: JSON format
 
 ```bash
 peerclaw agent list -output json

@@ -1,37 +1,37 @@
-**English** | [中文](PRODUCT_zh.md)
+[English](PRODUCT.md) | **中文**
 
-# PeerClaw Product Document
+# PeerClaw 产品文档
 
-## Product Vision
+## 产品愿景
 
-Build a decentralization-first communication infrastructure for AI Agents, enabling any Agent -- regardless of protocol or deployment location -- to discover and communicate with others securely and efficiently.
+构建一个去中心化优先的 AI Agent 通信基础设施，让任何 Agent 无论使用什么协议、部署在哪里，都能安全、高效地互相发现和通信。
 
-## Target Users
+## 目标用户
 
-### AI Agent Developers
+### AI Agent 开发者
 
-- Need their Agent to communicate with other Agents
-- Don't want to be locked into a single protocol ecosystem (A2A / MCP / ACP)
-- Prefer P2P direct connections over routing all traffic through a central server
-- Need out-of-the-box security (identity, signatures, trust management)
+- 需要让自己的 Agent 与其他 Agent 通信
+- 不想被绑定在某一个协议生态（A2A / MCP / ACP）
+- 希望 P2P 直连而非所有流量都经过中心服务器
+- 需要开箱即用的安全方案（身份、签名、信任管理）
 
-### Platform Integrators
+### 平台集成商
 
-- Operate Agent platforms and need a unified registration and discovery mechanism
-- Need to bridge Agents across different protocol ecosystems
-- Need observability and auditing capabilities
-- Need horizontal scaling and high availability
+- 运营 Agent 平台，需要统一的注册和发现机制
+- 需要桥接不同协议生态的 Agent
+- 需要可观测性和审计能力
+- 需要水平扩展和高可用
 
-## Core Scenarios
+## 核心场景
 
-### Scenario 1: Agent Discovery and Connection
+### 场景 1: Agent 发现与连接
 
 ```
-Alice (Search Agent)                  PeerClaw Server                    Bob (Data Agent)
+Alice (搜索 Agent)                    PeerClaw Server                    Bob (数据 Agent)
        │                                    │                                   │
-       │  POST /api/v1/agents (Register)    │                                   │
+       │  POST /api/v1/agents (注册)         │                                   │
        │──────────────────────────────────►  │                                   │
-       │                                    │  ◄── POST /api/v1/agents (Register)│
+       │                                    │  ◄──── POST /api/v1/agents (注册)  │
        │                                    │                                   │
        │  POST /api/v1/discover             │                                   │
        │  {"capabilities": ["data"]}        │                                   │
@@ -40,9 +40,9 @@ Alice (Search Agent)                  PeerClaw Server                    Bob (Da
        │                                    │                                   │
 ```
 
-Agents register their capabilities and public keys via the REST API. Other Agents can search and discover them by capability or protocol.
+Agent 通过 REST API 注册自身能力和公钥，其他 Agent 可按能力或协议搜索和发现。
 
-### Scenario 2: Secure P2P Communication
+### 场景 2: P2P 安全通信
 
 ```
 Alice                           Signaling Hub                          Bob
@@ -54,16 +54,16 @@ Alice                           Signaling Hub                          Bob
   │                                  │       sdp:"..."}                 │
   │◄─────────────────────────────────│◄─────────────────────────────────│
   │                                  │                                  │
-  │  ◄═══════ WebRTC DataChannel (P2P Direct) ═══════►                 │
+  │  ◄═══════ WebRTC DataChannel (P2P 直连) ═══════►                   │
   │                                  │                                  │
   │  Envelope {encrypted_payload, signature}                           │
   │════════════════════════════════════════════════════════════════════►│
   │  ◄═════════════ Envelope {encrypted_payload, signature} ══════════│
 ```
 
-The signaling server is only used for the WebRTC handshake. Actual data flows through the P2P DataChannel. Every message carries an Ed25519 signature.
+信令服务器仅用于 WebRTC 握手，实际数据通过 P2P DataChannel 传输。每条消息附带 Ed25519 签名。
 
-### Scenario 3: Cross-Protocol Interoperability
+### 场景 3: 跨协议互操作
 
 ```
 A2A Agent                    PeerClaw Server                    MCP Agent
@@ -83,31 +83,31 @@ A2A Agent                    PeerClaw Server                    MCP Agent
     │◄─────────────────────────────│                                │
 ```
 
-The Bridge Manager automatically identifies the source and target protocols and performs seamless translation through the Envelope intermediate format.
+Bridge Manager 自动识别源协议和目标协议，通过 Envelope 中间格式完成无缝转换。
 
-### Scenario 4: Decentralized Fallback
+### 场景 4: 去中心化兜底
 
 ```
 Alice                         Nostr Relay                          Bob
   │                               │                                 │
-  │  (WebRTC connection failed)   │                                 │
+  │  (WebRTC 连接失败)             │                                 │
   │                               │                                 │
-  │  NIP-44 Encrypted Envelope    │                                 │
+  │  NIP-44 加密 Envelope          │                                 │
   │──────────────────────────────►│────────────────────────────────►│
-  │                               │  ◄── NIP-44 Encrypted Envelope  │
+  │                               │  ◄── NIP-44 加密 Envelope       │
   │◄──────────────────────────────│◄────────────────────────────────│
 ```
 
-When a WebRTC P2P connection cannot be established (strict NAT, firewalls), the system automatically falls back to transport via Nostr relay.
+当 WebRTC P2P 连接无法建立时（严格 NAT、防火墙），自动回退到 Nostr relay 传输。
 
-## System Architecture
+## 系统架构
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
 │                      peerclaw-server                           │
 │                                                                │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │       HTTP Entry + Protocol Endpoints + Federation      │   │
+│  │           HTTP 入口 + 协议端点 + 联邦端点                  │   │
 │  │  /api/v1/*  /a2a  /mcp  /acp/*  /api/v1/federation/*   │   │
 │  └──────┬──────────────┬──────────────┬───────────────────┘   │
 │         │              │              │                        │
@@ -115,13 +115,10 @@ When a WebRTC P2P connection cannot be established (strict NAT, firewalls), the 
 │  │  Registry   │ │  Router   │ │  Signaling │                │
 │  │  Service    │ │  Engine   │ │  Hub       │                │
 │  │             │ │           │ │            │                │
-│  │ - Register/ │ │ - Routing │ │ - WS Conn  │                │
-│  │   Deregister│ │   Table   │ │ - Message  │                │
-│  │ - Discover/ │ │ - Route   │ │   Relay    │                │
-│  │   Query     │ │   Resolve │ │ - Ping/Pong│                │
-│  │ - Heartbeat │ │ - Capabil.│ │- bridge_msg│                │
-│  │ - Federated │ │   Match   │ │            │                │
-│  │   Discovery │ │           │ │            │                │
+│  │ - 注册/注销  │ │ - 路由表   │ │ - WS 连接  │                │
+│  │ - 发现/查询  │ │ - 路由解析 │ │ - 消息转发  │                │
+│  │ - 心跳管理  │ │ - 能力匹配 │ │ - Ping/Pong│                │
+│  │ - 联邦发现  │ │           │ │- bridge_msg│                │
 │  └──────┬──────┘ └───────────┘ └─────┬──────┘                │
 │         │                            │                        │
 │  ┌──────▼──────┐ ┌───────────────────▼────────────────────┐   │
@@ -132,9 +129,8 @@ When a WebRTC P2P connection cannot be established (strict NAT, firewalls), the 
 │  ┌─────────────┐ │  └──────┘  └──────┘  └──────┘         │   │
 │  │ Federation  │ │  ┌────────────┐  ┌──────────────────┐  │   │
 │  │  Service    │ │  │ Negotiator │  │ Bridge Forwarder │  │   │
-│  │ - Peer Conn │ │  └────────────┘  └──────────────────┘  │   │
-│  │ - Signaling │ └────────────────────────────────────────┘   │
-│  │   Relay     │                                              │
+│  │ - 对端连接  │ │  └────────────┘  └──────────────────┘  │   │
+│  │ - 信令转发  │ └────────────────────────────────────────┘   │
 │  │ - DNS SRV   │                                              │
 │  └─────────────┘                                              │
 └────────────────────────────────────────────────────────────────┘
@@ -144,7 +140,7 @@ When a WebRTC P2P connection cannot be established (strict NAT, firewalls), the 
 │                                                                │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐ │
 │  │   Agent API  │  │  Discovery   │  │     Signaling        │ │
-│  │              │  │  (Interface) │  │     (Interface)      │ │
+│  │              │  │  (接口)       │  │     (接口)           │ │
 │  │              │  │ Registry     │  │  WebSocket Client    │ │
 │  │              │  │ DHTDiscovery │  │  NostrSignaling      │ │
 │  │              │  │ Composite    │  │  Composite           │ │
@@ -157,9 +153,8 @@ When a WebRTC P2P connection cannot be established (strict NAT, firewalls), the 
 │  ┌──────────────┐  ┌──────────────────────────────────────┐   │
 │  │     DHT      │  │            Identity                  │   │
 │  │  (Kademlia)  │  │  IdentityAnchor + NostrAnchor +      │   │
-│  │ - Routing    │  │  Domain Verify + Recovery             │   │
-│  │   Table      │  └──────────────────────────────────────┘   │
-│  │ - KV Store   │                                              │
+│  │ - 路由表     │  │  Domain Verify + Recovery             │   │
+│  │ - KV Store   │  └──────────────────────────────────────┘   │
 │  │ - Bootstrap  │                                              │
 │  └──────────────┘                                              │
 │  ┌────────────────────────────────────────────────────────┐   │
@@ -169,98 +164,97 @@ When a WebRTC P2P connection cannot be established (strict NAT, firewalls), the 
 └────────────────────────────────────────────────────────────────┘
 
 ┌────────────────────────────────────────────────────────────────┐
-│                      peerclaw-core (Type Library)              │
+│                      peerclaw-core (类型库)                     │
 │                                                                │
 │  identity    envelope    agentcard    protocol    signaling    │
-│  (Ed25519)   (Message    (Agent       (Protocol   (Signaling   │
-│               Envelope)   Card)        Constants)  Types)      │
+│  (Ed25519)   (消息信封)   (Agent 名片)  (协议常量)   (信令类型)    │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-## Communication Flow
+## 通信流程
 
-The full Agent-to-Agent communication goes through the following stages:
+完整的 Agent 间通信经历以下阶段：
 
-### 1. Registration
+### 1. 注册
 
-When an Agent starts up, it registers with the Server via the REST API, submitting an Agent Card (name, public key, capabilities, protocols). The Server stores this in SQLite and updates the routing table.
+Agent 启动时通过 REST API 向 Server 注册，提交 Agent Card（名称、公钥、能力、协议）。Server 存储到 SQLite 并更新路由表。
 
-### 2. Discovery
+### 2. 发现
 
-Agent A searches for target Agents by capability via `/api/v1/discover`. The Server returns a list of matching Agent Cards containing public keys and connection information.
+Agent A 通过 `/api/v1/discover` 按能力搜索目标 Agent。Server 返回匹配的 Agent Card 列表，包含公钥和连接信息。
 
-### 3. Signaling
+### 3. 信令
 
-Agent A connects to the Server's Signaling Hub via WebSocket and sends a WebRTC offer SDP to Agent B. The Server relays signaling messages. Agent B replies with an answer SDP, and both sides exchange ICE candidates.
+Agent A 通过 WebSocket 连接 Server 的信令 Hub，发送 WebRTC offer SDP 给 Agent B。Server 转发信令消息。Agent B 回复 answer SDP，双方交换 ICE candidate。
 
-### 4. P2P Connection
+### 4. P2P 连接
 
-After WebRTC ICE negotiation completes, Agent A and B establish a direct DataChannel connection. If ICE fails (strict NAT), the system falls back to Nostr relay.
+WebRTC ICE 协商完成后，Agent A 和 B 建立 DataChannel 直连。如果 ICE 失败（严格 NAT），回退到 Nostr relay。
 
-### 5. Message Exchange
+### 5. 消息交换
 
-Messages are wrapped in an Envelope containing source/destination, protocol type, payload, and an Ed25519 signature. The receiver verifies the signature before processing the message.
+消息封装在 Envelope 中，包含源/目标、协议类型、Payload、Ed25519 签名。接收方验证签名后处理消息。
 
-## Security Model
+## 安全模型
 
-### Layer 1: Connection-Level -- TOFU (Trust-On-First-Use)
+### 第一层：连接级 — TOFU (Trust-On-First-Use)
 
-| Property | Description |
-|----------|-------------|
-| Mechanism | Records the peer's public key fingerprint on first connection |
-| Storage | Local Trust Store file |
-| Verification | Subsequent connections check whether the public key matches the record |
-| Threat Mitigation | Man-in-the-middle attacks (after first use) |
-| Analogy | SSH known_hosts |
+| 属性 | 说明 |
+|------|------|
+| 机制 | 首次连接记录对端公钥指纹 |
+| 存储 | 本地 Trust Store 文件 |
+| 验证 | 后续连接检查公钥是否与记录一致 |
+| 威胁缓解 | 中间人攻击（首次之后） |
+| 类比 | SSH known_hosts |
 
-### Layer 2: Message-Level -- Ed25519 Signatures
+### 第二层：消息级 — Ed25519 签名
 
-| Property | Description |
-|----------|-------------|
-| Algorithm | Ed25519 (RFC 8032) |
-| Signed Object | Envelope Payload |
-| Verifier | Receiving Agent |
-| Threat Mitigation | Message tampering, identity spoofing |
-| Performance | ~76,000 signatures/sec, ~200,000 verifications/sec |
+| 属性 | 说明 |
+|------|------|
+| 算法 | Ed25519（RFC 8032） |
+| 签名对象 | Envelope Payload |
+| 验证方 | 接收 Agent |
+| 威胁缓解 | 消息篡改、身份伪造 |
+| 性能 | ~76,000 签名/秒，~200,000 验证/秒 |
 
-### Layer 3: Transport-Level -- End-to-End Encryption
+### 第三层：传输级 — 端到端加密
 
-| Property | Description |
-|----------|-------------|
-| Key Exchange | X25519 ECDH (derived from Ed25519 seed) |
-| Key Derivation | HKDF-SHA256 |
-| Symmetric Encryption | XChaCha20-Poly1305 (24-byte random nonce) |
-| Session Establishment | X25519 public keys exchanged during signaling handshake |
-| Nostr Adaptation | NIP-44 format wrapping (secp256k1 session key) |
-| Threat Mitigation | Eavesdropping, man-in-the-middle, message leakage |
+| 属性 | 说明 |
+|------|------|
+| 密钥交换 | X25519 ECDH（从 Ed25519 seed 派生） |
+| 密钥派生 | HKDF-SHA256 |
+| 对称加密 | XChaCha20-Poly1305（24 字节随机 nonce） |
+| 会话建立 | 信令握手阶段交换 X25519 公钥 |
+| Nostr 适配 | NIP-44 格式封装（secp256k1 会话密钥） |
+| 威胁缓解 | 窃听、中间人、消息泄露 |
 
-### Layer 4: Execution-Level -- Sandbox
+### 第四层：执行级 — 沙箱
 
-| Property | Description |
-|----------|-------------|
-| Mechanism | Enforces permission constraints on external requests |
-| Controls | Resource limits, operation allowlists |
-| Threat Mitigation | Malicious operations, resource exhaustion |
+| 属性 | 说明 |
+|------|------|
+| 机制 | 对外部请求实施权限约束 |
+| 控制 | 资源限制、操作白名单 |
+| 威胁缓解 | 恶意操作、资源耗尽 |
 
-## Protocol Compatibility Matrix
+## 协议兼容矩阵
 
-| Feature | A2A | ACP | MCP |
-|---------|-----|-----|-----|
-| Message Routing | ✅ | ✅ | ✅ |
-| Capability Discovery | ✅ | ✅ | ✅ |
-| Task Model | ✅ | — | — |
-| Tool Invocation | — | — | ✅ |
+| 特性 | A2A | ACP | MCP |
+|------|-----|-----|-----|
+| 消息路由 | ✅ | ✅ | ✅ |
+| 能力发现 | ✅ | ✅ | ✅ |
+| Task 模型 | ✅ | — | — |
+| Tool 调用 | — | — | ✅ |
 | Artifact | ✅ | — | — |
 | Resource | — | — | ✅ |
 | Prompt | — | — | ✅ |
-| Run Management | — | ✅ | — |
-| Protocol Negotiation | ✅ | ✅ | ✅ |
-| Cross-Protocol Translation | ✅ | ✅ | ✅ |
-| Bidirectional Streaming | ✅ | ✅ | 🔲 Phase 4 |
+| Run 管理 | — | ✅ | — |
+| 协议协商 | ✅ | ✅ | ✅ |
+| 跨协议翻译 | ✅ | ✅ | ✅ |
+| 双向流 | ✅ | ✅ | 🔲 Phase 4 |
 
-## Deployment Architecture
+## 部署架构
 
-### Single Node
+### 单节点
 
 ```
 [ Agent A ] ──► [ PeerClaw Server (SQLite) ] ◄── [ Agent B ]
@@ -268,7 +262,7 @@ Messages are wrapped in an Envelope containing source/destination, protocol type
                    [ Agent A ] ◄═══ P2P ═══► [ Agent B ]
 ```
 
-### Multi-Node (Phase 4 -- Implemented)
+### 多节点（Phase 4 已实现）
 
 ```
                         ┌── OTel Collector ── Grafana
@@ -284,7 +278,7 @@ Messages are wrapped in an Envelope containing source/destination, protocol type
 Middleware chain (per request):
 `Recovery → RequestID → Tracing → Logging → Metrics → RateLimit → MaxBody`
 
-### Decentralized (Phase 5 -- Implemented)
+### 去中心化（Phase 5 已实现）
 
 ```
 [ Agent A ] ◄═══ P2P (WebRTC) ═══► [ Agent B ]
@@ -296,45 +290,45 @@ Middleware chain (per request):
      └──── Nostr Relay (kind 20004) ─────┘
 ```
 
-### Federated Mode (Phase 5 -- Implemented)
+### 联邦模式（Phase 5 已实现）
 
 ```
 [ Agent A ] ──► [ Server 1 ] ◄══ Federation ══► [ Server 2 ] ◄── [ Agent B ]
                      │         (HTTP + Auth)          │
-              [ DNS SRV Discovery ]            [ DNS SRV Discovery ]
+              [ DNS SRV 发现 ]                 [ DNS SRV 发现 ]
 ```
 
-### Serverless Mode (Phase 5 -- Implemented)
+### 无 Server 模式（Phase 5 已实现）
 
 ```
 [ Agent A ]                                    [ Agent B ]
      │  1. DHT Bootstrap (Nostr kind 20005)         │
      │──────────────►  Nostr Relays  ◄──────────────│
-     │  2. Agent Card stored in DHT                  │
-     │  3. Nostr Signaling (kind 20006)              │
+     │  2. Agent Card 存入 DHT                       │
+     │  3. Nostr 信令 (kind 20006)                   │
      │──────────────►  Nostr Relays  ◄──────────────│
-     │  4. WebRTC P2P Direct Connection              │
+     │  4. WebRTC P2P 直连                           │
      │◄════════════ DataChannel ═══════════════════►│
-     │  5. Offline Message Cache (MessageCache)      │
+     │  5. 离线消息缓存 (MessageCache)                │
 ```
 
-## Reputation Model (Phase 5)
+## 信誉模型（Phase 5）
 
-| Property | Description |
-|----------|-------------|
-| Scoring Algorithm | Exponentially Weighted Moving Average (EWMA, alpha=0.1) |
-| Score Range | 0.0 (malicious) ~ 1.0 (trusted) |
-| Malicious Threshold | < 0.15 triggers automatic isolation |
-| Behavior Types | success (+1.0), timeout (-0.3), error (-0.2), invalid_signature (-0.8), spam (-0.5), protocol_violation (-0.7) |
-| Storage | Persisted in local JSON file |
-| Gossip | Optional Nostr kind 30078, second-hand weight 0.3x, accepts only TrustVerified+ |
+| 属性 | 说明 |
+|------|------|
+| 评分算法 | 指数加权移动平均（EWMA，alpha=0.1） |
+| 评分范围 | 0.0 (恶意) ~ 1.0 (可信) |
+| 恶意阈值 | < 0.15 自动隔离 |
+| 行为类型 | success (+1.0), timeout (-0.3), error (-0.2), invalid_signature (-0.8), spam (-0.5), protocol_violation (-0.7) |
+| 存储 | 本地 JSON 文件持久化 |
+| Gossip | 可选 Nostr kind 30078，第二手权重 0.3x，仅接受 TrustVerified+ |
 
-## Identity Anchoring (Phase 5)
+## 身份锚定（Phase 5）
 
-| Property | Description |
-|----------|-------------|
-| Interface | IdentityAnchor (Publish/Verify/Resolve/RecoveryKeys) |
-| Primary Implementation | Nostr kind 10078 replaceable event |
-| Key Binding | Bidirectional: Ed25519 signs Nostr key + Nostr key signs Ed25519 key |
-| Domain Verification | DNS TXT record peerclaw-verify=<fingerprint> |
-| Identity Recovery | threshold-of-n multisig recovery keys |
+| 属性 | 说明 |
+|------|------|
+| 接口 | IdentityAnchor (Publish/Verify/Resolve/RecoveryKeys) |
+| 首选实现 | Nostr kind 10078 replaceable event |
+| 密钥绑定 | 双向：Ed25519 签 Nostr key + Nostr key 签 Ed25519 key |
+| 域名验证 | DNS TXT 记录 peerclaw-verify=<fingerprint> |
+| 身份恢复 | threshold-of-n 多签 recovery keys |
