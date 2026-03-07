@@ -50,6 +50,7 @@ Thumbs.db
 # Config overrides
 **/peerclaw.yaml
 !**/peerclaw.example.yaml
+!deploy/peerclaw.yaml
 
 # Environment
 .env

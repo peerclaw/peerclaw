@@ -1,0 +1,39 @@
+server:
+  http_addr: ":8080"
+
+auth:
+  required: true
+
+database:
+  driver: "postgres"
+  dsn: "${DATABASE_URL}"
+
+redis:
+  addr: "redis:6379"
+  password: "${REDIS_PASSWORD}"
+  db: 0
+
+signaling:
+  enabled: true
+
+bridge:
+  a2a:
+    enabled: true
+  mcp:
+    enabled: true
+  acp:
+    enabled: true
+
+rate_limit:
+  enabled: true
+  requests_per_sec: 100
+  burst_size: 200
+  max_connections: 1000
+
+audit_log:
+  enabled: true
+  output: "stdout"
+
+logging:
+  level: "info"
+  format: "json"
