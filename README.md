@@ -39,33 +39,30 @@ PeerClaw fixes this. It's **the trust layer for AI Agents**: every agent gets a 
 Get two agents talking in under 5 minutes:
 
 ```bash
-git clone https://github.com/peerclaw/peerclaw.git
-cd peerclaw
+# Clone and build the gateway
+git clone https://github.com/peerclaw/peerclaw-server.git
+cd peerclaw-server
+go build -o peerclawd ./cmd/peerclawd
 
-# Clone sub-projects
-git clone https://github.com/peerclaw/peerclaw-core.git core
-git clone https://github.com/peerclaw/peerclaw-server.git server
-git clone https://github.com/peerclaw/peerclaw-agent.git agent
-
-# Build
-cd server && go build -o peerclawd ./cmd/peerclawd && cd ..
-cd agent && go build -o echo ./examples/echo && cd ..
-cd cli && go build -o peerclaw ./cmd/peerclaw && cd ..
+# Clone and build the agent SDK (in another directory)
+git clone https://github.com/peerclaw/peerclaw-agent.git
+cd peerclaw-agent
+go build -o echo ./examples/echo
 ```
 
 ```bash
 # Terminal 1: Start the gateway
-./server/peerclawd
+./peerclawd
 # → PeerClaw gateway started  http=:8080
 
 # Terminal 2: Start agent Alice
-./agent/echo -name alice -server http://localhost:8080
+./echo -name alice -server http://localhost:8080
 
 # Terminal 3: Start agent Bob
-./agent/echo -name bob -server http://localhost:8080
+./echo -name bob -server http://localhost:8080
 
-# Terminal 4: See who's online
-./cli/peerclaw agent list
+# Terminal 4: See who's online (install CLI from this repo's cli/ directory)
+go run ./cli/cmd/peerclaw agent list
 ```
 
 Alice and Bob will automatically register, discover each other, and establish an encrypted P2P connection.
@@ -228,20 +225,30 @@ peerclaw config set server http://host:8080  # Set gateway URL
 ## Development
 
 ```bash
-# The project uses Go workspace (go.work) to manage modules
+# Each module is a separate repository. Build and test individually:
+
+# peerclaw-core
+git clone https://github.com/peerclaw/peerclaw-core.git
+cd peerclaw-core && go build ./... && go test ./...
+
+# peerclaw-server (requires CGO for SQLite)
+git clone https://github.com/peerclaw/peerclaw-server.git
+cd peerclaw-server && CGO_ENABLED=1 go build ./... && CGO_ENABLED=1 go test ./...
+
+# peerclaw-agent
+git clone https://github.com/peerclaw/peerclaw-agent.git
+cd peerclaw-agent && go build ./... && go test ./...
+```
+
+For local multi-module development, you can use a [Go workspace](https://go.dev/doc/tutorial/workspaces):
+
+```bash
+mkdir peerclaw && cd peerclaw
+git clone https://github.com/peerclaw/peerclaw-core.git core
+git clone https://github.com/peerclaw/peerclaw-server.git server
+git clone https://github.com/peerclaw/peerclaw-agent.git agent
+go work init ./core ./server ./agent
 go work sync
-
-# Build all
-cd core && go build ./... && cd ..
-cd agent && go build ./... && cd ..
-cd server && go build ./... && cd ..
-cd cli && go build ./... && cd ..
-
-# Test all
-cd core && go test ./... && cd ..
-cd agent && go test ./... && cd ..
-cd server && CGO_ENABLED=1 go test ./... && cd ..
-cd cli && go test ./... && cd ..
 ```
 
 ## Documentation
