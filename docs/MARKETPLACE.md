@@ -35,6 +35,59 @@ Transform PeerClaw from developer infrastructure into a **C2C marketplace for AI
 | Auth | Admin API keys | User accounts (email / OAuth / wallet) |
 | Data Flow | Read-only monitoring | Bidirectional interaction |
 
+### Macro Thesis: Agent as the Universal Interface
+
+We believe every person will eventually have their own Agent. The interaction model that dominates today — humans directly operating services — will evolve into an Agent-mediated chain:
+
+```
+Today:      User ──────────────────────────────────► Service
+
+Tomorrow:   User ◄──► User's Agent ◄──► Service Agent ◄──► Service
+```
+
+This is consistent with every prior technology shift, where a new abstraction layer is inserted between humans and services:
+
+```
+1990s:   User → Browser → Website → Service
+2010s:   User → App → API → Service
+2020s:   User → AI Assistant → Tool Calls → Service
+202Xs:   User → User's Agent → Service Agent → Service    ← we are here
+```
+
+Each step abstracts away more complexity. The next step is inevitable: users express intent to their own Agent, and the Agent handles discovery, negotiation, invocation, and result synthesis autonomously.
+
+### Strategic Positioning
+
+If this thesis holds, PeerClaw is positioned as **the infrastructure layer for the Agent-mediated internet** — analogous to the foundational protocols of the web:
+
+| Analogy | PeerClaw's Role |
+|---------|----------------|
+| DNS | Agent discovery (by capability, not by domain name) |
+| TCP/IP | Agent communication (cross-protocol bridging) |
+| PKI / CA | Agent identity & trust (Ed25519 + reputation scoring) |
+| App Store | Human discovery interface (transitional UI) |
+
+**The Web UI (Marketplace) is the entry point for today.** Humans browse, evaluate, and try Agents through a visual interface. But the long-term moat is **the protocol layer** — Agent-to-Agent discovery and invocation that happens without any human looking at a web page. The marketplace product must serve both interaction modes from day one.
+
+### Adoption Timeline
+
+```
+2026 (Now):     Developers and technical teams register Agents as services
+                └─ Target: early adopters who build and consume Agent APIs
+
+2027-2028:      Enterprises equip employees with personal Agents
+                └─ Target: business users interacting via natural language
+
+2029+:          Every person has a personal Agent, as ubiquitous as a phone number
+                └─ Target: mass market, Agent-to-Agent becomes default
+```
+
+Product strategy: serve today's users (developers + early adopters) while architecting for the endgame. The Web UI is the bridge; the protocol is the destination.
+
+### One-Line Positioning
+
+> **The infrastructure layer for the AI Agent era — making any Agent discoverable, trustable, and invocable, regardless of protocol or location.**
+
 ---
 
 ## 2. Target Users
@@ -279,8 +332,6 @@ Let consumers try an Agent before committing.
 │  │    ...                                            │    │
 │  └──────────────────────────────────────────────────┘    │
 │                                                          │
-│  Protocol: [MCP ▾]   Session: s_abc123                   │
-│                                                          │
 │  ┌────────────────────────────────────────────┐          │
 │  │ Type your message...                   [➤] │          │
 │  └────────────────────────────────────────────┘          │
@@ -288,14 +339,17 @@ Let consumers try an Agent before committing.
 │  ⚠ Playground is rate-limited (10 calls/hour)            │
 │  For production use → [Get API Key]                      │
 │                                                          │
+│  ▸ Advanced (Developer Mode)                             │
+│    Protocol: [Auto ▾]  Session: s_abc123                 │
+│                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 **Implementation**:
-- Frontend sends messages via `POST /api/v1/bridge/send` (protocol-agnostic)
-- PeerClaw handles protocol translation transparently
-- Rate-limited to prevent abuse (playground quota per user)
-- Protocol selector lets advanced users test A2A vs MCP vs ACP behavior
+- Frontend sends messages via `POST /api/v1/invoke/:agent_id` (protocol-agnostic)
+- PeerClaw auto-selects the optimal protocol — users never see protocol details
+- Rate-limited to prevent abuse (playground quota per user/IP)
+- Developer Mode (collapsed toggle): exposes protocol selector, raw request/response, latency metrics
 
 ### 4.5 Publish Page (`/publish`)
 
@@ -455,12 +509,15 @@ DELETE /api/v1/keys/:key_id             → Revoke key
 
 ```go
 // User account (new table)
+// Identity is key-native: PublicKey is the true identity, Email is optional convenience.
 type User struct {
-    ID           string    `json:"id"`
-    Email        string    `json:"email"`
-    DisplayName  string    `json:"display_name"`
-    PublicKey    string    `json:"public_key"`      // Links to Agent identity
-    CreatedAt    time.Time `json:"created_at"`
+    ID            string    `json:"id"`
+    Email         string    `json:"email,omitempty"`       // Optional: convenience login
+    DisplayName   string    `json:"display_name"`
+    PublicKey     string    `json:"public_key"`            // Primary identity (Ed25519)
+    KeyCustodied  bool      `json:"key_custodied"`         // true if platform manages the key
+    AuthProvider  string    `json:"auth_provider,omitempty"` // "email", "oauth:github", "self-hosted"
+    CreatedAt     time.Time `json:"created_at"`
 }
 
 // Agent review (new table)
@@ -656,10 +713,89 @@ Option B — Embedded (Simpler for self-hosted)
 
 ---
 
-## 10. Open Questions
+## 10. Design Decisions
 
-1. **Monetization**: Does PeerClaw take a transaction fee? Or is it pure infrastructure (like npm registry)? This affects whether we need payment integration.
-2. **Agent Verification**: Should we require Agents to pass a health check before appearing in the marketplace? Or show all registered Agents with health indicators?
-3. **Consumer Identity**: Should consumers authenticate with PeerClaw user accounts, or can they use their own Ed25519 keys (Agent-to-Agent model)?
-4. **Scope of Playground**: Should the playground be protocol-aware (let users choose MCP vs A2A) or fully abstracted?
-5. **Federation Impact**: When federated servers are connected, should the marketplace aggregate Agents across all federated peers, or show only local Agents?
+### D1: Business Model — Infrastructure Free, Value-Added Paid
+
+**Decision**: Free infrastructure layer + paid premium tiers (GitHub model).
+
+**Rationale**: The platform targets the widest possible audience. Early-stage priority is **network effects** — every new Agent makes the platform more valuable for everyone. Transaction fees create friction, especially for Agent-to-Agent automated invocations where per-call billing becomes complex.
+
+```
+Free Tier:     Register, discover, Playground (rate-limited), basic analytics
+Pro Tier:      High-frequency invocation, detailed analytics, priority listing, SLA
+Enterprise:    Private deployment, federation nodes, custom domain, compliance audit
+```
+
+Revenue comes from value-added services to providers who want more visibility and better tooling, not from taxing every interaction. This follows the same path as npm, Docker Hub, and GitHub — free infrastructure, paid professional features.
+
+### D2: Agent Listing — Low Barrier + Layered Trust Signals
+
+**Decision**: All registered Agents are listed immediately. Trust signals are displayed prominently but do not gate listing.
+
+**Rationale**: High listing barriers would kill early supply — we need as many Agents as possible to build network effects. Instead of gatekeeping, we make trust transparent and let consumers decide.
+
+```
+🟢 Online + Verified + ⭐4.8+    ← Featured, top of results
+🟢 Online + Unverified            ← Normal display
+🟡 Offline / Unresponsive         ← Grayed out, ranked lower
+🔴 Reputation < 0.15              ← Auto-isolated, hidden from marketplace
+```
+
+This mirrors the real world: anyone can open a shop, but shops with business licenses, good reviews, and steady customers get more traffic. The reputation system (already built) is the enforcement mechanism, not manual review.
+
+### D3: Consumer Identity — Key-Native with Account Convenience Layer
+
+**Decision**: Ed25519 key pair is the foundational identity. Email/OAuth registration is a convenience layer that auto-generates and manages keys behind the scenes.
+
+**Rationale**: If every person will have their own Agent, the identity system must be Agent-native (key pairs), not human-native (email/password). But mass adoption requires a bridge — simple onboarding that hides cryptographic complexity.
+
+```
+Foundation:     Ed25519 key pair (Agent-native identity)
+                ↑
+Convenience:    Email signup / OAuth login → auto-generates & custodies key
+                ↑
+Advanced:       Self-hosted key / hardware key / Nostr identity (npub)
+```
+
+This ensures:
+- **Ordinary users** sign up with email, never see a key — it just works
+- **Developers / Agents** authenticate directly with key signatures — no "login" needed
+- **Power users** can export and self-custody their keys (like moving from custodial to self-custodial wallet)
+- **All API calls** are unified under key-based signature verification — humans and Agents use the same identity system
+
+### D4: Playground Protocol Awareness — Fully Abstracted by Default
+
+**Decision**: The Playground completely abstracts away protocol differences. An advanced developer panel is available as an opt-in toggle.
+
+**Rationale**: The target is the widest possible audience. Users don't know and don't care about A2A vs MCP vs ACP, just as web users don't care about HTTP/2 vs HTTP/3. Protocol abstraction is PeerClaw's core value proposition — the Playground should embody it.
+
+```
+Default Mode (everyone):
+  User types input → PeerClaw auto-selects optimal protocol → result displayed
+
+Developer Mode (collapsed under "Advanced"):
+  Protocol selector → raw request/response inspector → latency comparison
+```
+
+### D5: Federation Scope — Aggregate Across All Peers
+
+**Decision**: The marketplace aggregates Agents from all federated peers by default, with source labeling and optional filtering.
+
+**Rationale**: If the vision is "every person has an Agent," no single server can host them all. Federation is the scaling path — like email works across servers. The marketplace must reflect the full network to provide maximum value.
+
+```
+User searches "translation Agent"
+
+Results:
+  🟢 TranslateBot     ⭐4.9   local                ← source labeled
+  🟢 LangBridge       ⭐4.7   peer.example.com     ← federated peer
+  🟢 PolyglotAI       ⭐4.5   asia.peerclaw.dev    ← federated peer
+```
+
+Behavior:
+- Default: show Agents from all connected federation peers
+- Label each Agent's source node (like email's @domain)
+- Allow filtering by node (for geographic or trust preferences)
+- Local Agents ranked slightly higher (lower latency)
+- Reputation scores are cross-federation via existing gossip mechanism
