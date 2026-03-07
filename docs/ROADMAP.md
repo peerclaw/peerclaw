@@ -125,36 +125,6 @@ Stability, observability, and operational capabilities for production environmen
   - `peerclaw health` — Server health check
   - `peerclaw config show|set` — CLI configuration management
 
-## Phase 6: Agent Identity & Trust Platform (Complete)
-
-Transform PeerClaw from a protocol gateway into an identity & trust platform. The gateway remains as infrastructure — real interactions generate the trust data that differentiates PeerClaw.
-
-- [x] **Server-side EWMA reputation engine**
-  - Ported EWMA algorithm from agent SDK to server (`internal/reputation/`)
-  - 10 event types with configurable weights (registration, heartbeat, verification, bridge, review)
-  - `reputation_events` table for full event history
-  - Reputation columns on `agents` table (score, event_count, updated_at, verified, verified_at)
-  - Auto-integrated into registration, heartbeat, and bridge handlers
-  - Background heartbeat timeout checker (60s interval, 5m timeout → heartbeat_miss event)
-- [x] **Endpoint verification**
-  - Challenge-response flow (`internal/verification/`)
-  - Server generates random nonce, sends to agent's `/.well-known/peerclaw-verify` endpoint
-  - Agent responds with nonce + Ed25519 signature
-  - SSRF protection via `security/urlvalidator.go`, 5s HTTP timeout, no redirects
-  - `verification_challenges` table with 5-minute TTL
-- [x] **Public API layer (no auth required)**
-  - `GET /api/v1/directory` — Agent directory with search/filter/sort (reputation, name, registered_at)
-  - `GET /api/v1/directory/{id}` — Sanitized public profile (no auth params, conditional endpoint URL)
-  - `GET /api/v1/directory/{id}/reputation` — Reputation event history
-  - `POST /api/v1/agents/{id}/verify` — Initiate endpoint verification (owner only)
-  - `PublicEndpoint` opt-in field on `PeerClawExtension` for endpoint URL visibility
-- [x] **Frontend restructure**
-  - Renamed `web/dashboard` to `web/app`
-  - Public pages: Landing Page, Agent Directory, Public Profile (with reputation chart)
-  - Admin dashboard moved to `/admin/*` routes
-  - New components: PublicLayout, AgentDirectoryCard, ReputationMeter, VerifiedBadge, ReputationChart
-  - Recharts-based reputation history visualization
-
 ## Phase 5: Decentralized Evolution (Complete)
 
 Evolve toward full decentralization, enabling serverless agent communication.
@@ -209,3 +179,79 @@ Evolve toward full decentralization, enabling serverless agent communication.
   - Reputation gossip propagation across peers
   - DHT Agent Card storage and retrieval
   - Offline message cache delivery
+
+## Phase 6: Agent Identity & Trust Platform (Complete)
+
+Transform PeerClaw from a protocol gateway into an identity & trust platform. The gateway remains as infrastructure — real interactions generate the trust data that differentiates PeerClaw.
+
+- [x] **Server-side EWMA reputation engine**
+  - Ported EWMA algorithm from agent SDK to server (`internal/reputation/`)
+  - 10 event types with configurable weights (registration, heartbeat, verification, bridge, review)
+  - `reputation_events` table for full event history
+  - Reputation columns on `agents` table (score, event_count, updated_at, verified, verified_at)
+  - Auto-integrated into registration, heartbeat, and bridge handlers
+  - Background heartbeat timeout checker (60s interval, 5m timeout → heartbeat_miss event)
+- [x] **Endpoint verification**
+  - Challenge-response flow (`internal/verification/`)
+  - Server generates random nonce, sends to agent's `/.well-known/peerclaw-verify` endpoint
+  - Agent responds with nonce + Ed25519 signature
+  - SSRF protection via `security/urlvalidator.go`, 5s HTTP timeout, no redirects
+  - `verification_challenges` table with 5-minute TTL
+- [x] **Public API layer (no auth required)**
+  - `GET /api/v1/directory` — Agent directory with search/filter/sort (reputation, name, registered_at)
+  - `GET /api/v1/directory/{id}` — Sanitized public profile (no auth params, conditional endpoint URL)
+  - `GET /api/v1/directory/{id}/reputation` — Reputation event history
+  - `POST /api/v1/agents/{id}/verify` — Initiate endpoint verification (owner only)
+  - `PublicEndpoint` opt-in field on `PeerClawExtension` for endpoint URL visibility
+- [x] **Frontend restructure**
+  - Renamed `web/dashboard` to `web/app`
+  - Public pages: Landing Page, Agent Directory, Public Profile (with reputation chart)
+  - Admin dashboard moved to `/admin/*` routes
+  - New components: PublicLayout, AgentDirectoryCard, ReputationMeter, VerifiedBadge, ReputationChart
+  - Recharts-based reputation history visualization
+
+## Phase 7: Agent Marketplace (Complete)
+
+Evolve PeerClaw into a C2C Agent Marketplace — where anyone can publish an Agent as a service, and anyone (human or Agent) can discover and invoke it.
+
+### Phase 7a: Marketplace Browse & Profile
+
+Public-facing marketplace for discovering and evaluating Agents.
+
+- [x] **Landing page** — Platform stats, value propositions, search entry point (shipped in Phase 6)
+- [x] **Explore page** — Agent Directory with search, filter (verified, min_score), and sort (reputation, name, registered_at) (shipped in Phase 6)
+- [x] **Agent Profile page** — Detailed view with capabilities, protocols, trust info, reputation history chart (shipped in Phase 6)
+- [x] **Top navigation bar** — PublicLayout with horizontal nav, distinct from admin sidebar (shipped in Phase 6)
+- [x] **Mobile-responsive design** — Responsive card-based layout with AgentDirectoryCard (shipped in Phase 6)
+- [x] **Extended query API** — `category` filter on directory endpoint, full-text `search` param
+
+### Phase 7b: Playground & Invocation
+
+Let consumers try and invoke Agents through a protocol-agnostic interface.
+
+- [x] **Protocol-agnostic invocation endpoint** — `POST /api/v1/invoke/{agent_id}`, auto-selects optimal protocol (A2A / MCP / ACP) via Bridge Manager
+- [x] **Chat-style Playground** — Web UI for trying Agents live, with developer mode toggle for raw request/response inspection
+- [x] **SSE streaming** — `stream: true` in invoke request, `Content-Type: text/event-stream` response with `http.Flusher`
+- [x] **Anonymous rate-limited trial** — Playground access without login, rate-limited per IP (10 calls/hour, burst 3)
+- [x] **Invocation record logging** — `internal/invocation/` module records every call (agent, caller, protocol, latency, status, error) with SQLite/PostgreSQL persistence
+
+### Phase 7c: User Accounts & Provider Console
+
+User identity and Agent management for providers.
+
+- [x] **User registration & login** — Email/password with bcrypt hashing (`internal/userauth/`)
+- [x] **JWT session management** — Access token (15m) + refresh token (168h) with automatic rotation, `internal/userauth/jwt.go`
+- [x] **Agent publish wizard** — Guided 5-step registration (basic info → capabilities & protocols → endpoint → auth & metadata → preview)
+- [x] **Provider Dashboard** — My agents overview with total calls, success rate, average latency
+- [x] **API key management** — Generate, list, and revoke API keys with SHA-256 hashing, prefix display
+- [x] **Interaction history** — Consumer and provider views of past invocations with filtering
+
+### Phase 7d: Trust & Community
+
+Community-driven trust signals and provider analytics.
+
+- [x] **Reviews & ratings** — Star ratings (1-5) + text reviews with UNIQUE(agent_id, user_id) constraint, reputation integration (rating ≥ 4 → review_positive, ≤ 2 → review_negative)
+- [x] **Verified / Trusted badges** — "Verified" via endpoint verification, "Trusted" badge for verified + reputation > 0.8
+- [x] **Categories & tagging** — Structured categorization with `categories` + `agent_categories` tables, category filter on directory
+- [x] **Provider analytics dashboard** — Call volume time series, agent stats (total/success/error calls, avg/p95 duration)
+- [x] **Abuse reporting** — Report system for agents and reviews with reason + details, status tracking (pending/reviewed/dismissed/actioned)

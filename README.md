@@ -2,11 +2,11 @@
 
 # PeerClaw
 
-**The open-source identity & trust platform for AI Agents — verifiable identity, reputation scoring, and cross-protocol communication.**
+**The open-source identity & trust platform for AI Agents — where any Agent becomes a discoverable, trustable, invocable service.**
 
 In a world flooding with fake AI agents, there's no way to know which ones are real. Marketplaces list thousands of "agents" with no proof they exist, no verification they work, and no accountability when they don't.
 
-PeerClaw fixes this. It's **the trust layer for AI Agents**: every agent gets a cryptographically verifiable Ed25519 identity, an EWMA-based reputation score computed from real interactions, and endpoint verification that proves agents control their claimed URLs. Built on top of a full protocol gateway (A2A, MCP, ACP), the real interactions that flow through PeerClaw generate the trust data that makes identities meaningful.
+PeerClaw fixes this. It's **the trust layer for AI Agents**: every agent gets a cryptographically verifiable Ed25519 identity, an EWMA-based reputation score computed from real interactions, and endpoint verification that proves agents control their claimed URLs. Built on top of a full protocol gateway (A2A, MCP, ACP), the real interactions that flow through PeerClaw generate the trust data that makes identities meaningful. PeerClaw is evolving into a marketplace where anyone can publish an Agent as a service, and anyone can discover and invoke it — regardless of protocol.
 
 ## What PeerClaw Does
 
@@ -203,12 +203,29 @@ These are available but not required for basic usage:
 |---------|-------------|
 | **Reputation Engine** | Server-side EWMA reputation scoring from real interaction events |
 | **Endpoint Verification** | Challenge-response proof that agents control their claimed URLs |
-| **Public Directory** | Browse and search agents by reputation, capability, and verification status |
+| **Public Directory** | Browse and search agents by reputation, capability, category, and verification status |
+| **Agent Playground** | Try any agent live via chat UI with SSE streaming, rate-limited anonymous access |
+| **User Auth & JWT** | Email/password registration, JWT sessions, API key management |
+| **Provider Console** | Publish agents, view analytics, manage invocations and API keys |
+| **Reviews & Ratings** | Star ratings (1-5) + text reviews with reputation integration |
+| **Trusted Badge** | Verified + high reputation agents earn a "Trusted" badge |
 | **DHT Discovery** | Serverless agent discovery via Kademlia DHT (Nostr transport) |
 | **Federation** | Multi-server signaling relay with DNS SRV discovery |
 | **Identity Anchoring** | Bind Ed25519 identity to Nostr/DNS for public verification |
 | **Offline Messaging** | Message cache with TTL, auto-flush on peer reconnect |
 | **Serverless Mode** | Full P2P operation without any central server |
+
+## Agent Marketplace (Phase 7)
+
+PeerClaw has evolved from infrastructure into a **C2C Agent Marketplace (Agent as a Service)**:
+
+- **Browse & Discover** — Landing page, explore page, agent profiles with trust info, category filtering
+- **Playground** — Try any Agent live through a protocol-agnostic chat interface with SSE streaming
+- **User Accounts** — Register/login with JWT auth, publish agents via 5-step wizard, manage API keys
+- **Provider Console** — Dashboard with call volume analytics, agent stats, invocation history
+- **Trust & Community** — Star ratings, text reviews, Verified/Trusted badges, abuse reporting
+
+See [Roadmap](docs/ROADMAP.md) for the complete development history.
 
 ## CLI Reference
 
@@ -253,6 +270,7 @@ go work sync
 
 ## Documentation
 
+- [Getting Started Guide](docs/GUIDE.md) — Register your Agent and join the PeerClaw ecosystem
 - [Product Document](docs/PRODUCT.md) — Detailed product design and security model
 - [Roadmap](docs/ROADMAP.md) — Development phases and milestones
 

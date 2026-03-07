@@ -125,36 +125,6 @@
   - `peerclaw health` — 服务器健康检查
   - `peerclaw config show|set` — CLI 配置管理
 
-## Phase 6: Agent 身份与信任平台 (已完成)
-
-将 PeerClaw 从协议网关转型为身份与信任平台。网关作为基础设施保留 — 真实交互产生的信任数据是 PeerClaw 的核心差异化。
-
-- [x] **服务端 EWMA 声誉引擎**
-  - 从 agent SDK 移植 EWMA 算法到服务端（`internal/reputation/`）
-  - 10 种事件类型，可配置权重（注册、心跳、验证、桥接、评价）
-  - `reputation_events` 表存储完整事件历史
-  - `agents` 表新增声誉列（score、event_count、updated_at、verified、verified_at）
-  - 自动集成到注册、心跳、桥接处理器
-  - 后台心跳超时检查器（60 秒间隔，5 分钟超时 → heartbeat_miss 事件）
-- [x] **端点验证**
-  - Challenge-Response 验证流程（`internal/verification/`）
-  - 服务器生成随机 nonce，发送到 Agent 的 `/.well-known/peerclaw-verify` 端点
-  - Agent 回复 nonce + Ed25519 签名
-  - 通过 `security/urlvalidator.go` 进行 SSRF 防护，5 秒 HTTP 超时，禁止重定向
-  - `verification_challenges` 表，5 分钟 TTL
-- [x] **公开 API 层（免认证）**
-  - `GET /api/v1/directory` — Agent 目录，支持搜索/过滤/排序（声誉、名称、注册时间）
-  - `GET /api/v1/directory/{id}` — 脱敏公开档案（不含认证参数，条件展示端点 URL）
-  - `GET /api/v1/directory/{id}/reputation` — 声誉事件历史
-  - `POST /api/v1/agents/{id}/verify` — 发起端点验证（仅所有者）
-  - `PeerClawExtension` 新增 `PublicEndpoint` 字段控制端点 URL 可见性
-- [x] **前端重构**
-  - `web/dashboard` 重命名为 `web/app`
-  - 公开页面：Landing Page、Agent 目录、公开 Profile（含声誉图表）
-  - 管理后台移至 `/admin/*` 路由
-  - 新组件：PublicLayout、AgentDirectoryCard、ReputationMeter、VerifiedBadge、ReputationChart
-  - 基于 Recharts 的声誉历史可视化
-
 ## Phase 5: Decentralized Evolution (已完成)
 
 向完全去中心化演进，实现无 Server 的 Agent 通信。
@@ -209,3 +179,79 @@
   - 信誉 Gossip 跨 peer 传播
   - DHT Agent Card 存取
   - 离线消息缓存投递
+
+## Phase 6: Agent 身份与信任平台 (已完成)
+
+将 PeerClaw 从协议网关转型为身份与信任平台。网关作为基础设施保留 — 真实交互产生的信任数据是 PeerClaw 的核心差异化。
+
+- [x] **服务端 EWMA 声誉引擎**
+  - 从 agent SDK 移植 EWMA 算法到服务端（`internal/reputation/`）
+  - 10 种事件类型，可配置权重（注册、心跳、验证、桥接、评价）
+  - `reputation_events` 表存储完整事件历史
+  - `agents` 表新增声誉列（score、event_count、updated_at、verified、verified_at）
+  - 自动集成到注册、心跳、桥接处理器
+  - 后台心跳超时检查器（60 秒间隔，5 分钟超时 → heartbeat_miss 事件）
+- [x] **端点验证**
+  - Challenge-Response 验证流程（`internal/verification/`）
+  - 服务器生成随机 nonce，发送到 Agent 的 `/.well-known/peerclaw-verify` 端点
+  - Agent 回复 nonce + Ed25519 签名
+  - 通过 `security/urlvalidator.go` 进行 SSRF 防护，5 秒 HTTP 超时，禁止重定向
+  - `verification_challenges` 表，5 分钟 TTL
+- [x] **公开 API 层（免认证）**
+  - `GET /api/v1/directory` — Agent 目录，支持搜索/过滤/排序（声誉、名称、注册时间）
+  - `GET /api/v1/directory/{id}` — 脱敏公开档案（不含认证参数，条件展示端点 URL）
+  - `GET /api/v1/directory/{id}/reputation` — 声誉事件历史
+  - `POST /api/v1/agents/{id}/verify` — 发起端点验证（仅所有者）
+  - `PeerClawExtension` 新增 `PublicEndpoint` 字段控制端点 URL 可见性
+- [x] **前端重构**
+  - `web/dashboard` 重命名为 `web/app`
+  - 公开页面：Landing Page、Agent 目录、公开 Profile（含声誉图表）
+  - 管理后台移至 `/admin/*` 路由
+  - 新组件：PublicLayout、AgentDirectoryCard、ReputationMeter、VerifiedBadge、ReputationChart
+  - 基于 Recharts 的声誉历史可视化
+
+## Phase 7: Agent Marketplace（已完成）
+
+将 PeerClaw 演进为 C2C Agent Marketplace — 任何人都可以将 Agent 发布为服务，任何人（人类或 Agent）都可以发现和调用它。
+
+### Phase 7a: Marketplace 浏览与档案
+
+面向公众的 Marketplace，用于发现和评估 Agent。
+
+- [x] **Landing Page** — 平台统计、价值主张、搜索入口（Phase 6 已交付）
+- [x] **Explore 页面** — Agent 目录，支持搜索、过滤（已验证、最低评分）、排序（声誉、名称、注册时间）（Phase 6 已交付）
+- [x] **Agent Profile 页面** — 详细视图，含能力、协议、信任信息、声誉历史图表（Phase 6 已交付）
+- [x] **顶部导航栏** — PublicLayout 水平导航，区别于管理后台侧边栏（Phase 6 已交付）
+- [x] **移动端响应式设计** — 响应式卡片布局 AgentDirectoryCard（Phase 6 已交付）
+- [x] **扩展查询 API** — 目录端点支持 `category` 过滤，全文 `search` 参数
+
+### Phase 7b: Playground 与调用
+
+让消费者通过协议无关的接口试用和调用 Agent。
+
+- [x] **协议无关调用端点** — `POST /api/v1/invoke/{agent_id}`，通过 Bridge Manager 自动选择最优协议（A2A / MCP / ACP）
+- [x] **Chat 式 Playground** — Web UI 实时试用 Agent，含开发者模式切换查看原始请求/响应
+- [x] **SSE 流式响应** — 请求中 `stream: true`，响应 `Content-Type: text/event-stream`，使用 `http.Flusher` 推送
+- [x] **匿名限速试用** — 无需登录即可使用 Playground，按 IP 限速（10 次/小时，突发 3）
+- [x] **调用记录** — `internal/invocation/` 模块记录每次调用（Agent、调用者、协议、延迟、状态、错误），SQLite/PostgreSQL 持久化
+
+### Phase 7c: 用户账户与 Provider 控制台
+
+用户身份和 Agent 管理。
+
+- [x] **用户注册与登录** — 邮箱/密码 + bcrypt 哈希（`internal/userauth/`）
+- [x] **JWT 会话管理** — Access Token（15m）+ Refresh Token（168h），自动轮换，`internal/userauth/jwt.go`
+- [x] **Agent 发布向导** — 引导式 5 步注册（基本信息 → 能力与协议 → 端点 → 认证与元数据 → 预览）
+- [x] **Provider Dashboard** — 我的 Agent 总览，含总调用量、成功率、平均延迟
+- [x] **API Key 管理** — 生成、列出、撤销 API Key，SHA-256 哈希存储，前缀显示
+- [x] **交互历史** — 消费者和 Provider 视角的调用历史，支持过滤
+
+### Phase 7d: 信任与社区
+
+社区驱动的信任信号和 Provider 分析。
+
+- [x] **评价与评分** — 星级评分（1-5）+ 文字评价，UNIQUE(agent_id, user_id) 约束，声誉联动（评分 ≥ 4 → review_positive，≤ 2 → review_negative）
+- [x] **Verified / Trusted 徽章** — 端点验证通过获得 "Verified"，已验证 + 声誉 > 0.8 获得 "Trusted" 徽章
+- [x] **分类与标签** — 结构化分类，`categories` + `agent_categories` 表，目录支持分类过滤
+- [x] **Provider 分析面板** — 调用量时间序列、Agent 统计（总量/成功/错误调用，平均/P95 延迟）
+- [x] **举报机制** — Agent 和评论举报系统，支持原因 + 详情，状态追踪（pending/reviewed/dismissed/actioned）

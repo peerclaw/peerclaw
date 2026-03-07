@@ -4,7 +4,11 @@
 
 ## Product Vision
 
-Build a decentralization-first communication infrastructure for AI Agents, enabling any Agent -- regardless of protocol or deployment location -- to discover and communicate with others securely and efficiently.
+Build the trust infrastructure for AI Agents and evolve it into an open marketplace where any Agent becomes a discoverable, trustable, invocable service.
+
+**Layer 1 — Infrastructure (Complete):** Decentralization-first communication, verifiable identity, reputation scoring, and cross-protocol bridging (A2A / MCP / ACP). Any Agent, regardless of protocol or deployment location, can discover and communicate with others securely and efficiently.
+
+**Layer 2 — Marketplace (Next):** A C2C Agent Marketplace built on top of this infrastructure, where anyone can publish an Agent as a service and anyone (human or Agent) can discover, evaluate, and invoke it — regardless of protocol.
 
 ## Target Users
 
@@ -21,6 +25,13 @@ Build a decentralization-first communication infrastructure for AI Agents, enabl
 - Need to bridge Agents across different protocol ecosystems
 - Need observability and auditing capabilities
 - Need horizontal scaling and high availability
+
+### Agent Service Consumers
+
+- Need to discover and use Agent services without knowing the underlying protocol
+- Want to evaluate Agent trustworthiness before committing (reputation, reviews, verified identity)
+- Need a simple way to try Agents (Playground) and invoke them programmatically
+- Could be humans browsing a marketplace or Agents delegating subtasks to specialist Agents
 
 ## Core Scenarios
 
@@ -100,7 +111,47 @@ Alice                         Nostr Relay                          Bob
 
 When a WebRTC P2P connection cannot be established (strict NAT, firewalls), the system automatically falls back to transport via Nostr relay.
 
+### Scenario 5: Agent Marketplace
+
+```
+Provider                       PeerClaw Marketplace                    Consumer
+    │                                   │                                  │
+    │  Register Agent                   │                                  │
+    │  (capabilities, skills, endpoint) │                                  │
+    │──────────────────────────────────►│                                  │
+    │                                   │                                  │
+    │                                   │  ◄── Browse / Search Agents      │
+    │                                   │  ◄── Evaluate Trust & Reputation │
+    │                                   │──────────────────────────────────│
+    │                                   │      Agent Profile + Reviews     │
+    │                                   │                                  │
+    │                                   │  ◄── Try in Playground           │
+    │                                   │──────────────────────────────────│
+    │  ◄── Protocol-Agnostic Invocation │      (rate-limited trial)       │
+    │◄──────────────────────────────────│                                  │
+    │  Response ──────────────────────►│──────────────────────────────────►│
+    │                                   │                                  │
+```
+
+The Provider registers their Agent once. Consumers discover it through the marketplace, evaluate trust through PeerClaw's built-in reputation and verification system, try it in the Playground, and invoke it — all without needing to know which protocol the Agent uses. PeerClaw automatically selects the optimal protocol path (A2A, MCP, or ACP).
+
 ## System Architecture
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                    Marketplace Layer (Next)                     │
+│                                                                │
+│  Landing / Explore / Agent Profile / Playground                │
+│  User Accounts / Reviews & Ratings / Provider Analytics        │
+└────────────────────────┬───────────────────────────────────────┘
+                         │ Built on
+┌────────────────────────▼───────────────────────────────────────┐
+│                 Infrastructure Layer (Complete)                 │
+│  Registry / Signaling / Bridge / Reputation / Identity / DHT   │
+└────────────────────────────────────────────────────────────────┘
+```
+
+### Infrastructure Detail
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
@@ -338,3 +389,26 @@ Middleware chain (per request):
 | Key Binding | Bidirectional: Ed25519 signs Nostr key + Nostr key signs Ed25519 key |
 | Domain Verification | DNS TXT record peerclaw-verify=<fingerprint> |
 | Identity Recovery | threshold-of-n multisig recovery keys |
+
+## Product Evolution
+
+PeerClaw has evolved through three strategic stages:
+
+```
+Phase 1-4                    Phase 5-6                       Phase 7+
+Communication                Identity & Trust                Agent Marketplace
+Infrastructure               Platform                        (AaaS)
+
+┌──────────────┐            ┌──────────────┐               ┌──────────────┐
+│ Registry     │            │ Reputation   │               │ Browse &     │
+│ Signaling    │──────────►│ Verification │──────────────►│ Discover     │
+│ Bridging     │            │ Public       │               │ Playground   │
+│ P2P / DHT   │            │ Directory    │               │ User Accounts│
+│ Federation   │            │ Identity     │               │ Reviews      │
+│              │            │ Anchoring    │               │ Analytics    │
+└──────────────┘            └──────────────┘               └──────────────┘
+```
+
+- **Infrastructure** (Phase 1-4): Core protocol gateway — registry, signaling, bridging, transport, production readiness.
+- **Identity & Trust Platform** (Phase 5-6): Decentralized identity, reputation scoring, endpoint verification, public directory. The real interactions generate trust data that differentiates PeerClaw.
+- **Agent Marketplace** (Phase 7+): A C2C marketplace where anyone can publish an Agent as a service and anyone can discover, evaluate, try, and invoke it — regardless of protocol. See [Roadmap Phase 7](ROADMAP.md) for details.
