@@ -125,6 +125,36 @@
   - `peerclaw health` — 服务器健康检查
   - `peerclaw config show|set` — CLI 配置管理
 
+## Phase 6: Agent 身份与信任平台 (已完成)
+
+将 PeerClaw 从协议网关转型为身份与信任平台。网关作为基础设施保留 — 真实交互产生的信任数据是 PeerClaw 的核心差异化。
+
+- [x] **服务端 EWMA 声誉引擎**
+  - 从 agent SDK 移植 EWMA 算法到服务端（`internal/reputation/`）
+  - 10 种事件类型，可配置权重（注册、心跳、验证、桥接、评价）
+  - `reputation_events` 表存储完整事件历史
+  - `agents` 表新增声誉列（score、event_count、updated_at、verified、verified_at）
+  - 自动集成到注册、心跳、桥接处理器
+  - 后台心跳超时检查器（60 秒间隔，5 分钟超时 → heartbeat_miss 事件）
+- [x] **端点验证**
+  - Challenge-Response 验证流程（`internal/verification/`）
+  - 服务器生成随机 nonce，发送到 Agent 的 `/.well-known/peerclaw-verify` 端点
+  - Agent 回复 nonce + Ed25519 签名
+  - 通过 `security/urlvalidator.go` 进行 SSRF 防护，5 秒 HTTP 超时，禁止重定向
+  - `verification_challenges` 表，5 分钟 TTL
+- [x] **公开 API 层（免认证）**
+  - `GET /api/v1/directory` — Agent 目录，支持搜索/过滤/排序（声誉、名称、注册时间）
+  - `GET /api/v1/directory/{id}` — 脱敏公开档案（不含认证参数，条件展示端点 URL）
+  - `GET /api/v1/directory/{id}/reputation` — 声誉事件历史
+  - `POST /api/v1/agents/{id}/verify` — 发起端点验证（仅所有者）
+  - `PeerClawExtension` 新增 `PublicEndpoint` 字段控制端点 URL 可见性
+- [x] **前端重构**
+  - `web/dashboard` 重命名为 `web/app`
+  - 公开页面：Landing Page、Agent 目录、公开 Profile（含声誉图表）
+  - 管理后台移至 `/admin/*` 路由
+  - 新组件：PublicLayout、AgentDirectoryCard、ReputationMeter、VerifiedBadge、ReputationChart
+  - 基于 Recharts 的声誉历史可视化
+
 ## Phase 5: Decentralized Evolution (已完成)
 
 向完全去中心化演进，实现无 Server 的 Agent 通信。

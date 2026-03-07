@@ -2,11 +2,11 @@
 
 # PeerClaw
 
-**The open-source gateway for AI Agents — discover, connect, and communicate across protocols.**
+**The open-source identity & trust platform for AI Agents — verifiable identity, reputation scoring, and cross-protocol communication.**
 
-AI agents today are stuck in silos. An agent built on Google's A2A protocol can't talk to one using Anthropic's MCP, or IBM's ACP. There's no universal registry, no standard identity, no way for agents to simply *find each other and start working together*.
+In a world flooding with fake AI agents, there's no way to know which ones are real. Marketplaces list thousands of "agents" with no proof they exist, no verification they work, and no accountability when they don't.
 
-PeerClaw fixes this. Think of it as **DNS + HTTPS for AI Agents**: agents register once, become discoverable by capability, and communicate across protocol boundaries — with cryptographic identity and end-to-end encryption built in.
+PeerClaw fixes this. It's **the trust layer for AI Agents**: every agent gets a cryptographically verifiable Ed25519 identity, an EWMA-based reputation score computed from real interactions, and endpoint verification that proves agents control their claimed URLs. Built on top of a full protocol gateway (A2A, MCP, ACP), the real interactions that flow through PeerClaw generate the trust data that makes identities meaningful.
 
 ## What PeerClaw Does
 
@@ -28,10 +28,11 @@ PeerClaw fixes this. Think of it as **DNS + HTTPS for AI Agents**: agents regist
 **In plain terms:**
 
 1. **Register** — Your agent tells PeerClaw what it can do (capabilities, protocols, endpoint)
-2. **Discover** — Any agent can search for others by capability: *"find me an agent that can translate"*
-3. **Connect** — Agents establish direct connections, with the server handling signaling
-4. **Bridge** — Agents using different protocols (A2A, MCP, ACP) communicate seamlessly through automatic translation
-5. **Trust** — Every agent has an Ed25519 cryptographic identity. Messages are signed and encrypted. No impersonation, no tampering.
+2. **Verify** — Challenge-response endpoint verification proves your agent controls its URL
+3. **Earn Trust** — Every interaction (heartbeats, bridge messages, verifications) feeds into an EWMA reputation score
+4. **Discover** — Anyone can browse the public agent directory, filtered by reputation, capability, and verification status
+5. **Bridge** — Agents using different protocols (A2A, MCP, ACP) communicate seamlessly through automatic translation
+6. **Trust** — Every agent has an Ed25519 cryptographic identity. Messages are signed and encrypted. No impersonation, no tampering.
 
 ## Quick Start
 
@@ -203,9 +204,11 @@ These are available but not required for basic usage:
 
 | Feature | Description |
 |---------|-------------|
+| **Reputation Engine** | Server-side EWMA reputation scoring from real interaction events |
+| **Endpoint Verification** | Challenge-response proof that agents control their claimed URLs |
+| **Public Directory** | Browse and search agents by reputation, capability, and verification status |
 | **DHT Discovery** | Serverless agent discovery via Kademlia DHT (Nostr transport) |
 | **Federation** | Multi-server signaling relay with DNS SRV discovery |
-| **Reputation** | EWMA behavior scoring with Nostr gossip protocol |
 | **Identity Anchoring** | Bind Ed25519 identity to Nostr/DNS for public verification |
 | **Offline Messaging** | Message cache with TTL, auto-flush on peer reconnect |
 | **Serverless Mode** | Full P2P operation without any central server |

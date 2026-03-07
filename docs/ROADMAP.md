@@ -125,6 +125,36 @@ Stability, observability, and operational capabilities for production environmen
   - `peerclaw health` — Server health check
   - `peerclaw config show|set` — CLI configuration management
 
+## Phase 6: Agent Identity & Trust Platform (Complete)
+
+Transform PeerClaw from a protocol gateway into an identity & trust platform. The gateway remains as infrastructure — real interactions generate the trust data that differentiates PeerClaw.
+
+- [x] **Server-side EWMA reputation engine**
+  - Ported EWMA algorithm from agent SDK to server (`internal/reputation/`)
+  - 10 event types with configurable weights (registration, heartbeat, verification, bridge, review)
+  - `reputation_events` table for full event history
+  - Reputation columns on `agents` table (score, event_count, updated_at, verified, verified_at)
+  - Auto-integrated into registration, heartbeat, and bridge handlers
+  - Background heartbeat timeout checker (60s interval, 5m timeout → heartbeat_miss event)
+- [x] **Endpoint verification**
+  - Challenge-response flow (`internal/verification/`)
+  - Server generates random nonce, sends to agent's `/.well-known/peerclaw-verify` endpoint
+  - Agent responds with nonce + Ed25519 signature
+  - SSRF protection via `security/urlvalidator.go`, 5s HTTP timeout, no redirects
+  - `verification_challenges` table with 5-minute TTL
+- [x] **Public API layer (no auth required)**
+  - `GET /api/v1/directory` — Agent directory with search/filter/sort (reputation, name, registered_at)
+  - `GET /api/v1/directory/{id}` — Sanitized public profile (no auth params, conditional endpoint URL)
+  - `GET /api/v1/directory/{id}/reputation` — Reputation event history
+  - `POST /api/v1/agents/{id}/verify` — Initiate endpoint verification (owner only)
+  - `PublicEndpoint` opt-in field on `PeerClawExtension` for endpoint URL visibility
+- [x] **Frontend restructure**
+  - Renamed `web/dashboard` to `web/app`
+  - Public pages: Landing Page, Agent Directory, Public Profile (with reputation chart)
+  - Admin dashboard moved to `/admin/*` routes
+  - New components: PublicLayout, AgentDirectoryCard, ReputationMeter, VerifiedBadge, ReputationChart
+  - Recharts-based reputation history visualization
+
 ## Phase 5: Decentralized Evolution (Complete)
 
 Evolve toward full decentralization, enabling serverless agent communication.
