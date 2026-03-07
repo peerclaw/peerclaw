@@ -1,0 +1,3 @@
+peerclaw.ai {
+    reverse_proxy peerclaw:8080
+}

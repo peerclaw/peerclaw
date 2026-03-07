@@ -36,6 +36,16 @@ Thumbs.db
 *.db-journal
 *.db-wal
 *.db-shm
+*.sqlite
+
+# Private keys / certificates
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Logs
+*.log
 
 # Config overrides
 **/peerclaw.yaml

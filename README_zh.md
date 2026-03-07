@@ -56,7 +56,7 @@ cd cli && go build -o peerclaw ./cmd/peerclaw && cd ..
 ```bash
 # 终端 1：启动网关
 ./server/peerclawd
-# → PeerClaw gateway started  http=:8080  grpc=:9090
+# → PeerClaw gateway started  http=:8080
 
 # 终端 2：启动 Agent Alice
 ./agent/echo -name alice -server http://localhost:8080

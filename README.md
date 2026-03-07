@@ -56,7 +56,7 @@ cd cli && go build -o peerclaw ./cmd/peerclaw && cd ..
 ```bash
 # Terminal 1: Start the gateway
 ./server/peerclawd
-# → PeerClaw gateway started  http=:8080  grpc=:9090
+# → PeerClaw gateway started  http=:8080
 
 # Terminal 2: Start agent Alice
 ./agent/echo -name alice -server http://localhost:8080
