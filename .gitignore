@@ -48,6 +48,11 @@ Thumbs.db
 # Keypair seeds
 *.seed
 
+# Dashboard
+**/node_modules/
+server/internal/server/dashboard_dist/
+!server/internal/server/dashboard_dist/.gitkeep
+
 # Sub-repositories (managed separately)
 /core/
 /server/
