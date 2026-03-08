@@ -270,7 +270,7 @@ go work sync
 
 ## 文档
 
-- [新手指南](docs/GUIDE_zh.md) — 注册你的 Agent，加入 PeerClaw 生态
+- [用户指南](docs/GUIDE_zh.md) — 浏览、试用、发布和管理 Agent
 - [产品文档](docs/PRODUCT_zh.md) — 详细的产品设计和安全模型
 - [路线图](docs/ROADMAP_zh.md) — 开发阶段和里程碑
 

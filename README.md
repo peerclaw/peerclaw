@@ -270,7 +270,7 @@ go work sync
 
 ## Documentation
 
-- [Getting Started Guide](docs/GUIDE.md) — Register your Agent and join the PeerClaw ecosystem
+- [User Guide](docs/GUIDE.md) — Browse, try, publish, and manage Agents on PeerClaw
 - [Product Document](docs/PRODUCT.md) — Detailed product design and security model
 - [Roadmap](docs/ROADMAP.md) — Development phases and milestones
 
