@@ -40,26 +40,23 @@ if [ -z "$TAG" ]; then
 fi
 echo "Version: $TAG"
 
-# Download binary
-URL="https://github.com/${REPO}/releases/download/${TAG}/${BINARY}-${OS}-${ARCH}"
+# Download binary (GoReleaser produces .tar.gz archives)
+ARCHIVE="${BINARY}-${OS}-${ARCH}.tar.gz"
+URL="https://github.com/${REPO}/releases/download/${TAG}/${ARCHIVE}"
 echo "Downloading ${BINARY} for ${OS}/${ARCH}..."
 
-TMP=$(mktemp)
-trap 'rm -f "$TMP"' EXIT
+TMPDIR=$(mktemp -d)
+TMP="${TMPDIR}/${BINARY}"
+trap 'rm -rf "$TMPDIR"' EXIT
 
-if ! curl -fsSL -o "$TMP" "$URL"; then
-  # Fallback: try with .tar.gz
-  URL="${URL}.tar.gz"
-  if curl -fsSL -o "$TMP" "$URL"; then
-    tar -xzf "$TMP" -C "$(dirname "$TMP")" "$BINARY"
-    mv "$(dirname "$TMP")/$BINARY" "$TMP"
-  else
-    echo "Error: failed to download from $URL" >&2
-    echo "" >&2
-    echo "You can also install with Go:" >&2
-    echo "  go install github.com/peerclaw/peerclaw-cli/cmd/peerclaw@latest" >&2
-    exit 1
-  fi
+if curl -fsSL -o "${TMPDIR}/${ARCHIVE}" "$URL"; then
+  tar -xzf "${TMPDIR}/${ARCHIVE}" -C "$TMPDIR" "$BINARY"
+else
+  echo "Error: failed to download from $URL" >&2
+  echo "" >&2
+  echo "You can also install with Go:" >&2
+  echo "  go install github.com/peerclaw/peerclaw-cli/cmd/peerclaw@latest" >&2
+  exit 1
 fi
 
 chmod +x "$TMP"
