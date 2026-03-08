@@ -28,6 +28,12 @@ func RunAgent(args []string, serverURL string) int {
 		return runAgentClaim(args[1:], serverURL)
 	case "delete":
 		return runAgentDelete(args[1:], serverURL)
+	case "discover":
+		return runAgentDiscover(args[1:], serverURL)
+	case "heartbeat":
+		return runAgentHeartbeat(args[1:], serverURL)
+	case "verify":
+		return runAgentVerify(args[1:], serverURL)
 	case "help", "-h":
 		printAgentUsage()
 		return 0
@@ -47,6 +53,9 @@ Subcommands:
   register   Register a new agent
   claim      Register an agent using a claim token
   delete     Delete an agent
+  discover   Discover agents by capabilities
+  heartbeat  Send heartbeat for an agent
+  verify     Verify an agent's endpoint
 `)
 }
 

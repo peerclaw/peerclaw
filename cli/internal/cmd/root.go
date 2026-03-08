@@ -55,7 +55,7 @@ func printUsage() {
 	fmt.Fprintf(os.Stderr, `Usage: peerclaw <command> [options]
 
 Commands:
-  agent       Manage agents (list, get, register, delete)
+  agent       Manage agents (list, get, register, claim, discover, heartbeat, verify)
   send        Send a message through the bridge
   health      Check server health
   config      Manage CLI configuration

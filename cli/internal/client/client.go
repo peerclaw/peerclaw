@@ -209,6 +209,41 @@ func (c *Client) Discover(ctx context.Context, capabilities []string, protocol s
 	return &resp, nil
 }
 
+// HeartbeatRequest is the request body for agent heartbeat.
+type HeartbeatRequest struct {
+	Status   string            `json:"status"`
+	Metadata map[string]string `json:"metadata,omitempty"`
+}
+
+// HeartbeatResponse is the response from agent heartbeat.
+type HeartbeatResponse struct {
+	NextDeadline string `json:"next_deadline"`
+}
+
+// Heartbeat sends a heartbeat for the given agent.
+func (c *Client) Heartbeat(ctx context.Context, agentID string, req HeartbeatRequest) (*HeartbeatResponse, error) {
+	var resp HeartbeatResponse
+	if err := c.post(ctx, "/api/v1/agents/"+agentID+"/heartbeat", req, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// VerifyResponse is the response from agent endpoint verification.
+type VerifyResponse struct {
+	Status    string `json:"status"`
+	Challenge string `json:"challenge"`
+}
+
+// VerifyEndpoint initiates endpoint verification for the given agent.
+func (c *Client) VerifyEndpoint(ctx context.Context, agentID string) (*VerifyResponse, error) {
+	var resp VerifyResponse
+	if err := c.post(ctx, "/api/v1/agents/"+agentID+"/verify", struct{}{}, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 // --- HTTP helpers ---
 
 func (c *Client) get(ctx context.Context, path string, params url.Values, out any) error {

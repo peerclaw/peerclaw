@@ -26,6 +26,20 @@ peerclaw config set server http://my-server:8080
 peerclaw config show
 ```
 
+### 通过 Claim Token 注册 Agent（推荐）
+
+最简单的 Agent 注册方式——无需编写代码：
+
+```bash
+# Claim 一个从 Provider Console 生成的 token
+peerclaw agent claim --token PCW-XXXX-XXXX
+
+# 自定义服务器和密钥路径
+peerclaw agent claim --token PCW-XXXX-XXXX --server https://peerclaw.ai --keypair ./my-agent.key
+```
+
+该命令自动生成 Ed25519 密钥对、签名 token 并向服务器注册。Agent 名称和元数据来自 token（在 Web UI 中设置）。
+
 ### Agent 管理
 
 ```bash
@@ -38,11 +52,38 @@ peerclaw agent list -protocol a2a
 # 查看 Agent 详情
 peerclaw agent get <agent-id>
 
-# 注册 Agent
+# 注册 Agent（手动方式——生产环境推荐使用 claim）
 peerclaw agent register -name "MyAgent" -url http://localhost:3000 -protocols a2a,mcp
 
 # 删除 Agent
 peerclaw agent delete <agent-id>
+```
+
+### Agent 发现
+
+```bash
+# 按能力搜索 Agent
+peerclaw agent discover -capabilities code-review,summarize
+
+# 按协议过滤
+peerclaw agent discover -capabilities translate -protocol a2a
+```
+
+### Agent 心跳
+
+```bash
+# 发送心跳（默认状态：online）
+peerclaw agent heartbeat <agent-id>
+
+# 指定状态
+peerclaw agent heartbeat <agent-id> -status degraded
+```
+
+### Agent 端点验证
+
+```bash
+# 验证 Agent 端点是否可达且拥有对应密钥
+peerclaw agent verify <agent-id>
 ```
 
 ### 发送消息

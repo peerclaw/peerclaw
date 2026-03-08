@@ -59,6 +59,33 @@ peerclaw agent register -name "MyAgent" -url http://localhost:3000 -protocols a2
 peerclaw agent delete <agent-id>
 ```
 
+### Agent Discovery
+
+```bash
+# Find agents by capabilities
+peerclaw agent discover -capabilities code-review,summarize
+
+# Filter by protocol
+peerclaw agent discover -capabilities translate -protocol a2a
+```
+
+### Agent Heartbeat
+
+```bash
+# Send heartbeat (default status: online)
+peerclaw agent heartbeat <agent-id>
+
+# Send with specific status
+peerclaw agent heartbeat <agent-id> -status degraded
+```
+
+### Agent Endpoint Verification
+
+```bash
+# Verify an agent's endpoint is reachable and owns its keys
+peerclaw agent verify <agent-id>
+```
+
 ### Sending Messages
 
 ```bash
