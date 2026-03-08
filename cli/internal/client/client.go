@@ -118,6 +118,27 @@ func (c *Client) RegisterAgent(ctx context.Context, req RegisterRequest) (*agent
 	return &resp, nil
 }
 
+// ClaimRequest is the request body for claiming an agent via token.
+type ClaimRequest struct {
+	Token        string            `json:"token"`
+	Name         string            `json:"name"`
+	PublicKey    string            `json:"public_key"`
+	Capabilities []string          `json:"capabilities,omitempty"`
+	Protocols    []string          `json:"protocols"`
+	Endpoint     EndpointReq       `json:"endpoint"`
+	Signature    string            `json:"signature"`
+	Metadata     map[string]string `json:"metadata,omitempty"`
+}
+
+// ClaimAgent registers an agent using a claim token.
+func (c *Client) ClaimAgent(ctx context.Context, req ClaimRequest) (*agentcard.Card, error) {
+	var resp agentcard.Card
+	if err := c.post(ctx, "/api/v1/agents/claim", req, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 // DeleteAgent deregisters an agent by ID.
 func (c *Client) DeleteAgent(ctx context.Context, id string) error {
 	reqURL := c.baseURL + "/api/v1/agents/" + id

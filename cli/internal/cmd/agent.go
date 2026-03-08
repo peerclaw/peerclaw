@@ -24,6 +24,8 @@ func RunAgent(args []string, serverURL string) int {
 		return runAgentGet(args[1:], serverURL)
 	case "register":
 		return runAgentRegister(args[1:], serverURL)
+	case "claim":
+		return runAgentClaim(args[1:], serverURL)
 	case "delete":
 		return runAgentDelete(args[1:], serverURL)
 	case "help", "-h":
@@ -43,6 +45,7 @@ Subcommands:
   list       List registered agents
   get        Get agent details
   register   Register a new agent
+  claim      Register an agent using a claim token
   delete     Delete an agent
 `)
 }
