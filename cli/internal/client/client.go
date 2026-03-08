@@ -97,6 +97,7 @@ type RegisterRequest struct {
 	Name         string            `json:"name"`
 	Description  string            `json:"description,omitempty"`
 	Version      string            `json:"version,omitempty"`
+	PublicKey    string            `json:"public_key,omitempty"`
 	Capabilities []string          `json:"capabilities,omitempty"`
 	Endpoint     EndpointReq       `json:"endpoint"`
 	Protocols    []string          `json:"protocols"`
@@ -106,6 +107,8 @@ type RegisterRequest struct {
 // EndpointReq is the endpoint specification for registration.
 type EndpointReq struct {
 	URL       string `json:"url"`
+	Host      string `json:"host,omitempty"`
+	Port      int    `json:"port,omitempty"`
 	Transport string `json:"transport,omitempty"`
 }
 

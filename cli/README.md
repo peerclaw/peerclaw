@@ -26,6 +26,20 @@ peerclaw config set server http://my-server:8080
 peerclaw config show
 ```
 
+### Agent Registration via Claim Token (recommended)
+
+The easiest way to register an agent — no code required:
+
+```bash
+# Claim a token generated from the Provider Console
+peerclaw agent claim --token PCW-XXXX-XXXX
+
+# With custom server and keypair path
+peerclaw agent claim --token PCW-XXXX-XXXX --server https://peerclaw.ai --keypair ./my-agent.key
+```
+
+The command automatically generates an Ed25519 keypair, signs the token, and registers with the server. Agent name and metadata come from the token (set in the web UI).
+
 ### Agent Management
 
 ```bash
@@ -38,7 +52,7 @@ peerclaw agent list -protocol a2a
 # View agent details
 peerclaw agent get <agent-id>
 
-# Register an agent
+# Register an agent (manual — prefer claim for production use)
 peerclaw agent register -name "MyAgent" -url http://localhost:3000 -protocols a2a,mcp
 
 # Delete an agent
