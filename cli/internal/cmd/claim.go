@@ -15,16 +15,16 @@ func runAgentClaim(args []string, serverURL string) int {
 	fs := flag.NewFlagSet("agent claim", flag.ExitOnError)
 	addServerFlag(fs, &serverURL)
 	token := fs.String("token", "", "Claim token (e.g., PCW-XXXX-XXXX) (required)")
-	name := fs.String("name", "", "Agent name (required)")
+	name := fs.String("name", "", "Agent name (optional — defaults to name set in token)")
 	keypairPath := fs.String("keypair", "./agent.key", "Path to save/load Ed25519 keypair")
-	capabilities := fs.String("capabilities", "", "Comma-separated capabilities")
-	protocols := fs.String("protocols", "a2a", "Comma-separated protocols")
-	endpointURL := fs.String("url", "", "Agent endpoint URL")
+	capabilities := fs.String("capabilities", "", "Comma-separated capabilities (optional)")
+	protocols := fs.String("protocols", "", "Comma-separated protocols (optional)")
+	endpointURL := fs.String("url", "", "Agent endpoint URL (optional)")
 	fs.Parse(args)
 
-	if *token == "" || *name == "" {
-		fmt.Fprintf(os.Stderr, "Error: --token and --name are required\n\n")
-		fmt.Fprintf(os.Stderr, "Usage: peerclaw agent claim --token <PCW-XXXX-XXXX> --name <agent-name>\n\n")
+	if *token == "" {
+		fmt.Fprintf(os.Stderr, "Error: --token is required\n\n")
+		fmt.Fprintf(os.Stderr, "Usage: peerclaw agent claim --token <PCW-XXXX-XXXX>\n\n")
 		fmt.Fprintf(os.Stderr, "Flags:\n")
 		fs.PrintDefaults()
 		return 1
@@ -54,14 +54,18 @@ func runAgentClaim(args []string, serverURL string) int {
 	if *capabilities != "" {
 		caps = strings.Split(*capabilities, ",")
 	}
+	var protos []string
+	if *protocols != "" {
+		protos = strings.Split(*protocols, ",")
+	}
 
 	c := client.New(serverURL)
 	card, err := c.ClaimAgent(context.Background(), client.ClaimRequest{
 		Token:        *token,
-		Name:         *name,
+		Name:         *name, // empty string is fine — server uses token metadata
 		PublicKey:    kp.PublicKeyString(),
 		Capabilities: caps,
-		Protocols:    strings.Split(*protocols, ","),
+		Protocols:    protos,
 		Endpoint:     client.EndpointReq{URL: *endpointURL},
 		Signature:    sig,
 	})
