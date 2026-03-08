@@ -244,6 +244,64 @@ func (c *Client) VerifyEndpoint(ctx context.Context, agentID string) (*VerifyRes
 	return &resp, nil
 }
 
+// --- Contacts ---
+
+// ContactResponse is a single contact entry.
+type ContactResponse struct {
+	ID             string `json:"id"`
+	OwnerAgentID   string `json:"owner_agent_id"`
+	ContactAgentID string `json:"contact_agent_id"`
+	Alias          string `json:"alias"`
+	CreatedAt      string `json:"created_at"`
+}
+
+// ListContactsResponse is the response from listing contacts.
+type ListContactsResponse struct {
+	Contacts []ContactResponse `json:"contacts"`
+}
+
+// ListContacts lists contacts for the given agent.
+func (c *Client) ListContacts(ctx context.Context, agentID string) (*ListContactsResponse, error) {
+	var resp ListContactsResponse
+	if err := c.get(ctx, "/api/v1/agents/"+agentID+"/contacts", nil, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// AddContactRequest is the request body for adding a contact.
+type AddContactRequest struct {
+	ContactAgentID string `json:"contact_agent_id"`
+	Alias          string `json:"alias,omitempty"`
+}
+
+// AddContact adds a contact to the agent's whitelist.
+func (c *Client) AddContact(ctx context.Context, agentID string, req AddContactRequest) (*ContactResponse, error) {
+	var resp ContactResponse
+	if err := c.post(ctx, "/api/v1/agents/"+agentID+"/contacts", req, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// RemoveContact removes a contact from the agent's whitelist.
+func (c *Client) RemoveContact(ctx context.Context, agentID, contactAgentID string) error {
+	reqURL := c.baseURL + "/api/v1/agents/" + agentID + "/contacts/" + contactAgentID
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, reqURL, nil)
+	if err != nil {
+		return err
+	}
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusNoContent {
+		return c.readError(resp)
+	}
+	return nil
+}
+
 // --- HTTP helpers ---
 
 func (c *Client) get(ctx context.Context, path string, params url.Values, out any) error {

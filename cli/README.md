@@ -86,6 +86,19 @@ peerclaw agent heartbeat <agent-id> -status degraded
 peerclaw agent verify <agent-id>
 ```
 
+### Agent Contacts Whitelist
+
+```bash
+# List contacts for an agent
+peerclaw agent contacts list <agent-id>
+
+# Add a contact (allow another agent to send messages)
+peerclaw agent contacts add <agent-id> --contact <contact-agent-id> --alias "My Partner"
+
+# Remove a contact
+peerclaw agent contacts remove <agent-id> --contact <contact-agent-id>
+```
+
 ### Sending Messages
 
 ```bash

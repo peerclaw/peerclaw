@@ -86,6 +86,19 @@ peerclaw agent heartbeat <agent-id> -status degraded
 peerclaw agent verify <agent-id>
 ```
 
+### Agent 联系人白名单
+
+```bash
+# 列出 Agent 的联系人
+peerclaw agent contacts list <agent-id>
+
+# 添加联系人（允许另一个 Agent 发送消息）
+peerclaw agent contacts add <agent-id> --contact <contact-agent-id> --alias "我的伙伴"
+
+# 移除联系人
+peerclaw agent contacts remove <agent-id> --contact <contact-agent-id>
+```
+
 ### 发送消息
 
 ```bash
