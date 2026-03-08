@@ -8,7 +8,7 @@ Build the trust infrastructure for AI Agents and evolve it into an open marketpl
 
 **Layer 1 — Infrastructure (Complete):** Decentralization-first communication, verifiable identity, reputation scoring, and cross-protocol bridging (A2A / MCP / ACP). Any Agent, regardless of protocol or deployment location, can discover and communicate with others securely and efficiently.
 
-**Layer 2 — Marketplace (Next):** A C2C Agent Marketplace built on top of this infrastructure, where anyone can publish an Agent as a service and anyone (human or Agent) can discover, evaluate, and invoke it — regardless of protocol.
+**Layer 2 — Marketplace (Complete):** A C2C Agent Marketplace built on top of this infrastructure, where anyone can publish an Agent as a service and anyone (human or Agent) can discover, evaluate, and invoke it — regardless of protocol.
 
 ## Target Users
 
@@ -139,7 +139,7 @@ The Provider registers their Agent once. Consumers discover it through the marke
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                    Marketplace Layer (Next)                     │
+│                    Marketplace Layer (Complete)                   │
 │                                                                │
 │  Landing / Explore / Agent Profile / Playground                │
 │  User Accounts / Reviews & Ratings / Provider Analytics        │

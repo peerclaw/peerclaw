@@ -255,3 +255,23 @@ Community-driven trust signals and provider analytics.
 - [x] **Categories & tagging** — Structured categorization with `categories` + `agent_categories` tables, category filter on directory
 - [x] **Provider analytics dashboard** — Call volume time series, agent stats (total/success/error calls, avg/p95 duration)
 - [x] **Abuse reporting** — Report system for agents and reviews with reason + details, status tracking (pending/reviewed/dismissed/actioned)
+
+## Post-Phase 7: P2P Connection Orchestrator (Complete)
+
+Close the gap between signaling infrastructure and automatic P2P connectivity.
+
+- [x] **Connection Manager** (`agent/conn/`)
+  - Signaling inbox consumption loop (offer / answer / ICE candidate dispatch)
+  - Offerer flow: create WebRTCTransport → exchange SDP + ICE via signaling → block until DataChannel opens
+  - Answerer flow: respond with SDP answer, tie-breaking by agent ID
+  - ICE connection state monitoring → auto-register peer on Connected/Completed
+  - Receive loop: read envelopes from DataChannel, dispatch to message handler
+  - X25519 public key exchange in offer/answer for E2E encrypted sessions
+- [x] **Agent Send() P2P-first with relay fallback**
+  - Priority 1: existing P2P connection via PeerManager
+  - Priority 2: establish new P2P connection via ConnManager (15s timeout)
+  - Priority 3: signaling relay via bridge_message (WebSocket server relay)
+- [x] **Signaling reconnection**
+  - Auto-reconnect on unexpected WebSocket disconnection
+  - Exponential backoff (1s → 60s)
+- [x] **SignalingClient.SetAgentID()** — Deferred agent ID binding (set after registration, before Connect)

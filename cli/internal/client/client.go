@@ -302,6 +302,95 @@ func (c *Client) RemoveContact(ctx context.Context, agentID, contactAgentID stri
 	return nil
 }
 
+// --- Directory & Reputation ---
+
+// DirectoryAgent is the public profile of an agent from the directory.
+type DirectoryAgent struct {
+	ID               string   `json:"id"`
+	Name             string   `json:"name"`
+	Description      string   `json:"description,omitempty"`
+	Version          string   `json:"version,omitempty"`
+	PublicKey        string   `json:"public_key,omitempty"`
+	Capabilities     []string `json:"capabilities,omitempty"`
+	Protocols        []string `json:"protocols,omitempty"`
+	Status           string   `json:"status"`
+	Tags             []string `json:"tags,omitempty"`
+	Verified         bool     `json:"verified"`
+	Trusted          bool     `json:"trusted"`
+	ReputationScore  float64  `json:"reputation_score"`
+	ReputationEvents int64    `json:"reputation_events"`
+	TotalCalls       int64    `json:"total_calls"`
+	EndpointURL      string   `json:"endpoint_url,omitempty"`
+	RegisteredAt     string   `json:"registered_at"`
+}
+
+// DirectoryResponse is the response from the public directory endpoint.
+type DirectoryResponse struct {
+	Agents        []DirectoryAgent `json:"agents"`
+	NextPageToken string           `json:"next_page_token,omitempty"`
+	TotalCount    int              `json:"total_count"`
+}
+
+// ListDirectory lists agents from the public directory.
+func (c *Client) ListDirectory(ctx context.Context, opts ListAgentsOptions) (*DirectoryResponse, error) {
+	params := url.Values{}
+	if opts.Protocol != "" {
+		params.Set("protocol", opts.Protocol)
+	}
+	if opts.Capability != "" {
+		params.Set("capability", opts.Capability)
+	}
+	if opts.Status != "" {
+		params.Set("status", opts.Status)
+	}
+	if opts.PageToken != "" {
+		params.Set("page_token", opts.PageToken)
+	}
+	var resp DirectoryResponse
+	if err := c.get(ctx, "/api/v1/directory", params, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// GetDirectoryAgent retrieves a single agent's public profile by ID.
+func (c *Client) GetDirectoryAgent(ctx context.Context, id string) (*DirectoryAgent, error) {
+	var resp DirectoryAgent
+	if err := c.get(ctx, "/api/v1/directory/"+id, nil, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// ReputationEvent is a single reputation event record.
+type ReputationEvent struct {
+	ID         int64   `json:"id"`
+	AgentID    string  `json:"agent_id"`
+	EventType  string  `json:"event_type"`
+	Weight     float64 `json:"weight"`
+	ScoreAfter float64 `json:"score_after"`
+	Metadata   string  `json:"metadata,omitempty"`
+	CreatedAt  string  `json:"created_at"`
+}
+
+// ReputationHistoryResponse is the response from the reputation history endpoint.
+type ReputationHistoryResponse struct {
+	Events []ReputationEvent `json:"events"`
+}
+
+// GetReputationHistory retrieves the reputation event history for an agent.
+func (c *Client) GetReputationHistory(ctx context.Context, agentID string, limit int) (*ReputationHistoryResponse, error) {
+	params := url.Values{}
+	if limit > 0 {
+		params.Set("limit", fmt.Sprintf("%d", limit))
+	}
+	var resp ReputationHistoryResponse
+	if err := c.get(ctx, "/api/v1/directory/"+agentID+"/reputation", params, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 // --- HTTP helpers ---
 
 func (c *Client) get(ctx context.Context, path string, params url.Values, out any) error {

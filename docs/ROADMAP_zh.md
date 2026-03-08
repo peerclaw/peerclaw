@@ -255,3 +255,23 @@
 - [x] **分类与标签** — 结构化分类，`categories` + `agent_categories` 表，目录支持分类过滤
 - [x] **Provider 分析面板** — 调用量时间序列、Agent 统计（总量/成功/错误调用，平均/P95 延迟）
 - [x] **举报机制** — Agent 和评论举报系统，支持原因 + 详情，状态追踪（pending/reviewed/dismissed/actioned）
+
+## Post-Phase 7: P2P 连接编排器 (已完成)
+
+弥合信令基础设施与自动 P2P 连接之间的差距。
+
+- [x] **连接管理器** (`agent/conn/`)
+  - 信令 inbox 消费循环（offer / answer / ICE candidate 分发）
+  - Offerer 流程：创建 WebRTCTransport → 通过信令交换 SDP + ICE → 阻塞直到 DataChannel 建立
+  - Answerer 流程：响应 SDP answer，通过 agent ID 字典序仲裁冲突
+  - ICE 连接状态监控 → Connected/Completed 时自动注册 peer
+  - 接收循环：从 DataChannel 读取信封，分发到消息处理器
+  - offer/answer 中交换 X25519 公钥用于 E2E 加密会话
+- [x] **Agent Send() P2P 优先 + 中继降级**
+  - 优先级 1：通过 PeerManager 使用已有 P2P 连接
+  - 优先级 2：通过 ConnManager 建立新 P2P 连接（15s 超时）
+  - 优先级 3：通过 bridge_message 信令中继（WebSocket 服务器转发）
+- [x] **信令断线重连**
+  - WebSocket 意外断开后自动重连
+  - 指数退避（1s → 60s）
+- [x] **SignalingClient.SetAgentID()** — 延迟 agent ID 绑定（注册后设置，连接前调用）
