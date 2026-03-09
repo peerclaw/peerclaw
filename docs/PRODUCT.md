@@ -293,6 +293,19 @@ Messages are wrapped in an Envelope containing source/destination, protocol type
 | Controls | Resource limits, operation allowlists |
 | Threat Mitigation | Malicious operations, resource exhaustion |
 
+### Layer 5: P2P Communication -- Whitelist + Message Validation (Phase 8)
+
+| Property | Description |
+|----------|-------------|
+| Default Policy | Default-deny — Agents must be whitelisted before communication |
+| Agent-Side Whitelist | TrustStore-based check on inbound/outbound messages and connections |
+| Server-Side Whitelist | ContactsChecker on signaling Hub blocks offer/answer/ICE for non-contacts |
+| Connection Gating | ConnectionGate callback rejects offers before any WebRTC resource allocation |
+| Message Validation | Signature verification, timestamp freshness (±2min), nonce-based replay protection, payload size limit (1MB) |
+| Anti-Replay | UUID nonce per message, server-side nonce cache with 5-minute cleanup |
+| Threat Mitigation | Prompt injection, replay attacks, resource exhaustion from unauthorized connections, DDoS via signaling flood |
+| Architecture | Defense-in-depth: Agent TrustStore (primary) + Server contacts service (secondary) |
+
 ## Protocol Compatibility Matrix
 
 | Feature | A2A | ACP | MCP |
@@ -411,4 +424,5 @@ Infrastructure               Platform                        (AaaS)
 
 - **Infrastructure** (Phase 1-4): Core protocol gateway — registry, signaling, bridging, transport, production readiness.
 - **Identity & Trust Platform** (Phase 5-6): Decentralized identity, reputation scoring, endpoint verification, public directory. The real interactions generate trust data that differentiates PeerClaw.
-- **Agent Marketplace** (Phase 7+): A C2C marketplace where anyone can publish an Agent as a service and anyone can discover, evaluate, try, and invoke it — regardless of protocol. See [Roadmap Phase 7](ROADMAP.md) for details.
+- **Agent Marketplace** (Phase 7+): A C2C marketplace where anyone can publish an Agent as a service and anyone can discover, evaluate, try, and invoke it — regardless of protocol.
+- **P2P Security Hardening** (Phase 8): Default-deny whitelist enforcement, message validation pipeline (signature, replay, timestamp), and connection gating — defense-in-depth at both Agent and Server layers. See [Roadmap](ROADMAP.md) for details.

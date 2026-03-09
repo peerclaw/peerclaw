@@ -275,3 +275,32 @@
   - WebSocket 意外断开后自动重连
   - 指数退避（1s → 60s）
 - [x] **SignalingClient.SetAgentID()** — 延迟 agent ID 绑定（注册后设置，连接前调用）
+
+## Phase 8: P2P 通信安全加固 (已完成)
+
+Agent P2P 通信默认拒绝安全模型 — Agent 必须先加入白名单才能建立连接或交换消息。
+
+- [x] **消息验证管线**
+  - MessageValidator 接入 HandleIncomingEnvelope（签名验证、重放防护、载荷大小检查）
+  - Send() 自动填充 Nonce（UUID）、Timestamp、Source 后再签名
+  - 后台 nonce 清理 goroutine（5 分钟间隔）
+- [x] **白名单强制执行（默认拒绝）**
+  - Agent 端：TrustStore 白名单检查入站和出站消息
+  - Agent 端：Send() 拒绝发送到非白名单目标
+  - Server 端：信令 Hub 上的 ContactsChecker 接口 — 拦截非联系人的 offer/answer/ICE
+  - 服务端启动时将 contacts 服务接入信令 Hub
+- [x] **连接门控**
+  - conn.Manager 中的 ConnectionGate 回调 — 在分配任何 WebRTC 资源之前检查
+  - 非白名单 peer 的入站 offer 被静默丢弃（零资源开销）
+  - 出站 Connect() 也在发起 WebRTC 握手前检查门控
+  - 门控组合 TrustStore 检查 + owner 注册的 ConnectionRequestHandler 回调
+- [x] **联系人管理 API**
+  - `AddContact(agentID)` — 将 peer 加入白名单（TrustVerified）
+  - `RemoveContact(agentID)` — 从白名单移除
+  - `BlockAgent(agentID)` — 拉黑 peer（TrustBlocked）
+  - `ListContacts()` — 列出所有信任条目
+  - `OnConnectionRequest(handler)` — 注册未知 peer 连接请求的回调
+- [x] **纵深防御架构**
+  - 第一层（Agent）：TrustStore + EWMA 声誉作为主防线
+  - 第二层（Server）：contacts 服务作为信令转发的辅助防线
+  - connection_request 信令消息类型用于通知 owner

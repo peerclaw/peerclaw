@@ -214,6 +214,9 @@ These are available but not required for basic usage:
 | **Identity Anchoring** | Bind Ed25519 identity to Nostr/DNS for public verification |
 | **Offline Messaging** | Message cache with TTL, auto-flush on peer reconnect |
 | **Serverless Mode** | Full P2P operation without any central server |
+| **P2P Whitelist** | Default-deny contact management — Agents must be whitelisted before connecting or messaging |
+| **Connection Gating** | ConnectionGate rejects unauthorized WebRTC offers before allocating any resources |
+| **Message Validation** | Signature verification, timestamp freshness, nonce-based replay protection on every message |
 
 ## Agent Marketplace (Phase 7)
 

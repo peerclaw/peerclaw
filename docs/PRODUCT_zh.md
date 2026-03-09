@@ -287,6 +287,19 @@ WebRTC ICE 协商完成后，Agent A 和 B 建立 DataChannel 直连。如果 IC
 | 控制 | 资源限制、操作白名单 |
 | 威胁缓解 | 恶意操作、资源耗尽 |
 
+### 第五层：P2P 通信 — 白名单 + 消息验证（Phase 8）
+
+| 属性 | 说明 |
+|------|------|
+| 默认策略 | 默认拒绝 — Agent 必须先加入白名单才能通信 |
+| Agent 端白名单 | TrustStore 检查入站/出站消息和连接 |
+| Server 端白名单 | 信令 Hub 上的 ContactsChecker 拦截非联系人的 offer/answer/ICE |
+| 连接门控 | ConnectionGate 回调在分配任何 WebRTC 资源之前拒绝非白名单 offer |
+| 消息验证 | 签名验证、时间戳新鲜度（±2 分钟）、基于 nonce 的重放防护、载荷大小限制（1MB） |
+| 反重放 | 每条消息 UUID nonce，服务端 nonce 缓存 + 5 分钟清理 |
+| 威胁缓解 | Prompt 注入、重放攻击、未授权连接的资源耗尽、信令泛洪 DDoS |
+| 架构 | 纵深防御：Agent TrustStore（主防线）+ Server contacts 服务（辅助防线） |
+
 ## 协议兼容矩阵
 
 | 特性 | A2A | ACP | MCP |
@@ -404,4 +417,5 @@ Phase 1-4                    Phase 5-6                       Phase 7+
 
 - **基础设施**（Phase 1-4）：核心协议网关 — 注册中心、信令、桥接、传输、生产就绪。
 - **身份与信任平台**（Phase 5-6）：去中心化身份、声誉评分、端点验证、公开目录。真实交互产生的信任数据是 PeerClaw 的核心差异化。
-- **Agent Marketplace**（Phase 7+）：C2C Marketplace，任何人都可以将 Agent 发布为服务，任何人都可以发现、评估、试用和调用它 — 无需关心底层协议。详见 [Roadmap Phase 7](ROADMAP_zh.md)。
+- **Agent Marketplace**（Phase 7+）：C2C Marketplace，任何人都可以将 Agent 发布为服务，任何人都可以发现、评估、试用和调用它 — 无需关心底层协议。
+- **P2P 通信安全加固**（Phase 8）：默认拒绝白名单强制执行、消息验证管线（签名、重放、时间戳）、连接门控 — Agent 端和 Server 端纵深防御。详见[路线图](ROADMAP_zh.md)。

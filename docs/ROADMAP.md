@@ -275,3 +275,32 @@ Close the gap between signaling infrastructure and automatic P2P connectivity.
   - Auto-reconnect on unexpected WebSocket disconnection
   - Exponential backoff (1s → 60s)
 - [x] **SignalingClient.SetAgentID()** — Deferred agent ID binding (set after registration, before Connect)
+
+## Phase 8: P2P Communication Security Hardening (Complete)
+
+Default-deny security model for Agent P2P communication — Agents must be whitelisted before they can connect or exchange messages.
+
+- [x] **Message validation pipeline**
+  - MessageValidator integrated into HandleIncomingEnvelope (signature verification, replay protection, payload size check)
+  - Send() auto-populates Nonce (UUID), Timestamp, and Source before signing
+  - Background nonce cleanup goroutine (5-minute interval)
+- [x] **Whitelist enforcement (default-deny)**
+  - Agent-side: TrustStore-based whitelist check on both inbound and outbound messages
+  - Agent-side: Outbound Send() rejects messages to non-whitelisted destinations
+  - Server-side: ContactsChecker interface on signaling Hub — blocks offer/answer/ICE for non-contacts
+  - Contacts service wired into signaling hub at server startup
+- [x] **Connection gating**
+  - ConnectionGate callback in conn.Manager — checked before any WebRTC resource allocation
+  - Inbound offers from non-whitelisted peers are silently dropped (zero resource cost)
+  - Outbound Connect() also checks gate before initiating WebRTC handshake
+  - Gate combines TrustStore check + owner-registered ConnectionRequestHandler callback
+- [x] **Contact management API**
+  - `AddContact(agentID)` — whitelist a peer (TrustVerified)
+  - `RemoveContact(agentID)` — remove from whitelist
+  - `BlockAgent(agentID)` — block a peer (TrustBlocked)
+  - `ListContacts()` — list all trust entries
+  - `OnConnectionRequest(handler)` — register callback for unknown peer connection requests
+- [x] **Defense-in-depth architecture**
+  - Layer 1 (Agent): TrustStore + EWMA reputation as primary defense
+  - Layer 2 (Server): contacts service as secondary defense on signaling relay
+  - connection_request signaling message type for owner notification
