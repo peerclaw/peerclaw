@@ -24,6 +24,11 @@ bridge:
   acp:
     enabled: true
 
+user_auth:
+  enabled: true
+  jwt_secret: "${JWT_SECRET}"
+  admin_emails: []    # emails auto-promoted to admin on login/register
+
 rate_limit:
   enabled: true
   requests_per_sec: 100

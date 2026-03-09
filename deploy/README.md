@@ -82,6 +82,43 @@ open https://peerclaw.ai
 - `.env` — Sensitive credentials (database passwords, Redis password)
 - `Caddyfile` — Reverse proxy and TLS settings
 
+## CLI Install Script
+
+The server automatically serves the CLI install script at `/install.sh`. Users can install the PeerClaw CLI with:
+
+```bash
+curl -fsSL https://<your-domain>/install.sh | sh
+```
+
+The script detects the user's OS and architecture, then downloads the latest release binary from GitHub.
+
+## Third-Party Deployment
+
+To run your own PeerClaw instance with a custom CLI distribution:
+
+1. **Fork the CLI repository** — fork `peerclaw/peerclaw-cli` and publish your own GitHub Releases.
+
+2. **Update the install script** — edit `server/internal/server/install.sh` and change the `REPO` variable to your fork (e.g. `REPO="yourorg/peerclaw-cli"`).
+
+3. **Update the Caddyfile** — replace the domain in `Caddyfile` with your own domain.
+
+4. **Configure admin emails** — in `peerclaw.yaml`, set `user_auth.admin_emails` to auto-promote specific emails to admin on registration:
+
+```yaml
+user_auth:
+  enabled: true
+  jwt_secret: "${JWT_SECRET}"
+  admin_emails:
+    - "admin@yourdomain.com"
+```
+
+5. **Rebuild and deploy** — rebuild the Docker image and start services:
+
+```bash
+docker compose build peerclaw
+docker compose up -d
+```
+
 ## Operations
 
 ```bash
