@@ -387,11 +387,48 @@ PeerClaw as a native OpenClaw communication channel — like WhatsApp, Telegram,
 - [ ] **WebSocket bridge** — PeerClaw agent maintains WebSocket connection to OpenClaw gateway (port 18789) for real-time event push
 - [ ] **Agent identity binding** — OpenClaw instance's identity mapped to PeerClaw Ed25519 keypair
 
-## Phase 15: A2A Task Model & ACP Bridge
+## Phase 15: Protocol Ecosystem Integration
 
-Protocol-level interoperability with the broader agent ecosystem.
+Deep integration with the three major agent protocols, making PeerClaw a native participant in each ecosystem.
 
-- [ ] **A2A Task model integration** — Map PeerClaw Envelope request-response to A2A Task lifecycle states
-- [ ] **A2A HTTP bridge** — Expose PeerClaw agents as standard A2A HTTP endpoints (Agent Card at `/.well-known/agent.json`)
-- [ ] **ACP bridge** — ndJSON/stdio bridge enabling ACP-compatible agents to join the PeerClaw network
-- [ ] **Protocol auto-detection** — Inbound connections auto-detected as A2A, MCP, or ACP and routed accordingly
+### Phase 15a: MCP Server (`peerclaw-mcp`)
+
+Standalone MCP Server binary — any MCP Host (Claude Code, VS Code Copilot, Cursor, etc.) can use PeerClaw as a tool provider.
+
+- [ ] **`peerclaw-mcp` stdio binary** — Wraps `agent/tools/` as a proper MCP Server using `github.com/modelcontextprotocol/go-sdk`
+- [ ] **Tool registration** — 8 PeerClaw tools registered with JSON Schema, descriptions, and MCP Tool Annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`)
+- [ ] **Streamable HTTP transport** — Optional HTTP mode (`--transport http --port 8081`) for remote MCP hosting, alongside default stdio
+- [ ] **Resource exposure** — Agent Card, trust store entries, and reputation data exposed as MCP Resources (`resources/list`, `resources/read`)
+- [ ] **Session management** — `initialize` handshake, `Mcp-Session-Id` header, capability negotiation
+- [ ] **Configuration** — `claude_desktop_config.json` / VS Code `settings.json` example configs for one-click setup
+
+### Phase 15b: A2A Task Model & HTTP Bridge
+
+Expose PeerClaw agents as standard A2A HTTP endpoints — any A2A client can discover and invoke PeerClaw agents.
+
+- [ ] **A2A Task model mapping** — Map PeerClaw Envelope request-response to A2A Task lifecycle (submitted → working → input-required → completed/failed/canceled)
+- [ ] **A2A HTTP endpoints** — `POST /a2a` JSON-RPC handler (`message/send`, `tasks/get`, `tasks/cancel`) backed by PeerClaw bridge
+- [ ] **Agent Card serving** — `GET /.well-known/agent.json` auto-generated from PeerClaw agent registration data
+- [ ] **Streaming support** — A2A SSE streaming mapped to PeerClaw's existing SSE invoke flow
+- [ ] **Push notifications** — A2A push notification support for long-running tasks (webhook callback URL)
+- [ ] **Multi-turn sessions** — A2A `contextId` mapped to PeerClaw `session_id` for stateful conversations
+
+### Phase 15c: Agent Client Protocol Bridge
+
+ndJSON/stdio bridge enabling ACP-compatible agents (OpenClaw, Zed AI, Coder) to join the PeerClaw network.
+
+- [ ] **ACP stdio adapter** — ndJSON/stdio bridge process using `github.com/coder/acp-go-sdk`, translates ACP messages ↔ PeerClaw Envelopes
+- [ ] **Agent Manifest translation** — PeerClaw Agent Card ↔ ACP Agent Manifest bidirectional mapping
+- [ ] **Session/Run lifecycle** — ACP Session + Run model mapped to PeerClaw sessions; Run states mapped to Envelope exchanges
+- [ ] **OpenClaw integration** — ACP bridge as OpenClaw's native channel for PeerClaw network access (complements Phase 14 Channel Plugin)
+- [ ] **Enterprise intranet mode** — Simplified ACP bridge for corporate environments: single peerclaw-server + multiple ACP agent processes on internal network, no Nostr/DHT/STUN
+- [ ] **Multi-agent orchestration** — ACP's `context_transfers` and `event_stream` mapped to PeerClaw broadcast/handler primitives
+
+### Phase 15d: Universal Protocol Gateway
+
+Unified ingress that auto-detects and routes any agent protocol.
+
+- [ ] **Protocol auto-detection** — Inbound connections identified by content-type and payload structure (JSON-RPC → A2A/MCP, ndJSON → ACP, binary → PeerClaw native)
+- [ ] **Unified routing** — Single gateway endpoint that dispatches to appropriate protocol adapter
+- [ ] **Protocol translation matrix** — Bidirectional translation between all protocol pairs (A2A ↔ MCP ↔ ACP ↔ PeerClaw), extending Phase 3 adapters with real-world handling
+- [ ] **Gateway metrics** — Per-protocol request counts, translation latency, error rates exposed via OpenTelemetry
