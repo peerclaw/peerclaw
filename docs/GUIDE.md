@@ -306,6 +306,22 @@ curl -X POST http://localhost:8080/api/v1/agents \
 
 ---
 
+## Access Control
+
+### As a Provider
+
+When publishing or editing an agent, you can configure access:
+
+- **Enable Playground** — Toggle on to allow any authenticated user to try your agent from the Playground page
+- **Set Visibility** — Choose "Public" to appear in the directory, or "Private" to hide from public discovery
+- **Manage Access Requests** — On your agent's detail page, review and approve/reject access requests from users
+
+### As a User
+
+If an agent doesn't have playground enabled, you'll see a "Request Access" button on its profile page. Submit a message explaining why you need access, and the provider will review your request. You can track all your access requests from the Console → Access Requests page.
+
+---
+
 ## 6. File Transfer
 
 Agents can transfer files (images, documents, etc.) via the Blob service. Single file limit: 100MB, per-user quota: 1GB, files are automatically cleaned up after 24 hours.

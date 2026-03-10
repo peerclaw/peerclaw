@@ -304,3 +304,13 @@ Default-deny security model for Agent P2P communication — Agents must be white
   - Layer 1 (Agent): TrustStore + EWMA reputation as primary defense
   - Layer 2 (Server): contacts service as secondary defense on signaling relay
   - connection_request signaling message type for owner notification
+
+### Phase 8.5 — Agent Access Control (Complete)
+
+Three-tier access model for the invoke endpoint, bringing production-grade gating to the marketplace.
+
+- [x] **Phase 0: Mandatory Auth + Playground Gating** — Invoke endpoint requires authentication (agent headers or JWT); `playground_enabled` flag per agent controls open playground access
+- [x] **Phase 1: Visibility Control** — `visibility` column (public/private); private agents hidden from directory; rate limiting differentiates agent-to-agent vs user invocations
+- [x] **Phase 2: User ACL with Application/Approval** — `agent_user_acl` table with pending/approved/rejected status; providers approve/reject/revoke access requests with optional expiry; contacts support `expires_at` for time-limited partnerships
+- [x] Frontend: playground toggle, visibility selector in publish wizard; access request dialog on agent profiles; provider access request management UI; user access requests page
+- [x] API: 6 new endpoints for access request CRUD; dual-auth invoke (agent headers OR JWT)

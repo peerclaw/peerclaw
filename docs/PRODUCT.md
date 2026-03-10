@@ -306,6 +306,16 @@ Messages are wrapped in an Envelope containing source/destination, protocol type
 | Threat Mitigation | Prompt injection, replay attacks, resource exhaustion from unauthorized connections, DDoS via signaling flood |
 | Architecture | Defense-in-depth: Agent TrustStore (primary) + Server contacts service (secondary) |
 
+### Agent Access Control
+
+PeerClaw enforces three tiers of access for agent invocation:
+
+1. **Playground Access** — Agents with `playground_enabled=true` can be invoked by any authenticated user from the playground. This is opt-in per agent.
+2. **Private Agents** — Agents with `visibility=private` are hidden from the public directory and can only be invoked by whitelisted contacts or approved users.
+3. **User ACL** — For agents that are neither playground-enabled nor have the caller in contacts, users can submit access requests. Providers approve/reject with optional expiry dates.
+
+This model gives providers full control over who can invoke their agents, from fully open to fully gated.
+
 ## Protocol Compatibility Matrix
 
 | Feature | A2A | ACP | MCP |
