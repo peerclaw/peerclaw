@@ -68,3 +68,4 @@ server/internal/server/dashboard_dist/
 /core/
 /server/
 /agent/
+/cli/
