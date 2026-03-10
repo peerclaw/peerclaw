@@ -314,3 +314,84 @@ Three-tier access model for the invoke endpoint, bringing production-grade gatin
 - [x] **Phase 2: User ACL with Application/Approval** — `agent_user_acl` table with pending/approved/rejected status; providers approve/reject/revoke access requests with optional expiry; contacts support `expires_at` for time-limited partnerships
 - [x] Frontend: playground toggle, visibility selector in publish wizard; access request dialog on agent profiles; provider access request management UI; user access requests page
 - [x] API: 6 new endpoints for access request CRUD; dual-auth invoke (agent headers OR JWT)
+
+### Phase 8.6 — LLM Tool Calling Integration (Complete)
+
+Wrap PeerClaw agent capabilities as MCP-compatible tool definitions for LLM-driven agents.
+
+- [x] **`agent/tools/` package** — 8 MCP tools (discover_agents, invoke_agent, get_agent_profile, check_reputation, add_contact, remove_contact, list_contacts, send_message)
+- [x] **AgentAPI interface** — Abstraction over `*agent.Agent` for testability
+- [x] **Handler dispatch** — Map-based dispatch with JSON-in/JSON-out, Result wrapper
+- [x] **APIClient** — Thin HTTP client for server directory/invoke/reputation APIs
+- [x] **Tool schema** — JSON Schema definitions for all 8 tools via `AllTools() → []agentcard.Tool`
+- [x] **Tests** — 24 unit tests (mock AgentAPI, dispatch, validation, httptest.Server)
+
+## Phase 9: Request-Response & Agent Collaboration Primitives
+
+Enable synchronous agent-to-agent task delegation — the foundation for multi-agent collaboration.
+
+- [ ] **SendRequest** — `Agent.SendRequest(ctx, env, timeout) → (*Envelope, error)` with TraceID-based correlation
+  - Pending request registry (`map[traceID]chan *Envelope`)
+  - Response matching in `HandleIncomingEnvelope` by TraceID + MessageType=response
+  - Context-based timeout and cancellation
+- [ ] **Envelope response helper** — `envelope.NewResponse(request, payload)` constructor
+- [ ] **Broadcast** — `Agent.Broadcast(ctx, env, destinations) → []error` for fan-out messaging
+- [ ] **A2A Task lifecycle mapping** — Map Envelope exchanges to A2A Task states (submitted → working → completed/failed)
+
+## Phase 10: Inbound Handler Router
+
+Enable agents to serve requests from other agents with capability-based routing.
+
+- [ ] **Handler registration** — `Agent.Handle(capability, func(ctx, *Envelope) (*Envelope, error))` pattern
+- [ ] **Automatic routing** — Incoming envelopes dispatched by metadata capability/action field
+- [ ] **Auto-response** — Handler return value automatically wrapped as response envelope and sent back
+- [ ] **Agent Card auto-generation** — Registered handler names populate Card.Capabilities automatically
+- [ ] **Middleware support** — Pre/post hooks for logging, auth, rate limiting on inbound handlers
+
+## Phase 11: Enterprise Simplified Configuration
+
+Lower the barrier for enterprise intranet deployments.
+
+- [ ] **`agent.NewSimple()`** — Simplified constructor (Name, ServerURL, KeypairPath, Capabilities only)
+  - Auto-configures: Serverless=false, no Nostr, no DHT, no STUN/TURN
+- [ ] **Enterprise deployment guide** — Single peerclaw-server + multiple agents on internal network
+- [ ] **Pre-provisioned trust** — Bulk import of verified contacts for managed environments
+
+## Phase 12: Nostr Relay Mailbox (Offline Message Delivery)
+
+Upgrade Nostr relay from fallback transport to encrypted mailbox, enabling reliable offline message delivery while preserving P2P purity.
+
+- [ ] **Encrypted inbox events** — Publish XChaCha20-encrypted envelopes as Nostr gift-wrapped events (NIP-59/NIP-44)
+- [ ] **Inbox relay configuration** — Agent Profile extended with `inbox_relays` field (analogous to NIP-65)
+- [ ] **Delivery flow** — Send() priority: 1) WebRTC direct → 2) Signaling relay → 3) Nostr inbox relay
+- [ ] **Inbox sync** — On agent startup, query inbox relays for events since last sync timestamp
+- [ ] **Delivery confirmation** — Encrypted delivery receipts sent back through the same channel
+- [ ] **Local outbox with retry** — Sender persists unconfirmed messages; exponential backoff retry
+- [ ] **TTL and cleanup** — Configurable message expiry (default 7 days); auto-cleanup of delivered events
+- [ ] **Wake-up signaling** — Lightweight notification via WebSocket / Webhook / Cron when inbox has pending messages
+
+## Phase 13: OpenClaw SKILL.md Integration
+
+Quick integration with the OpenClaw ecosystem via a SKILL.md skill file.
+
+- [ ] **SKILL.md authoring** — Markdown skill file teaching OpenClaw to use PeerClaw CLI/API for discovery, messaging, and contact management
+- [ ] **CLI enhancements for SKILL.md** — Ensure all operations needed by SKILL.md are available as CLI commands (inbox check, contact approve, etc.)
+- [ ] **Publish to ClawHub** — Submit PeerClaw skill to the OpenClaw skill registry
+
+## Phase 14: OpenClaw Channel Plugin (Deep Integration)
+
+PeerClaw as a native OpenClaw communication channel — like WhatsApp, Telegram, or Slack.
+
+- [ ] **Channel plugin** — OpenClaw channel plugin that connects to PeerClaw agent network
+- [ ] **Bidirectional messaging** — Incoming P2P messages surfaced in OpenClaw; OpenClaw responses sent back via PeerClaw
+- [ ] **WebSocket bridge** — PeerClaw agent maintains WebSocket connection to OpenClaw gateway (port 18789) for real-time event push
+- [ ] **Agent identity binding** — OpenClaw instance's identity mapped to PeerClaw Ed25519 keypair
+
+## Phase 15: A2A Task Model & ACP Bridge
+
+Protocol-level interoperability with the broader agent ecosystem.
+
+- [ ] **A2A Task model integration** — Map PeerClaw Envelope request-response to A2A Task lifecycle states
+- [ ] **A2A HTTP bridge** — Expose PeerClaw agents as standard A2A HTTP endpoints (Agent Card at `/.well-known/agent.json`)
+- [ ] **ACP bridge** — ndJSON/stdio bridge enabling ACP-compatible agents to join the PeerClaw network
+- [ ] **Protocol auto-detection** — Inbound connections auto-detected as A2A, MCP, or ACP and routed accordingly
