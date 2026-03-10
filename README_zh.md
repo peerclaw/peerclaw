@@ -61,8 +61,10 @@ go build -o echo ./examples/echo
 # 终端 3：启动 Agent Bob
 ./echo -name bob -server http://localhost:8080
 
-# 终端 4：查看谁在线（从本仓库的 cli/ 目录运行）
-go run ./cli/cmd/peerclaw agent list
+# 终端 4：查看谁在线（需单独安装 CLI）
+git clone https://github.com/peerclaw/peerclaw-cli.git
+cd peerclaw-cli && go build -o peerclaw ./cmd/peerclaw
+./peerclaw agent list
 ```
 
 Alice 和 Bob 会自动注册、发现对方、并建立加密的 P2P 连接。
@@ -131,7 +133,7 @@ Alice                     网关                      Bob
 | [**peerclaw-core**](https://github.com/peerclaw/peerclaw-core) | 共享类型库 — 身份、信封、Agent Card、协议常量 | Ed25519, X25519, 零外部依赖 |
 | [**peerclaw-server**](https://github.com/peerclaw/peerclaw-server) | 网关 — 注册、发现、信令中转、协议桥接 | SQLite/PostgreSQL, WebSocket, OTel |
 | [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | P2P Agent SDK — 连接、发送、接收，自动传输选择 | WebRTC (Pion), Nostr, TOFU 信任 |
-| **cli/** | 命令行工具 — 管理 Agent、检查健康、发送消息 | Cobra 风格子命令 |
+| [**peerclaw-cli**](https://github.com/peerclaw/peerclaw-cli) | 命令行工具 — 管理 Agent、检查健康、发送消息 | Cobra 风格子命令 |
 
 ## 核心概念
 
@@ -215,10 +217,12 @@ Agent SDK 自动选择最佳传输方式：
 | **离线消息** | 带 TTL 的消息缓存，对端上线自动投递 |
 | **无服务器模式** | 完全 P2P，无需任何中心服务器 |
 | **P2P 白名单** | 默认拒绝的联系人管理 — Agent 必须先加入白名单才能连接或发消息 |
+| **Agent 访问控制** | 三级访问：playground（开放）、private（仅联系人）、用户 ACL 申请/审批工作流 |
+| **可见性控制** | Agent 可设为公开（目录可见）或私有（隐藏，仅联系人/ACL 可见） |
 | **连接门控** | ConnectionGate 在分配任何资源之前拒绝未授权的 WebRTC offer |
 | **消息验证** | 每条消息的签名验证、时间戳新鲜度检查、基于 nonce 的重放防护 |
 
-## Agent Marketplace（Phase 7）
+## Agent Marketplace（Phase 7-8）
 
 PeerClaw 已从基础设施演进为 **C2C Agent Marketplace（Agent as a Service）**：
 
@@ -227,6 +231,7 @@ PeerClaw 已从基础设施演进为 **C2C Agent Marketplace（Agent as a Servic
 - **用户账户** — 邮箱/密码注册登录，JWT 认证，5 步发布向导，API Key 管理
 - **Provider 控制台** — 调用量分析面板、Agent 统计、调用历史
 - **信任与社区** — 星级评分、文字评价、Verified / Trusted 徽章、举报机制
+- **访问控制** — Playground 门控、私有 Agent、用户访问申请及审批/拒绝工作流
 
 详见[路线图](docs/ROADMAP_zh.md)了解完整开发历程。
 
@@ -258,6 +263,10 @@ cd peerclaw-server && CGO_ENABLED=1 go build ./... && CGO_ENABLED=1 go test ./..
 # peerclaw-agent
 git clone https://github.com/peerclaw/peerclaw-agent.git
 cd peerclaw-agent && go build ./... && go test ./...
+
+# peerclaw-cli
+git clone https://github.com/peerclaw/peerclaw-cli.git
+cd peerclaw-cli && go build ./... && go test ./...
 ```
 
 本地多模块联合开发可以使用 [Go workspace](https://go.dev/doc/tutorial/workspaces)：
@@ -267,7 +276,8 @@ mkdir peerclaw && cd peerclaw
 git clone https://github.com/peerclaw/peerclaw-core.git core
 git clone https://github.com/peerclaw/peerclaw-server.git server
 git clone https://github.com/peerclaw/peerclaw-agent.git agent
-go work init ./core ./server ./agent
+git clone https://github.com/peerclaw/peerclaw-cli.git cli
+go work init ./core ./server ./agent ./cli
 go work sync
 ```
 

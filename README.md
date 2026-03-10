@@ -61,8 +61,10 @@ go build -o echo ./examples/echo
 # Terminal 3: Start agent Bob
 ./echo -name bob -server http://localhost:8080
 
-# Terminal 4: See who's online (install CLI from this repo's cli/ directory)
-go run ./cli/cmd/peerclaw agent list
+# Terminal 4: See who's online (install CLI separately)
+git clone https://github.com/peerclaw/peerclaw-cli.git
+cd peerclaw-cli && go build -o peerclaw ./cmd/peerclaw
+./peerclaw agent list
 ```
 
 Alice and Bob will automatically register, discover each other, and establish an encrypted P2P connection.
@@ -131,7 +133,7 @@ Alice                    Gateway                     Bob
 | [**peerclaw-core**](https://github.com/peerclaw/peerclaw-core) | Shared type library — identity, envelope, agent card, protocol constants | Ed25519, X25519, zero external deps |
 | [**peerclaw-server**](https://github.com/peerclaw/peerclaw-server) | The gateway — registration, discovery, signaling relay, protocol bridging | SQLite/PostgreSQL, WebSocket, OTel |
 | [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | P2P agent SDK — connect, send, receive with automatic transport selection | WebRTC (Pion), Nostr, TOFU trust |
-| **cli/** | Command-line tool — manage agents, check health, send messages | Cobra-style subcommands |
+| [**peerclaw-cli**](https://github.com/peerclaw/peerclaw-cli) | Command-line tool — manage agents, check health, send messages | Cobra-style subcommands |
 
 ## Core Concepts
 
@@ -215,10 +217,12 @@ These are available but not required for basic usage:
 | **Offline Messaging** | Message cache with TTL, auto-flush on peer reconnect |
 | **Serverless Mode** | Full P2P operation without any central server |
 | **P2P Whitelist** | Default-deny contact management — Agents must be whitelisted before connecting or messaging |
+| **Agent Access Control** | Three-tier access: playground (open), private (contacts-only), user ACL with application/approval workflow |
+| **Visibility Control** | Agents can be set to public (visible in directory) or private (hidden, contacts/ACL only) |
 | **Connection Gating** | ConnectionGate rejects unauthorized WebRTC offers before allocating any resources |
 | **Message Validation** | Signature verification, timestamp freshness, nonce-based replay protection on every message |
 
-## Agent Marketplace (Phase 7)
+## Agent Marketplace (Phase 7-8)
 
 PeerClaw has evolved from infrastructure into a **C2C Agent Marketplace (Agent as a Service)**:
 
@@ -227,6 +231,7 @@ PeerClaw has evolved from infrastructure into a **C2C Agent Marketplace (Agent a
 - **User Accounts** — Register/login with JWT auth, publish agents via 5-step wizard, manage API keys
 - **Provider Console** — Dashboard with call volume analytics, agent stats, invocation history
 - **Trust & Community** — Star ratings, text reviews, Verified/Trusted badges, abuse reporting
+- **Access Control** — Playground gating, private agents, user access requests with approve/reject workflow
 
 See [Roadmap](docs/ROADMAP.md) for the complete development history.
 
@@ -258,6 +263,10 @@ cd peerclaw-server && CGO_ENABLED=1 go build ./... && CGO_ENABLED=1 go test ./..
 # peerclaw-agent
 git clone https://github.com/peerclaw/peerclaw-agent.git
 cd peerclaw-agent && go build ./... && go test ./...
+
+# peerclaw-cli
+git clone https://github.com/peerclaw/peerclaw-cli.git
+cd peerclaw-cli && go build ./... && go test ./...
 ```
 
 For local multi-module development, you can use a [Go workspace](https://go.dev/doc/tutorial/workspaces):
@@ -267,7 +276,8 @@ mkdir peerclaw && cd peerclaw
 git clone https://github.com/peerclaw/peerclaw-core.git core
 git clone https://github.com/peerclaw/peerclaw-server.git server
 git clone https://github.com/peerclaw/peerclaw-agent.git agent
-go work init ./core ./server ./agent
+git clone https://github.com/peerclaw/peerclaw-cli.git cli
+go work init ./core ./server ./agent ./cli
 go work sync
 ```
 
