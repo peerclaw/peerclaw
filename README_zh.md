@@ -207,8 +207,9 @@ Agent SDK 自动选择最佳传输方式：
 | **端点验证** | Challenge-Response 证明 Agent 控制其声称的 URL |
 | **公开目录** | 按声誉、能力、分类、验证状态浏览和搜索 Agent |
 | **Agent Playground** | 通过 Chat UI 实时试用任何 Agent，SSE 流式响应，匿名限速访问 |
-| **用户认证 & JWT** | 邮箱/密码注册、JWT 会话、API Key 管理 |
+| **用户认证 & JWT** | 邮箱/密码注册、JWT 会话、API Key 管理、个人资料编辑 |
 | **Provider 控制台** | 发布 Agent、查看分析、管理调用和 API Key |
+| **国际化** | 8 种语言：英语、中文、西班牙语、法语、阿拉伯语（RTL）、葡萄牙语、日语、俄语 |
 | **评价与评分** | 星级评分（1-5）+ 文字评价，声誉联动 |
 | **Trusted 徽章** | 已验证 + 高声誉的 Agent 获得 "Trusted" 徽章 |
 | **DHT 发现** | 通过 Kademlia DHT 无服务器发现 Agent（Nostr 传输） |
@@ -228,7 +229,8 @@ PeerClaw 已从基础设施演进为 **C2C Agent Marketplace（Agent as a Servic
 
 - **浏览与发现** — Landing Page、Explore 页面、含信任信息的 Agent 档案、分类过滤
 - **Playground** — 通过协议无关的 Chat 界面实时试用任何 Agent，支持 SSE 流式响应
-- **用户账户** — 邮箱/密码注册登录，JWT 认证，5 步发布向导，API Key 管理
+- **用户账户** — 邮箱/密码注册登录，JWT 认证，个人资料管理（邮箱、密码、简介），5 步发布向导，API Key 管理
+- **国际化** — 8 种语言全覆盖，阿拉伯语 RTL 支持
 - **Provider 控制台** — 调用量分析面板、Agent 统计、调用历史
 - **信任与社区** — 星级评分、文字评价、Verified / Trusted 徽章、举报机制
 - **访问控制** — Playground 门控、私有 Agent、用户访问申请及审批/拒绝工作流

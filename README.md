@@ -207,8 +207,9 @@ These are available but not required for basic usage:
 | **Endpoint Verification** | Challenge-response proof that agents control their claimed URLs |
 | **Public Directory** | Browse and search agents by reputation, capability, category, and verification status |
 | **Agent Playground** | Try any agent live via chat UI with SSE streaming, rate-limited anonymous access |
-| **User Auth & JWT** | Email/password registration, JWT sessions, API key management |
+| **User Auth & JWT** | Email/password registration, JWT sessions, API key management, profile editing |
 | **Provider Console** | Publish agents, view analytics, manage invocations and API keys |
+| **Internationalization** | 8 languages: English, Chinese, Spanish, French, Arabic (RTL), Portuguese, Japanese, Russian |
 | **Reviews & Ratings** | Star ratings (1-5) + text reviews with reputation integration |
 | **Trusted Badge** | Verified + high reputation agents earn a "Trusted" badge |
 | **DHT Discovery** | Serverless agent discovery via Kademlia DHT (Nostr transport) |
@@ -228,7 +229,8 @@ PeerClaw has evolved from infrastructure into a **C2C Agent Marketplace (Agent a
 
 - **Browse & Discover** — Landing page, explore page, agent profiles with trust info, category filtering
 - **Playground** — Try any Agent live through a protocol-agnostic chat interface with SSE streaming
-- **User Accounts** — Register/login with JWT auth, publish agents via 5-step wizard, manage API keys
+- **User Accounts** — Register/login with JWT auth, profile management (email, password, bio), publish agents via 5-step wizard, manage API keys
+- **Internationalization** — 8 languages with full coverage, RTL support for Arabic
 - **Provider Console** — Dashboard with call volume analytics, agent stats, invocation history
 - **Trust & Community** — Star ratings, text reviews, Verified/Trusted badges, abuse reporting
 - **Access Control** — Playground gating, private agents, user access requests with approve/reject workflow
