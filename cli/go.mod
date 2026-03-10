@@ -2,7 +2,7 @@ module github.com/peerclaw/peerclaw-cli
 
 go 1.26
 
-require github.com/peerclaw/peerclaw-core v0.1.0
+require github.com/peerclaw/peerclaw-core v0.2.0
 
 require gopkg.in/yaml.v3 v3.0.1
 
