@@ -418,16 +418,19 @@ PeerClaw as a native OpenClaw communication channel — like WhatsApp, Telegram,
 - [ ] **WebSocket bridge** — PeerClaw agent maintains WebSocket connection to OpenClaw gateway (port 18789) for real-time event push
 - [ ] **Agent identity binding** — OpenClaw instance's identity mapped to PeerClaw Ed25519 keypair
 
-## Phase 15c: Agent Client Protocol Bridge
+## Phase 15c: ACP HTTP Bridge (Complete)
 
-ndJSON/stdio bridge enabling ACP-compatible agents (OpenClaw, Zed AI, Coder) to join the PeerClaw network.
+Expose PeerClaw agents as standard ACP HTTP endpoints — any ACP client can discover and invoke PeerClaw agents.
 
-- [ ] **ACP stdio adapter** — ndJSON/stdio bridge process using `github.com/coder/acp-go-sdk`, translates ACP messages ↔ PeerClaw Envelopes
-- [ ] **Agent Manifest translation** — PeerClaw Agent Card ↔ ACP Agent Manifest bidirectional mapping
-- [ ] **Session/Run lifecycle** — ACP Session + Run model mapped to PeerClaw sessions; Run states mapped to Envelope exchanges
-- [ ] **OpenClaw integration** — ACP bridge as OpenClaw's native channel for PeerClaw network access (complements Phase 14 Channel Plugin)
-- [ ] **Enterprise intranet mode** — Simplified ACP bridge for corporate environments: single peerclaw-server + multiple ACP agent processes on internal network, no Nostr/DHT/STUN
-- [ ] **Multi-agent orchestration** — ACP's `context_transfers` and `event_stream` mapped to PeerClaw broadcast/handler primitives
+- [x] **ACP Run model mapping** — Map PeerClaw Envelope request-response to ACP Run lifecycle (created → in-progress → completed/failed/cancelled)
+- [x] **ACP HTTP endpoints** — `POST /acp/{agent_id}/runs` REST handler with sync/stream/async modes, `GET /acp/{agent_id}/runs/{run_id}` for status polling, `POST /acp/{agent_id}/runs/{run_id}/cancel` for cancellation
+- [x] **Agent Manifest serving** — `GET /acp/{agent_id}/agents` auto-generated from PeerClaw agent registration data with name, description, capabilities, content types
+- [x] **Streaming support** — ACP SSE streaming via `mode: "stream"`, each SSE event is `event: run_update\ndata: <Run JSON>`
+- [x] **Async mode** — `mode: "async"` returns HTTP 202 immediately, background goroutine executes bridge call with 5-minute timeout
+- [x] **Ping endpoint** — `GET /acp/{agent_id}/ping` for health checks
+- [x] **Access control** — External ACP clients treated as anonymous users, gated by `playground_enabled` flag
+- [x] **Rate limiting** — Per-IP rate limiting via `invokeRateLimiter` for ACP bridge requests
+- [x] **Run cleanup** — Background goroutine cleans expired runs (1 hour TTL)
 
 ## Phase 15d: Universal Protocol Gateway
 
@@ -437,3 +440,13 @@ Unified ingress that auto-detects and routes any agent protocol.
 - [ ] **Unified routing** — Single gateway endpoint that dispatches to appropriate protocol adapter
 - [ ] **Protocol translation matrix** — Bidirectional translation between all protocol pairs (A2A ↔ MCP ↔ ACP ↔ PeerClaw), extending Phase 3 adapters with real-world handling
 - [ ] **Gateway metrics** — Per-protocol request counts, translation latency, error rates exposed via OpenTelemetry
+
+## Phase 15e: ACP Stdio Bridge
+
+ndJSON/stdio bridge enabling ACP-compatible agents (OpenClaw, Zed AI, Coder) to join the PeerClaw network via local process communication.
+
+- [ ] **ACP stdio adapter** — ndJSON/stdio bridge process using `github.com/coder/acp-go-sdk`, translates ACP messages ↔ PeerClaw Envelopes
+- [ ] **Session/Run lifecycle** — ACP Session + Run model mapped to PeerClaw sessions; Run states mapped to Envelope exchanges
+- [ ] **OpenClaw integration** — ACP bridge as OpenClaw's native channel for PeerClaw network access (complements Phase 14 Channel Plugin)
+- [ ] **Enterprise intranet mode** — Simplified ACP bridge for corporate environments: single peerclaw-server + multiple ACP agent processes on internal network, no Nostr/DHT/STUN
+- [ ] **Multi-agent orchestration** — ACP's `context_transfers` and `event_stream` mapped to PeerClaw broadcast/handler primitives
