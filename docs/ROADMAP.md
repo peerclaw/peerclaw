@@ -374,6 +374,16 @@ Upgrade Nostr relay from fallback transport to encrypted mailbox, enabling relia
 - [x] **TTL and cleanup** — Configurable message expiry (default 7 days); expired and confirmed entries auto-cleaned from outbox
 - [x] **Wake-up signaling** — `mailbox_wakeup` signaling message type for lightweight notification when inbox has pending messages
 
+## Phase 15a: MCP Server — `peerclaw mcp serve` (Complete)
+
+MCP Server integrated into the CLI — any MCP Host (Claude Code, VS Code Copilot, Cursor, Windsurf, etc.) can use PeerClaw as a tool provider.
+
+- [x] **`peerclaw mcp serve` command** — Wraps `agent/tools/` as a proper MCP Server using `github.com/modelcontextprotocol/go-sdk` (v1.4.0)
+- [x] **Tool registration** — 4 API-mode tools (discover_agents, invoke_agent, get_agent_profile, check_reputation) with JSON Schema and MCP Tool Annotations (`readOnlyHint`, `idempotentHint`, `destructiveHint`)
+- [x] **Dual transport** — stdio (default) and Streamable HTTP (`--transport http --port 8081`)
+- [x] **Resource exposure** — Agent directory exposed as MCP Resource (`peerclaw://directory`)
+- [x] **Configuration guide** — `docs/mcp-config.md` with examples for Claude Code, VS Code, Cursor, Windsurf
+
 ## Phase 13: OpenClaw SKILL.md Integration
 
 Quick integration with the OpenClaw ecosystem via a SKILL.md skill file.
@@ -391,20 +401,9 @@ PeerClaw as a native OpenClaw communication channel — like WhatsApp, Telegram,
 - [ ] **WebSocket bridge** — PeerClaw agent maintains WebSocket connection to OpenClaw gateway (port 18789) for real-time event push
 - [ ] **Agent identity binding** — OpenClaw instance's identity mapped to PeerClaw Ed25519 keypair
 
-## Phase 15: Protocol Ecosystem Integration
+## Phase 15: Protocol Ecosystem Integration (Remaining)
 
 Deep integration with the three major agent protocols, making PeerClaw a native participant in each ecosystem.
-
-### Phase 15a: MCP Server (`peerclaw-mcp`)
-
-Standalone MCP Server binary — any MCP Host (Claude Code, VS Code Copilot, Cursor, etc.) can use PeerClaw as a tool provider.
-
-- [ ] **`peerclaw-mcp` stdio binary** — Wraps `agent/tools/` as a proper MCP Server using `github.com/modelcontextprotocol/go-sdk`
-- [ ] **Tool registration** — 8 PeerClaw tools registered with JSON Schema, descriptions, and MCP Tool Annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`)
-- [ ] **Streamable HTTP transport** — Optional HTTP mode (`--transport http --port 8081`) for remote MCP hosting, alongside default stdio
-- [ ] **Resource exposure** — Agent Card, trust store entries, and reputation data exposed as MCP Resources (`resources/list`, `resources/read`)
-- [ ] **Session management** — `initialize` handshake, `Mcp-Session-Id` header, capability negotiation
-- [ ] **Configuration** — `claude_desktop_config.json` / VS Code `settings.json` example configs for one-click setup
 
 ### Phase 15b: A2A Task Model & HTTP Bridge
 
