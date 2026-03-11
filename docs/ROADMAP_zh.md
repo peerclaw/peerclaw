@@ -394,16 +394,20 @@ MCP Server 集成到 CLI — 任何 MCP Host（Claude Code、VS Code Copilot、C
 - [x] **SKILL.md 编写** — `docs/SKILL.md` — Markdown 技能文件，描述 PeerClaw CLI 命令和 REST API，涵盖发现、调用、访问管理和信誉查询
 - [ ] **发布到 ClawHub** — 将 PeerClaw 技能提交到 OpenClaw 技能注册中心
 
-## Phase 15b: A2A HTTP 桥接
+## Phase 15b: A2A HTTP 桥接（已完成）
 
 将 PeerClaw Agent 暴露为标准 A2A HTTP 端点 — 任何 A2A 客户端均可发现和调用 PeerClaw Agent。
 
-- [ ] **A2A Task 模型映射** — 将 PeerClaw Envelope 请求-响应映射到 A2A Task 生命周期（submitted → working → input-required → completed/failed/canceled）
-- [ ] **A2A HTTP 端点** — `POST /a2a` JSON-RPC handler（`message/send`、`tasks/get`、`tasks/cancel`），后端对接 PeerClaw bridge
-- [ ] **Agent Card 服务** — `GET /.well-known/agent.json` 从 PeerClaw Agent 注册数据自动生成
-- [ ] **流式支持** — A2A SSE 流式响应映射到 PeerClaw 已有的 SSE invoke 流程
-- [ ] **推送通知** — 长时间运行任务的 A2A 推送通知支持（webhook 回调 URL）
-- [ ] **多轮会话** — A2A `contextId` 映射到 PeerClaw `session_id` 实现有状态对话
+- [x] **A2A Task 模型映射** — 将 PeerClaw Envelope 请求-响应映射到 A2A Task 生命周期（accepted → working → completed/failed/canceled）
+- [x] **A2A HTTP 端点** — `POST /a2a/{agent_id}` JSON-RPC handler（`message/send`、`message/send/subscribe`、`tasks/get`、`tasks/cancel`、`tasks/pushNotification/set|get`），后端对接 PeerClaw bridge
+- [x] **Agent Card 服务** — `GET /a2a/{agent_id}/.well-known/agent.json` 从 PeerClaw Agent 注册数据自动生成，含 endpoint、capabilities、skills
+- [x] **流式支持** — 通过 `message/send/subscribe` 或 `Accept: text/event-stream` 实现 A2A SSE 流式响应，每个 SSE 事件是完整的 JSON-RPC Response 包裹 Task
+- [x] **推送通知** — A2A 推送通知配置存储（`tasks/pushNotification/set|get`），支持长时间运行任务
+- [x] **多轮会话** — A2A `contextId` 映射到 PeerClaw `session_id` 实现有状态对话
+- [x] **REST 便捷端点** — `GET /a2a/{agent_id}/tasks/{task_id}` 用于任务状态轮询
+- [x] **访问控制** — 外部 A2A 客户端作为匿名用户处理，通过 `playground_enabled` 标志门控
+- [x] **限速** — 通过 `invokeRateLimiter` 实现 A2A 桥接请求的 Per-IP 限速
+- [x] **任务清理** — 后台 goroutine 清理过期任务（1 小时 TTL）
 
 ## Phase 14: OpenClaw Channel 插件（深度集成）
 

@@ -394,16 +394,20 @@ Fill CLI gaps and author an OpenClaw SKILL.md for AI-driven agent orchestration.
 - [x] **SKILL.md authoring** — `docs/SKILL.md` — Markdown skill file describing PeerClaw CLI commands and REST API for discovery, invocation, access management, and reputation checking
 - [ ] **Publish to ClawHub** — Submit PeerClaw skill to the OpenClaw skill registry
 
-## Phase 15b: A2A HTTP Bridge
+## Phase 15b: A2A HTTP Bridge (Complete)
 
 Expose PeerClaw agents as standard A2A HTTP endpoints — any A2A client can discover and invoke PeerClaw agents.
 
-- [ ] **A2A Task model mapping** — Map PeerClaw Envelope request-response to A2A Task lifecycle (submitted → working → input-required → completed/failed/canceled)
-- [ ] **A2A HTTP endpoints** — `POST /a2a` JSON-RPC handler (`message/send`, `tasks/get`, `tasks/cancel`) backed by PeerClaw bridge
-- [ ] **Agent Card serving** — `GET /.well-known/agent.json` auto-generated from PeerClaw agent registration data
-- [ ] **Streaming support** — A2A SSE streaming mapped to PeerClaw's existing SSE invoke flow
-- [ ] **Push notifications** — A2A push notification support for long-running tasks (webhook callback URL)
-- [ ] **Multi-turn sessions** — A2A `contextId` mapped to PeerClaw `session_id` for stateful conversations
+- [x] **A2A Task model mapping** — Map PeerClaw Envelope request-response to A2A Task lifecycle (accepted → working → completed/failed/canceled)
+- [x] **A2A HTTP endpoints** — `POST /a2a/{agent_id}` JSON-RPC handler (`message/send`, `message/send/subscribe`, `tasks/get`, `tasks/cancel`, `tasks/pushNotification/set|get`) backed by PeerClaw bridge
+- [x] **Agent Card serving** — `GET /a2a/{agent_id}/.well-known/agent.json` auto-generated from PeerClaw agent registration data with endpoint, capabilities, and skills
+- [x] **Streaming support** — A2A SSE streaming via `message/send/subscribe` or `Accept: text/event-stream`, each SSE event is a full JSON-RPC Response wrapping the Task
+- [x] **Push notifications** — A2A push notification config storage (`tasks/pushNotification/set|get`) for long-running tasks
+- [x] **Multi-turn sessions** — A2A `contextId` mapped to PeerClaw `session_id` for stateful conversations
+- [x] **REST convenience endpoint** — `GET /a2a/{agent_id}/tasks/{task_id}` for task status polling
+- [x] **Access control** — External A2A clients treated as anonymous users, gated by `playground_enabled` flag
+- [x] **Rate limiting** — Per-IP rate limiting via `invokeRateLimiter` for A2A bridge requests
+- [x] **Task cleanup** — Background goroutine cleans expired tasks (1 hour TTL)
 
 ## Phase 14: OpenClaw Channel Plugin (Deep Integration)
 
