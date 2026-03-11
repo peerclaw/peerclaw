@@ -326,27 +326,27 @@ Wrap PeerClaw agent capabilities as MCP-compatible tool definitions for LLM-driv
 - [x] **Tool schema** — JSON Schema definitions for all 8 tools via `AllTools() → []agentcard.Tool`
 - [x] **Tests** — 24 unit tests (mock AgentAPI, dispatch, validation, httptest.Server)
 
-## Phase 9: Request-Response & Agent Collaboration Primitives
+## Phase 9: Request-Response & Agent Collaboration Primitives (Complete)
 
 Enable synchronous agent-to-agent task delegation — the foundation for multi-agent collaboration.
 
-- [ ] **SendRequest** — `Agent.SendRequest(ctx, env, timeout) → (*Envelope, error)` with TraceID-based correlation
+- [x] **SendRequest** — `Agent.SendRequest(ctx, env, timeout) → (*Envelope, error)` with TraceID-based correlation
   - Pending request registry (`map[traceID]chan *Envelope`)
   - Response matching in `HandleIncomingEnvelope` by TraceID + MessageType=response
   - Context-based timeout and cancellation
-- [ ] **Envelope response helper** — `envelope.NewResponse(request, payload)` constructor
-- [ ] **Broadcast** — `Agent.Broadcast(ctx, env, destinations) → []error` for fan-out messaging
-- [ ] **A2A Task lifecycle mapping** — Map Envelope exchanges to A2A Task states (submitted → working → completed/failed)
+- [x] **Envelope response helper** — `envelope.NewResponse(request, payload)` constructor
+- [x] **Broadcast** — `Agent.Broadcast(ctx, env, destinations) → map[string]error` for fan-out messaging
+- [x] **A2A Task lifecycle mapping** — TaskTracker maps Envelope exchanges to A2A Task states (submitted → working → completed/failed)
 
-## Phase 10: Inbound Handler Router
+## Phase 10: Inbound Handler Router (Complete)
 
 Enable agents to serve requests from other agents with capability-based routing.
 
-- [ ] **Handler registration** — `Agent.Handle(capability, func(ctx, *Envelope) (*Envelope, error))` pattern
-- [ ] **Automatic routing** — Incoming envelopes dispatched by metadata capability/action field
-- [ ] **Auto-response** — Handler return value automatically wrapped as response envelope and sent back
-- [ ] **Agent Card auto-generation** — Registered handler names populate Card.Capabilities automatically
-- [ ] **Middleware support** — Pre/post hooks for logging, auth, rate limiting on inbound handlers
+- [x] **Handler registration** — `Agent.Handle(capability, func(ctx, *Envelope) (*Envelope, error))` pattern
+- [x] **Automatic routing** — Incoming envelopes dispatched by `metadata["capability"]` field via Router
+- [x] **Auto-response** — Handler return value automatically wrapped via `envelope.NewResponse()` and sent back
+- [x] **Agent Card auto-generation** — `Agent.Capabilities()` returns deduplicated union of opts.Capabilities + router-registered capabilities
+- [x] **Middleware support** — `Middleware` type with `Use()` API; built-in `LoggingMiddleware` and `RecoveryMiddleware`
 
 ## Phase 11: Enterprise Simplified Configuration
 
