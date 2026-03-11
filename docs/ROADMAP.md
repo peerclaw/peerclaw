@@ -348,14 +348,18 @@ Enable agents to serve requests from other agents with capability-based routing.
 - [x] **Agent Card auto-generation** — `Agent.Capabilities()` returns deduplicated union of opts.Capabilities + router-registered capabilities
 - [x] **Middleware support** — `Middleware` type with `Use()` API; built-in `LoggingMiddleware` and `RecoveryMiddleware`
 
-## Phase 11: Enterprise Simplified Configuration
+## Phase 11: Enterprise Simplified Configuration (Complete)
 
 Lower the barrier for enterprise intranet deployments.
 
-- [ ] **`agent.NewSimple()`** — Simplified constructor (Name, ServerURL, KeypairPath, Capabilities only)
+- [x] **`agent.NewSimple()`** — Simplified constructor (Name, ServerURL, Capabilities variadic)
   - Auto-configures: Serverless=false, no Nostr, no DHT, no STUN/TURN
-- [ ] **Enterprise deployment guide** — Single peerclaw-server + multiple agents on internal network
-- [ ] **Pre-provisioned trust** — Bulk import of verified contacts for managed environments
+  - Auto-generates Ed25519 keypair, server-only discovery and signaling
+- [x] **`agent.ImportContacts()`** — Bulk import of verified contacts for managed environments
+  - Sets all imported agent IDs to TrustVerified level
+- [x] **Enterprise deployment guide** — `docs/ENTERPRISE.md` / `docs/ENTERPRISE_zh.md`
+  - Architecture diagram, quick start, Docker Compose, security recommendations
+- [x] **Enterprise example** — `agent/examples/enterprise/main.go`
 
 ## Phase 12: Nostr Relay Mailbox (Offline Message Delivery)
 
