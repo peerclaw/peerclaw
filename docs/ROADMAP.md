@@ -384,28 +384,17 @@ MCP Server integrated into the CLI — any MCP Host (Claude Code, VS Code Copilo
 - [x] **Resource exposure** — Agent directory exposed as MCP Resource (`peerclaw://directory`)
 - [x] **Configuration guide** — `docs/mcp-config.md` with examples for Claude Code, VS Code, Cursor, Windsurf
 
-## Phase 13: OpenClaw SKILL.md Integration
+## Phase 13: CLI Completeness & SKILL.md (Complete)
 
-Quick integration with the OpenClaw ecosystem via a SKILL.md skill file.
+Fill CLI gaps and author an OpenClaw SKILL.md for AI-driven agent orchestration.
 
-- [ ] **SKILL.md authoring** — Markdown skill file teaching OpenClaw to use PeerClaw CLI/API for discovery, messaging, and contact management
-- [ ] **CLI enhancements for SKILL.md** — Ensure all operations needed by SKILL.md are available as CLI commands (inbox check, contact approve, etc.)
+- [x] **`peerclaw invoke` command** — Direct agent invocation (`peerclaw invoke <agent-id> --message "..."`) with `--protocol`, `--session-id`, `--stream` flags; SSE streaming with real-time output; no source agent required
+- [x] **`peerclaw inbox` command** — Access request management: `request` (submit access request), `status` (check request status), `list` (list all my requests); JWT auth via `--token` flag or `PEERCLAW_TOKEN` env
+- [x] **`peerclaw agent update` subcommand** — Update agent fields (name, description, version, capabilities, endpoint, protocols) without re-registration; JWT auth required
+- [x] **SKILL.md authoring** — `docs/SKILL.md` — Markdown skill file describing PeerClaw CLI commands and REST API for discovery, invocation, access management, and reputation checking
 - [ ] **Publish to ClawHub** — Submit PeerClaw skill to the OpenClaw skill registry
 
-## Phase 14: OpenClaw Channel Plugin (Deep Integration)
-
-PeerClaw as a native OpenClaw communication channel — like WhatsApp, Telegram, or Slack.
-
-- [ ] **Channel plugin** — OpenClaw channel plugin that connects to PeerClaw agent network
-- [ ] **Bidirectional messaging** — Incoming P2P messages surfaced in OpenClaw; OpenClaw responses sent back via PeerClaw
-- [ ] **WebSocket bridge** — PeerClaw agent maintains WebSocket connection to OpenClaw gateway (port 18789) for real-time event push
-- [ ] **Agent identity binding** — OpenClaw instance's identity mapped to PeerClaw Ed25519 keypair
-
-## Phase 15: Protocol Ecosystem Integration (Remaining)
-
-Deep integration with the three major agent protocols, making PeerClaw a native participant in each ecosystem.
-
-### Phase 15b: A2A Task Model & HTTP Bridge
+## Phase 15b: A2A HTTP Bridge
 
 Expose PeerClaw agents as standard A2A HTTP endpoints — any A2A client can discover and invoke PeerClaw agents.
 
@@ -416,7 +405,16 @@ Expose PeerClaw agents as standard A2A HTTP endpoints — any A2A client can dis
 - [ ] **Push notifications** — A2A push notification support for long-running tasks (webhook callback URL)
 - [ ] **Multi-turn sessions** — A2A `contextId` mapped to PeerClaw `session_id` for stateful conversations
 
-### Phase 15c: Agent Client Protocol Bridge
+## Phase 14: OpenClaw Channel Plugin (Deep Integration)
+
+PeerClaw as a native OpenClaw communication channel — like WhatsApp, Telegram, or Slack.
+
+- [ ] **Channel plugin** — OpenClaw channel plugin that connects to PeerClaw agent network
+- [ ] **Bidirectional messaging** — Incoming P2P messages surfaced in OpenClaw; OpenClaw responses sent back via PeerClaw
+- [ ] **WebSocket bridge** — PeerClaw agent maintains WebSocket connection to OpenClaw gateway (port 18789) for real-time event push
+- [ ] **Agent identity binding** — OpenClaw instance's identity mapped to PeerClaw Ed25519 keypair
+
+## Phase 15c: Agent Client Protocol Bridge
 
 ndJSON/stdio bridge enabling ACP-compatible agents (OpenClaw, Zed AI, Coder) to join the PeerClaw network.
 
@@ -427,7 +425,7 @@ ndJSON/stdio bridge enabling ACP-compatible agents (OpenClaw, Zed AI, Coder) to 
 - [ ] **Enterprise intranet mode** — Simplified ACP bridge for corporate environments: single peerclaw-server + multiple ACP agent processes on internal network, no Nostr/DHT/STUN
 - [ ] **Multi-agent orchestration** — ACP's `context_transfers` and `event_stream` mapped to PeerClaw broadcast/handler primitives
 
-### Phase 15d: Universal Protocol Gateway
+## Phase 15d: Universal Protocol Gateway
 
 Unified ingress that auto-detects and routes any agent protocol.
 
