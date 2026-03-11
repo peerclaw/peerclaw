@@ -432,14 +432,19 @@ Expose PeerClaw agents as standard ACP HTTP endpoints — any ACP client can dis
 - [x] **Rate limiting** — Per-IP rate limiting via `invokeRateLimiter` for ACP bridge requests
 - [x] **Run cleanup** — Background goroutine cleans expired runs (1 hour TTL)
 
-## Phase 15d: Universal Protocol Gateway
+## Phase 15d: Universal Protocol Gateway (Complete)
 
-Unified ingress that auto-detects and routes any agent protocol.
+Per-agent MCP bridge + unified protocol gateway with auto-detection and multi-format discovery.
 
-- [ ] **Protocol auto-detection** — Inbound connections identified by content-type and payload structure (JSON-RPC → A2A/MCP, ndJSON → ACP, binary → PeerClaw native)
-- [ ] **Unified routing** — Single gateway endpoint that dispatches to appropriate protocol adapter
-- [ ] **Protocol translation matrix** — Bidirectional translation between all protocol pairs (A2A ↔ MCP ↔ ACP ↔ PeerClaw), extending Phase 3 adapters with real-world handling
-- [ ] **Gateway metrics** — Per-protocol request counts, translation latency, error rates exposed via OpenTelemetry
+- [x] **Per-agent MCP Bridge** — `POST /mcp/{agent_id}` JSON-RPC handler (`initialize`, `tools/list`, `tools/call`, `resources/list`, `prompts/list`) with session management, access control, rate limiting, and invocation logging
+- [x] **MCP initialize** — Returns `InitializeResult` with `ServerInfo` from agent card, `Mcp-Session-Id` header for session tracking
+- [x] **MCP tools mapping** — Agent card `Tools` automatically mapped to MCP `ToolDef` list; `tools/call` dispatches via bridge with `mcp.tool_name` envelope metadata
+- [x] **MCP SSE endpoint** — `GET /mcp/{agent_id}` SSE placeholder for server-initiated notifications
+- [x] **Universal Gateway invoke** — `POST /agent/{agent_id}` auto-detects protocol from request body and dispatches to A2A/MCP/ACP bridge handler
+- [x] **Protocol auto-detection** — JSON-RPC `method` prefix matching (`message/` `tasks/` → A2A, `tools/` `resources/` `prompts/` `initialize` → MCP), `input`/`agent_name` fields → ACP, with params shape fallback
+- [x] **Multi-format discovery** — `GET /agent/{agent_id}?format=a2a|mcp|acp` returns protocol-specific agent card (A2A AgentCard, MCP server info, ACP Manifest); default returns PeerClaw Card
+- [x] **Gateway metrics** — `peerclaw.gateway.requests.total` OpenTelemetry counter with `protocol` attribute
+- [x] **Session cleanup** — Background goroutine cleans expired MCP sessions (1 hour TTL)
 
 ## Phase 15e: ACP Stdio Bridge
 
