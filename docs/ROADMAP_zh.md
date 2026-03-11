@@ -446,12 +446,12 @@ Per-agent MCP 桥接 + 统一协议网关，自动检测协议并路由，多格
 - [x] **网关指标** — `peerclaw.gateway.requests.total` OpenTelemetry 计数器，含 `protocol` 属性
 - [x] **Session 清理** — 后台 goroutine 清理过期 MCP session（1 小时 TTL）
 
-## Phase 15e: ACP Stdio 桥接
+## Phase 15e: ACP Stdio 桥接（已完成）
 
 ndJSON/stdio 桥接，让 ACP 兼容的 Agent（OpenClaw、Zed AI、Coder）通过本地进程通信加入 PeerClaw 网络。
 
-- [ ] **ACP stdio 适配器** — 使用 `github.com/coder/acp-go-sdk` 的 ndJSON/stdio 桥接进程，翻译 ACP 消息 ↔ PeerClaw Envelope
-- [ ] **Session/Run 生命周期** — ACP Session + Run 模型映射到 PeerClaw session；Run 状态映射到 Envelope 交换
-- [ ] **OpenClaw 集成** — ACP 桥接作为 OpenClaw 访问 PeerClaw 网络的原生通道（补充 Phase 14 Channel 插件）
-- [ ] **企业内网模式** — 面向企业环境的简化 ACP 桥接：单 peerclaw-server + 内网多 ACP Agent 进程，无需 Nostr/DHT/STUN
-- [ ] **多 Agent 编排** — ACP 的 `context_transfers` 和 `event_stream` 映射到 PeerClaw broadcast/handler 原语
+- [x] **`peerclaw acp serve` 命令** — ndJSON/stdio 桥接进程，从 stdin 读取 ACP 请求，向 stdout 写入响应，代理到 PeerClaw server 的 ACP HTTP 桥接
+- [x] **ACP 方法分发** — 6 种方法：`create_run`（POST /acp/{agent_id}/runs）、`get_run`（含本地缓存）、`cancel_run`、`list_agents`（目录 → ACP manifest 转换）、`get_agent`、`ping`
+- [x] **轻量 ACP 类型** — 在 CLI 包中创建与 server ACP 类型 JSON 兼容的副本（Run、Message、MessagePart、AgentManifest），不依赖 server 模块
+- [x] **Run 缓存** — 本地 sync.Map 缓存已创建的 Run，减少 get_run 的服务器往返
+- [x] **测试** — 10 个单元测试（ping、非法 JSON、未知方法、create_run、get_run、get_run 缓存、cancel_run、list_agents、get_agent、空行）+ 2 个命令测试

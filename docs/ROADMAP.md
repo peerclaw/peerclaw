@@ -446,12 +446,12 @@ Per-agent MCP bridge + unified protocol gateway with auto-detection and multi-fo
 - [x] **Gateway metrics** — `peerclaw.gateway.requests.total` OpenTelemetry counter with `protocol` attribute
 - [x] **Session cleanup** — Background goroutine cleans expired MCP sessions (1 hour TTL)
 
-## Phase 15e: ACP Stdio Bridge
+## Phase 15e: ACP Stdio Bridge (Complete)
 
 ndJSON/stdio bridge enabling ACP-compatible agents (OpenClaw, Zed AI, Coder) to join the PeerClaw network via local process communication.
 
-- [ ] **ACP stdio adapter** — ndJSON/stdio bridge process using `github.com/coder/acp-go-sdk`, translates ACP messages ↔ PeerClaw Envelopes
-- [ ] **Session/Run lifecycle** — ACP Session + Run model mapped to PeerClaw sessions; Run states mapped to Envelope exchanges
-- [ ] **OpenClaw integration** — ACP bridge as OpenClaw's native channel for PeerClaw network access (complements Phase 14 Channel Plugin)
-- [ ] **Enterprise intranet mode** — Simplified ACP bridge for corporate environments: single peerclaw-server + multiple ACP agent processes on internal network, no Nostr/DHT/STUN
-- [ ] **Multi-agent orchestration** — ACP's `context_transfers` and `event_stream` mapped to PeerClaw broadcast/handler primitives
+- [x] **`peerclaw acp serve` command** — ndJSON/stdio bridge process, reads ACP requests from stdin and writes responses to stdout, proxying to PeerClaw server's ACP HTTP bridge
+- [x] **ACP method dispatch** — 6 methods: `create_run` (POST /acp/{agent_id}/runs), `get_run` (with local cache), `cancel_run`, `list_agents` (directory → ACP manifest conversion), `get_agent`, `ping`
+- [x] **Lightweight ACP types** — JSON-compatible copies of server ACP types (Run, Message, MessagePart, AgentManifest) in CLI package, no server module dependency
+- [x] **Run caching** — Local sync.Map cache for created runs, reducing server round-trips on get_run
+- [x] **Tests** — 10 unit tests (ping, invalid JSON, unknown method, create_run, get_run, get_run cached, cancel_run, list_agents, get_agent, blank lines) + 2 command tests
