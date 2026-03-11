@@ -361,18 +361,18 @@ Lower the barrier for enterprise intranet deployments.
   - Architecture diagram, quick start, Docker Compose, security recommendations
 - [x] **Enterprise example** — `agent/examples/enterprise/main.go`
 
-## Phase 12: Nostr Relay Mailbox (Offline Message Delivery)
+## Phase 12: Nostr Relay Mailbox (Offline Message Delivery) (Complete)
 
 Upgrade Nostr relay from fallback transport to encrypted mailbox, enabling reliable offline message delivery while preserving P2P purity.
 
-- [ ] **Encrypted inbox events** — Publish XChaCha20-encrypted envelopes as Nostr gift-wrapped events (NIP-59/NIP-44)
-- [ ] **Inbox relay configuration** — Agent Profile extended with `inbox_relays` field (analogous to NIP-65)
-- [ ] **Delivery flow** — Send() priority: 1) WebRTC direct → 2) Signaling relay → 3) Nostr inbox relay
-- [ ] **Inbox sync** — On agent startup, query inbox relays for events since last sync timestamp
-- [ ] **Delivery confirmation** — Encrypted delivery receipts sent back through the same channel
-- [ ] **Local outbox with retry** — Sender persists unconfirmed messages; exponential backoff retry
-- [ ] **TTL and cleanup** — Configurable message expiry (default 7 days); auto-cleanup of delivered events
-- [ ] **Wake-up signaling** — Lightweight notification via WebSocket / Webhook / Cron when inbox has pending messages
+- [x] **Encrypted inbox events** — Publish NIP-44-encrypted envelopes as Nostr events (kind 20007) to recipient's inbox relays
+- [x] **Inbox relay configuration** — `PeerClawExtension.InboxRelays` field (analogous to NIP-65), distinct from `NostrRelays` (real-time transport)
+- [x] **Delivery flow** — Send() priority: 1) Existing P2P → 2) New P2P (15s) → 3) Signaling relay → 4) Nostr mailbox → 5) MessageCache
+- [x] **Inbox sync** — Periodic inbox polling (`SyncInterval`, default 5 min) queries inbox relays for events since last sync timestamp
+- [x] **Delivery confirmation** — Encrypted delivery receipts (kind 20008) sent back through the same channel; outbox entries marked as confirmed
+- [x] **Local outbox with retry** — Sender persists unconfirmed messages; exponential backoff retry (5s base, 5 min max, 10 retries)
+- [x] **TTL and cleanup** — Configurable message expiry (default 7 days); expired and confirmed entries auto-cleaned from outbox
+- [x] **Wake-up signaling** — `mailbox_wakeup` signaling message type for lightweight notification when inbox has pending messages
 
 ## Phase 13: OpenClaw SKILL.md Integration
 
