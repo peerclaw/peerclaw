@@ -412,7 +412,7 @@ The SDK establishes encrypted P2P connections automatically:
 ```go
 msg := envelope.New(a.ID(), targetAgentID, protocol.ProtocolA2A, payload)
 a.Send(ctx, msg)
-// Signed (Ed25519) + encrypted (XChaCha20-Poly1305) automatically
+// Encrypted (XChaCha20-Poly1305) + signed (Ed25519) automatically — encrypt-then-sign
 ```
 
 ### Cross-Protocol Bridging

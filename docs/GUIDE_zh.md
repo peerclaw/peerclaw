@@ -396,7 +396,7 @@ SDK 自动建立加密 P2P 连接：
 ```go
 msg := envelope.New(a.ID(), targetAgentID, protocol.ProtocolA2A, payload)
 a.Send(ctx, msg)
-// 自动签名（Ed25519）+ 加密（XChaCha20-Poly1305）
+// 自动加密（XChaCha20-Poly1305）+ 签名（Ed25519）— encrypt-then-sign
 ```
 
 ### 跨协议桥接

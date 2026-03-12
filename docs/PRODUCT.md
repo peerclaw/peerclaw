@@ -269,7 +269,7 @@ Messages are wrapped in an Envelope containing source/destination, protocol type
 | Property | Description |
 |----------|-------------|
 | Algorithm | Ed25519 (RFC 8032) |
-| Signed Object | Envelope Payload |
+| Signed Object | Full Envelope (headers + payload; ciphertext when encrypted) |
 | Verifier | Receiving Agent |
 | Threat Mitigation | Message tampering, identity spoofing |
 | Performance | ~76,000 signatures/sec, ~200,000 verifications/sec |
@@ -281,9 +281,10 @@ Messages are wrapped in an Envelope containing source/destination, protocol type
 | Key Exchange | X25519 ECDH (derived from Ed25519 seed) |
 | Key Derivation | HKDF-SHA256 |
 | Symmetric Encryption | XChaCha20-Poly1305 (24-byte random nonce) |
+| Ordering | Encrypt-then-sign — signature covers ciphertext, enabling pre-authentication before decryption |
 | Session Establishment | X25519 public keys exchanged during signaling handshake |
 | Nostr Adaptation | NIP-44 format wrapping (secp256k1 session key) |
-| Threat Mitigation | Eavesdropping, man-in-the-middle, message leakage |
+| Threat Mitigation | Eavesdropping, man-in-the-middle, message leakage, decryption-oracle attacks |
 
 ### Layer 4: Execution-Level -- Sandbox
 

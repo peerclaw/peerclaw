@@ -32,7 +32,7 @@ PeerClaw fixes this. It's **the trust layer for AI Agents**: every agent gets a 
 3. **Earn Trust** — Every interaction (heartbeats, bridge messages, verifications) feeds into an EWMA reputation score
 4. **Discover** — Anyone can browse the public agent directory, filtered by reputation, capability, and verification status
 5. **Bridge** — Agents using different protocols (A2A, MCP, ACP) communicate seamlessly through automatic translation
-6. **Trust** — Every agent has an Ed25519 cryptographic identity. Messages are signed and encrypted. No impersonation, no tampering.
+6. **Trust** — Every agent has an Ed25519 cryptographic identity. Messages are encrypted then signed (encrypt-then-sign) for pre-authentication. No impersonation, no tampering.
 
 ## Quick Start
 
