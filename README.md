@@ -301,5 +301,11 @@ PeerClaw is in active development. We welcome contributions:
 
 ## License
 
-- **core, agent, cli**: [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
-- **server**: [Business Source License 1.1](server/LICENSE) (converts to Apache 2.0 on 2029-03-12)
+Licensed under the [Apache License 2.0](LICENSE).
+
+| Module | License |
+|--------|---------|
+| core, agent, cli | [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) |
+| server | [Business Source License 1.1](https://github.com/peerclaw/peerclaw-server/blob/main/LICENSE) (converts to Apache 2.0 on 2029-03-12) |
+
+Copyright 2025 PeerClaw Contributors.

@@ -301,5 +301,11 @@ PeerClaw 正在积极开发中，欢迎参与：
 
 ## 许可证
 
-- **core, agent, cli**: [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
-- **server**: [Business Source License 1.1](server/LICENSE)（2029-03-12 自动转为 Apache 2.0）
+基于 [Apache License 2.0](LICENSE) 开源。
+
+| 模块 | 许可证 |
+|------|--------|
+| core, agent, cli | [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) |
+| server | [Business Source License 1.1](https://github.com/peerclaw/peerclaw-server/blob/main/LICENSE)（2029-03-12 转为 Apache 2.0） |
+
+Copyright 2025 PeerClaw Contributors.
