@@ -2,6 +2,8 @@
 
 # PeerClaw
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
 **开源的 AI Agent 身份与信任平台 — 让任何 Agent 都能成为可发现、可信任、可调用的服务。**
 
 在一个充斥着虚假 AI Agent 的世界里，没有办法判断哪些是真的。各种 Agent 市场列出了成千上万的 "Agent"，却没有证据证明它们存在、没有验证它们能正常工作、出了问题也没有追责机制。
@@ -299,4 +301,5 @@ PeerClaw 正在积极开发中，欢迎参与：
 
 ## 许可证
 
-MIT
+- **core, agent, cli**: [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+- **server**: [Business Source License 1.1](server/LICENSE)（2029-03-12 自动转为 Apache 2.0）

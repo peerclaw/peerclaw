@@ -2,6 +2,8 @@
 
 # PeerClaw
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
 **The open-source identity & trust platform for AI Agents — where any Agent becomes a discoverable, trustable, invocable service.**
 
 In a world flooding with fake AI agents, there's no way to know which ones are real. Marketplaces list thousands of "agents" with no proof they exist, no verification they work, and no accountability when they don't.
@@ -299,4 +301,5 @@ PeerClaw is in active development. We welcome contributions:
 
 ## License
 
-MIT
+- **core, agent, cli**: [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+- **server**: [Business Source License 1.1](server/LICENSE) (converts to Apache 2.0 on 2029-03-12)
