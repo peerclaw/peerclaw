@@ -29,6 +29,14 @@ user_auth:
   jwt_secret: "${JWT_SECRET}"
   admin_emails: []    # emails auto-promoted to admin on login/register
 
+# smtp:                          # Uncomment to enable email verification
+#   host: "smtp.example.com"
+#   port: 465
+#   username: "${SMTP_USERNAME}"
+#   password: "${SMTP_PASSWORD}"
+#   from: "noreply@example.com"
+#   tls: true
+
 rate_limit:
   enabled: true
   requests_per_sec: 100
