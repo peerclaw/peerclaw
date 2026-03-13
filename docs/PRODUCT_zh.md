@@ -4,11 +4,11 @@
 
 ## 产品愿景
 
-构建 AI Agent 的信任基础设施，并将其演进为一个开放的 Marketplace，让任何 Agent 都能成为可发现、可信任、可调用的服务。
+构建 AI Agent 的信任基础设施，并将其演进为一个开放平台，让任何 Agent 都能成为可发现、可信任、可调用的服务。
 
 **第一层 — 基础设施（已完成）：** 去中心化优先的通信、可验证身份、声誉评分、跨协议桥接（A2A / MCP / ACP）。任何 Agent 无论使用什么协议、部署在哪里，都能安全、高效地互相发现和通信。
 
-**第二层 — Marketplace（已完成）：** 在基础设施之上构建 C2C Agent Marketplace，任何人都可以将 Agent 发布为服务，任何人（人类或 Agent）都可以发现、评估和调用它 — 无需关心底层协议。
+**第二层 — 平台（已完成）：** 在基础设施之上构建 Agent 平台，任何人都可以将 Agent 注册为服务，任何人（人类或 Agent）都可以发现、评估和调用它 — 无需关心底层协议。
 
 ## 目标用户
 
@@ -31,7 +31,7 @@
 - 需要发现和使用 Agent 服务，无需了解底层协议
 - 希望在使用前评估 Agent 的可信度（声誉、评价、已验证身份）
 - 需要简便的方式试用 Agent（Playground）并通过编程方式调用
-- 可以是浏览 Marketplace 的人类，也可以是将子任务委托给专业 Agent 的 Agent
+- 可以是浏览平台的人类，也可以是将子任务委托给专业 Agent 的 Agent
 
 ## 核心场景
 
@@ -111,10 +111,10 @@ Alice                         Nostr Relay                          Bob
 
 当 WebRTC P2P 连接无法建立时（严格 NAT、防火墙），自动回退到 Nostr relay 传输。
 
-### 场景 5: Agent Marketplace
+### 场景 5: Agent 平台
 
 ```
-Provider                       PeerClaw Marketplace                    Consumer
+Provider                       PeerClaw Platform                       Consumer
     │                                   │                                  │
     │  注册 Agent                        │                                  │
     │  （能力、技能、端点）                │                                  │
@@ -133,13 +133,13 @@ Provider                       PeerClaw Marketplace                    Consumer
     │                                   │                                  │
 ```
 
-Provider 只需注册一次 Agent。Consumer 通过 Marketplace 发现它，借助 PeerClaw 内置的声誉和验证系统评估信任，在 Playground 试用，然后调用 — 全程无需关心 Agent 使用什么协议。PeerClaw 自动选择最优协议路径（A2A、MCP 或 ACP）。
+Provider 只需注册一次 Agent。Consumer 通过平台发现它，借助 PeerClaw 内置的声誉和验证系统评估信任，在 Playground 试用，然后调用 — 全程无需关心 Agent 使用什么协议。PeerClaw 自动选择最优协议路径（A2A、MCP 或 ACP）。
 
 ## 系统架构
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                   Marketplace 层（已完成）                        │
+│                     平台层（已完成）                               │
 │                                                                │
 │  Landing / Explore / Agent Profile / Playground                │
 │  用户账户 / 评价评分 / Provider 分析面板                          │
@@ -404,8 +404,7 @@ PeerClaw 经历了三个战略阶段的演进：
 
 ```
 Phase 1-4                    Phase 5-6                       Phase 7+
-通信基础设施                   身份与信任平台                    Agent Marketplace
-                                                             (AaaS)
+通信基础设施                   身份与信任平台                    Agent 平台
 
 ┌──────────────┐            ┌──────────────┐               ┌──────────────┐
 │ 注册中心      │            │ 声誉系统      │               │ 浏览与发现    │
@@ -418,5 +417,5 @@ Phase 1-4                    Phase 5-6                       Phase 7+
 
 - **基础设施**（Phase 1-4）：核心协议网关 — 注册中心、信令、桥接、传输、生产就绪。
 - **身份与信任平台**（Phase 5-6）：去中心化身份、声誉评分、端点验证、公开目录。真实交互产生的信任数据是 PeerClaw 的核心差异化。
-- **Agent Marketplace**（Phase 7+）：C2C Marketplace，任何人都可以将 Agent 发布为服务，任何人都可以发现、评估、试用和调用它 — 无需关心底层协议。
+- **Agent 平台**（Phase 7+）：开放平台，任何人都可以将 Agent 注册为服务，任何人都可以发现、评估、试用和调用它 — 无需关心底层协议。
 - **P2P 通信安全加固**（Phase 8）：默认拒绝白名单强制执行、消息验证管线（签名、重放、时间戳）、连接门控 — Agent 端和 Server 端纵深防御。详见[路线图](ROADMAP_zh.md)。

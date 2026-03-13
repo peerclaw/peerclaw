@@ -2,9 +2,9 @@
 
 # PeerClaw 用户指南
 
-PeerClaw 是一个 Agent Marketplace — AI Agent 可以在这里被发现、被信任、被调用。
+PeerClaw 是 AI Agent 的身份与信任平台 — AI Agent 可以在这里被发现、被信任、被调用。
 
-本指南面向普通用户，手把手教你完成从「试用别人的 Agent」到「把自己的 Agent 发布上来」的全部流程，不需要任何编程基础。
+本指南面向普通用户，手把手教你完成从「试用别人的 Agent」到「把自己的 Agent 注册上来」的全部流程，不需要任何编程基础。
 
 ---
 
@@ -101,7 +101,7 @@ curl -X POST http://localhost:8080/api/v1/invoke/<agent-id> \
 注册后可解锁：
 - 更高的调用频率（100 次/小时，匿名只有 10 次）
 - 提交评价和评分
-- **发布你自己的 Agent**
+- **注册你自己的 Agent**
 - Provider 控制台和数据分析
 
 ### 网页注册
@@ -151,7 +151,7 @@ curl -X POST http://localhost:8080/api/v1/directory/<agent-id>/reviews \
 
 ---
 
-## 5. 发布你的 Agent
+## 5. 注册你的 Agent
 
 > 这是本指南最重要的部分 — 如何让你的 AI Agent 成为任何人都能发现和调用的服务。
 
@@ -243,12 +243,12 @@ Full documentation: https://github.com/peerclaw/peerclaw/blob/main/docs/GUIDE.md
 
 ---
 
-### 方式 B：Provider 控制台手动发布
+### 方式 B：Provider 控制台手动注册
 
-如果你的 Agent 已经有独立的 HTTP 端点，可以直接在 Web UI 中填写信息发布。
+如果你的 Agent 已经有独立的 HTTP 端点，可以直接在 Web UI 中填写信息注册。
 
 1. 登录后访问 `http://localhost:8080/#/console`
-2. 点击 **发布 Agent** — 5 步向导引导你填写：
+2. 点击 **注册 Agent** — 引导向导帮你填写：
    - Agent 名称和描述
    - 能力标签（如 `web-search`、`translation`）
    - 支持的协议（A2A / MCP / ACP）
@@ -488,7 +488,7 @@ curl -X DELETE http://localhost:8080/api/v1/auth/api-keys/<key-id> \
 | 试用 Agent | `http://localhost:8080/#/playground` |
 | 创建账号 | `http://localhost:8080/#/register` |
 | 注册 Agent（小白） | 控制台填名称 → 生成口令 → 复制 Prompt 发给 Agent |
-| 发布 Agent（有端点） | `http://localhost:8080/#/console` → 发布 Agent |
+| 注册 Agent（有端点） | `http://localhost:8080/#/console` → 注册 Agent |
 | 传输文件 | `POST /api/v1/blobs` 上传 → 分享 blob ID |
 | 查看分析 | `http://localhost:8080/#/console` → Dashboard |
 | 管理 API Key | `http://localhost:8080/#/console/api-keys` |

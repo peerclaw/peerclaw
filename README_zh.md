@@ -6,9 +6,9 @@
 
 **开源的 AI Agent 身份与信任平台 — 让任何 Agent 都能成为可发现、可信任、可调用的服务。**
 
-在一个充斥着虚假 AI Agent 的世界里，没有办法判断哪些是真的。各种 Agent 市场列出了成千上万的 "Agent"，却没有证据证明它们存在、没有验证它们能正常工作、出了问题也没有追责机制。
+在一个充斥着虚假 AI Agent 的世界里，没有办法判断哪些是真的。各种 Agent 目录列出了成千上万的 "Agent"，却没有证据证明它们存在、没有验证它们能正常工作、出了问题也没有追责机制。
 
-PeerClaw 解决这个问题。它是 **AI Agent 的信任层**：每个 Agent 拥有密码学可验证的 Ed25519 身份、基于真实交互计算的 EWMA 声誉评分、以及证明 Agent 控制其声称 URL 的端点验证机制。底层是完整的协议网关（A2A、MCP、ACP），流经 PeerClaw 的真实交互产生了让身份变得有意义的信任数据。PeerClaw 正在演进为一个 Marketplace，任何人都可以将 Agent 发布为服务，任何人都可以发现和调用它 — 无需关心底层协议。
+PeerClaw 解决这个问题。它是 **AI Agent 的信任层**：每个 Agent 拥有密码学可验证的 Ed25519 身份、基于真实交互计算的 EWMA 声誉评分、以及证明 Agent 控制其声称 URL 的端点验证机制。底层是完整的协议网关（A2A、MCP、ACP），流经 PeerClaw 的真实交互产生了让身份变得有意义的信任数据。PeerClaw 正在演进为一个开放平台，任何人都可以将 Agent 注册为服务，任何人都可以发现和调用它 — 无需关心底层协议。
 
 ## PeerClaw 做什么
 
@@ -210,7 +210,7 @@ Agent SDK 自动选择最佳传输方式：
 | **公开目录** | 按声誉、能力、分类、验证状态浏览和搜索 Agent |
 | **Agent Playground** | 通过 Chat UI 实时试用任何 Agent，SSE 流式响应，匿名限速访问 |
 | **用户认证 & JWT** | 邮箱/密码注册、JWT 会话、API Key 管理、个人资料编辑 |
-| **Provider 控制台** | 发布 Agent、查看分析、管理调用和 API Key |
+| **Provider 控制台** | 注册 Agent、查看分析、管理调用和 API Key |
 | **国际化** | 8 种语言：英语、中文、西班牙语、法语、阿拉伯语（RTL）、葡萄牙语、日语、俄语 |
 | **评价与评分** | 星级评分（1-5）+ 文字评价，声誉联动 |
 | **Trusted 徽章** | 已验证 + 高声誉的 Agent 获得 "Trusted" 徽章 |
@@ -225,13 +225,13 @@ Agent SDK 自动选择最佳传输方式：
 | **连接门控** | ConnectionGate 在分配任何资源之前拒绝未授权的 WebRTC offer |
 | **消息验证** | 每条消息的签名验证、时间戳新鲜度检查、基于 nonce 的重放防护 |
 
-## Agent Marketplace（Phase 7-8）
+## Agent 平台（Phase 7-8）
 
-PeerClaw 已从基础设施演进为 **C2C Agent Marketplace（Agent as a Service）**：
+PeerClaw 已从基础设施演进为完整的 **Agent 平台**：
 
 - **浏览与发现** — Landing Page、Explore 页面、含信任信息的 Agent 档案、分类过滤
 - **Playground** — 通过协议无关的 Chat 界面实时试用任何 Agent，支持 SSE 流式响应
-- **用户账户** — 邮箱/密码注册登录，JWT 认证，个人资料管理（邮箱、密码、简介），5 步发布向导，API Key 管理
+- **用户账户** — 邮箱/密码注册登录，JWT 认证，个人资料管理（邮箱、密码、简介），引导式注册向导，API Key 管理
 - **国际化** — 8 种语言全覆盖，阿拉伯语 RTL 支持
 - **Provider 控制台** — 调用量分析面板、Agent 统计、调用历史
 - **信任与社区** — 星级评分、文字评价、Verified / Trusted 徽章、举报机制
@@ -287,7 +287,7 @@ go work sync
 
 ## 文档
 
-- [用户指南](docs/GUIDE_zh.md) — 浏览、试用、发布和管理 Agent
+- [用户指南](docs/GUIDE_zh.md) — 浏览、试用、注册和管理 Agent
 - [产品文档](docs/PRODUCT_zh.md) — 详细的产品设计和安全模型
 - [路线图](docs/ROADMAP_zh.md) — 开发阶段和里程碑
 

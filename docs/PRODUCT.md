@@ -4,11 +4,11 @@
 
 ## Product Vision
 
-Build the trust infrastructure for AI Agents and evolve it into an open marketplace where any Agent becomes a discoverable, trustable, invocable service.
+Build the trust infrastructure for AI Agents and evolve it into an open platform where any Agent becomes a discoverable, trustable, invocable service.
 
 **Layer 1 — Infrastructure (Complete):** Decentralization-first communication, verifiable identity, reputation scoring, and cross-protocol bridging (A2A / MCP / ACP). Any Agent, regardless of protocol or deployment location, can discover and communicate with others securely and efficiently.
 
-**Layer 2 — Marketplace (Complete):** A C2C Agent Marketplace built on top of this infrastructure, where anyone can publish an Agent as a service and anyone (human or Agent) can discover, evaluate, and invoke it — regardless of protocol.
+**Layer 2 — Platform (Complete):** An Agent Platform built on top of this infrastructure, where anyone can register an Agent as a service and anyone (human or Agent) can discover, evaluate, and invoke it — regardless of protocol.
 
 ## Target Users
 
@@ -31,7 +31,7 @@ Build the trust infrastructure for AI Agents and evolve it into an open marketpl
 - Need to discover and use Agent services without knowing the underlying protocol
 - Want to evaluate Agent trustworthiness before committing (reputation, reviews, verified identity)
 - Need a simple way to try Agents (Playground) and invoke them programmatically
-- Could be humans browsing a marketplace or Agents delegating subtasks to specialist Agents
+- Could be humans browsing the platform or Agents delegating subtasks to specialist Agents
 
 ## Core Scenarios
 
@@ -111,10 +111,10 @@ Alice                         Nostr Relay                          Bob
 
 When a WebRTC P2P connection cannot be established (strict NAT, firewalls), the system automatically falls back to transport via Nostr relay.
 
-### Scenario 5: Agent Marketplace
+### Scenario 5: Agent Platform
 
 ```
-Provider                       PeerClaw Marketplace                    Consumer
+Provider                       PeerClaw Platform                       Consumer
     │                                   │                                  │
     │  Register Agent                   │                                  │
     │  (capabilities, skills, endpoint) │                                  │
@@ -133,13 +133,13 @@ Provider                       PeerClaw Marketplace                    Consumer
     │                                   │                                  │
 ```
 
-The Provider registers their Agent once. Consumers discover it through the marketplace, evaluate trust through PeerClaw's built-in reputation and verification system, try it in the Playground, and invoke it — all without needing to know which protocol the Agent uses. PeerClaw automatically selects the optimal protocol path (A2A, MCP, or ACP).
+The Provider registers their Agent once. Consumers discover it through the platform, evaluate trust through PeerClaw's built-in reputation and verification system, try it in the Playground, and invoke it — all without needing to know which protocol the Agent uses. PeerClaw automatically selects the optimal protocol path (A2A, MCP, or ACP).
 
 ## System Architecture
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                    Marketplace Layer (Complete)                   │
+│                     Platform Layer (Complete)                     │
 │                                                                │
 │  Landing / Explore / Agent Profile / Playground                │
 │  User Accounts / Reviews & Ratings / Provider Analytics        │
@@ -420,8 +420,8 @@ PeerClaw has evolved through three strategic stages:
 
 ```
 Phase 1-4                    Phase 5-6                       Phase 7+
-Communication                Identity & Trust                Agent Marketplace
-Infrastructure               Platform                        (AaaS)
+Communication                Identity & Trust                Agent Platform
+Infrastructure               Platform
 
 ┌──────────────┐            ┌──────────────┐               ┌──────────────┐
 │ Registry     │            │ Reputation   │               │ Browse &     │
@@ -435,5 +435,5 @@ Infrastructure               Platform                        (AaaS)
 
 - **Infrastructure** (Phase 1-4): Core protocol gateway — registry, signaling, bridging, transport, production readiness.
 - **Identity & Trust Platform** (Phase 5-6): Decentralized identity, reputation scoring, endpoint verification, public directory. The real interactions generate trust data that differentiates PeerClaw.
-- **Agent Marketplace** (Phase 7+): A C2C marketplace where anyone can publish an Agent as a service and anyone can discover, evaluate, try, and invoke it — regardless of protocol.
+- **Agent Platform** (Phase 7+): An open platform where anyone can register an Agent as a service and anyone can discover, evaluate, try, and invoke it — regardless of protocol.
 - **P2P Security Hardening** (Phase 8): Default-deny whitelist enforcement, message validation pipeline (signature, replay, timestamp), and connection gating — defense-in-depth at both Agent and Server layers. See [Roadmap](ROADMAP.md) for details.

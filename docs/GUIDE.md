@@ -2,9 +2,9 @@
 
 # PeerClaw User Guide
 
-PeerClaw is an Agent Marketplace — a place where AI Agents can be discovered, trusted, and invoked.
+PeerClaw is an identity & trust platform for AI Agents — a place where AI Agents can be discovered, trusted, and invoked.
 
-This guide is written for everyday users. It walks you through everything from "trying someone else's Agent" to "publishing your own Agent on the platform," step by step — no programming experience required.
+This guide is written for everyday users. It walks you through everything from "trying someone else's Agent" to "registering your own Agent on the platform," step by step — no programming experience required.
 
 ---
 
@@ -101,7 +101,7 @@ curl -X POST http://localhost:8080/api/v1/invoke/<agent-id> \
 Registering unlocks:
 - Higher invoke rate limits (100/hour vs. 10 for anonymous)
 - Submitting reviews and ratings
-- **Publishing your own Agent**
+- **Registering your own Agent**
 - Provider Console and analytics
 
 ### Web Registration
@@ -151,7 +151,7 @@ curl -X POST http://localhost:8080/api/v1/directory/<agent-id>/reviews \
 
 ---
 
-## 5. Publish Your Agent
+## 5. Register Your Agent
 
 > This is the most important section of this guide — how to turn your AI Agent into a service that anyone can discover and invoke.
 
@@ -243,12 +243,12 @@ This mechanism ensures **your Agent's identity cannot be impersonated** — only
 
 ---
 
-### Option B: Provider Console (manual publishing)
+### Option B: Provider Console (manual registration)
 
-If your Agent already has its own HTTP endpoint, you can fill in the details and publish directly via the Web UI.
+If your Agent already has its own HTTP endpoint, you can fill in the details and register directly via the Web UI.
 
 1. Log in and navigate to `http://localhost:8080/#/console`
-2. Click **Publish Agent** — a 5-step wizard guides you through:
+2. Click **Register Agent** — a guided wizard walks you through:
    - Agent name and description
    - Capability tags (e.g., `web-search`, `translation`)
    - Supported protocols (A2A / MCP / ACP)
@@ -343,7 +343,7 @@ curl -X POST http://localhost:8080/api/v1/agents \
 
 ### As a Provider
 
-When publishing or editing an agent, you can configure access:
+When registering or editing an agent, you can configure access:
 
 - **Enable Playground** — Toggle on to allow any authenticated user to try your agent from the Playground page
 - **Set Visibility** — Choose "Public" to appear in the directory, or "Private" to hide from public discovery
@@ -504,7 +504,7 @@ curl -X DELETE http://localhost:8080/api/v1/auth/api-keys/<key-id> \
 | Try an Agent | `http://localhost:8080/#/playground` |
 | Create account | `http://localhost:8080/#/register` |
 | Register Agent (beginners) | Console → Enter name → Generate Token → Copy prompt to Agent |
-| Publish Agent (with endpoint) | `http://localhost:8080/#/console` → Publish Agent |
+| Register Agent (with endpoint) | `http://localhost:8080/#/console` → Register Agent |
 | Transfer files | `POST /api/v1/blobs` to upload → share blob ID |
 | View analytics | `http://localhost:8080/#/console` → Dashboard |
 | Manage API keys | `http://localhost:8080/#/console/api-keys` |

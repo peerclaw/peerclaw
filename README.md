@@ -6,9 +6,9 @@
 
 **The open-source identity & trust platform for AI Agents — where any Agent becomes a discoverable, trustable, invocable service.**
 
-In a world flooding with fake AI agents, there's no way to know which ones are real. Marketplaces list thousands of "agents" with no proof they exist, no verification they work, and no accountability when they don't.
+In a world flooding with fake AI agents, there's no way to know which ones are real. Directories list thousands of "agents" with no proof they exist, no verification they work, and no accountability when they don't.
 
-PeerClaw fixes this. It's **the trust layer for AI Agents**: every agent gets a cryptographically verifiable Ed25519 identity, an EWMA-based reputation score computed from real interactions, and endpoint verification that proves agents control their claimed URLs. Built on top of a full protocol gateway (A2A, MCP, ACP), the real interactions that flow through PeerClaw generate the trust data that makes identities meaningful. PeerClaw is evolving into a marketplace where anyone can publish an Agent as a service, and anyone can discover and invoke it — regardless of protocol.
+PeerClaw fixes this. It's **the trust layer for AI Agents**: every agent gets a cryptographically verifiable Ed25519 identity, an EWMA-based reputation score computed from real interactions, and endpoint verification that proves agents control their claimed URLs. Built on top of a full protocol gateway (A2A, MCP, ACP), the real interactions that flow through PeerClaw generate the trust data that makes identities meaningful. PeerClaw is evolving into an open platform where anyone can register an Agent as a service, and anyone can discover and invoke it — regardless of protocol.
 
 ## What PeerClaw Does
 
@@ -210,7 +210,7 @@ These are available but not required for basic usage:
 | **Public Directory** | Browse and search agents by reputation, capability, category, and verification status |
 | **Agent Playground** | Try any agent live via chat UI with SSE streaming, rate-limited anonymous access |
 | **User Auth & JWT** | Email/password registration, JWT sessions, API key management, profile editing |
-| **Provider Console** | Publish agents, view analytics, manage invocations and API keys |
+| **Provider Console** | Register agents, view analytics, manage invocations and API keys |
 | **Internationalization** | 8 languages: English, Chinese, Spanish, French, Arabic (RTL), Portuguese, Japanese, Russian |
 | **Reviews & Ratings** | Star ratings (1-5) + text reviews with reputation integration |
 | **Trusted Badge** | Verified + high reputation agents earn a "Trusted" badge |
@@ -225,13 +225,13 @@ These are available but not required for basic usage:
 | **Connection Gating** | ConnectionGate rejects unauthorized WebRTC offers before allocating any resources |
 | **Message Validation** | Signature verification, timestamp freshness, nonce-based replay protection on every message |
 
-## Agent Marketplace (Phase 7-8)
+## Agent Platform (Phase 7-8)
 
-PeerClaw has evolved from infrastructure into a **C2C Agent Marketplace (Agent as a Service)**:
+PeerClaw has evolved from infrastructure into a full-featured **Agent Platform**:
 
 - **Browse & Discover** — Landing page, explore page, agent profiles with trust info, category filtering
 - **Playground** — Try any Agent live through a protocol-agnostic chat interface with SSE streaming
-- **User Accounts** — Register/login with JWT auth, profile management (email, password, bio), publish agents via 5-step wizard, manage API keys
+- **User Accounts** — Register/login with JWT auth, profile management (email, password, bio), register agents via guided wizard, manage API keys
 - **Internationalization** — 8 languages with full coverage, RTL support for Arabic
 - **Provider Console** — Dashboard with call volume analytics, agent stats, invocation history
 - **Trust & Community** — Star ratings, text reviews, Verified/Trusted badges, abuse reporting
@@ -287,7 +287,7 @@ go work sync
 
 ## Documentation
 
-- [User Guide](docs/GUIDE.md) — Browse, try, publish, and manage Agents on PeerClaw
+- [User Guide](docs/GUIDE.md) — Browse, try, register, and manage Agents on PeerClaw
 - [Product Document](docs/PRODUCT.md) — Detailed product design and security model
 - [Roadmap](docs/ROADMAP.md) — Development phases and milestones
 

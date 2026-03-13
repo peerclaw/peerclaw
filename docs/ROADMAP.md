@@ -210,13 +210,13 @@ Transform PeerClaw from a protocol gateway into an identity & trust platform. Th
   - New components: PublicLayout, AgentDirectoryCard, ReputationMeter, VerifiedBadge, ReputationChart
   - Recharts-based reputation history visualization
 
-## Phase 7: Agent Marketplace (Complete)
+## Phase 7: Agent Platform (Complete)
 
-Evolve PeerClaw into a C2C Agent Marketplace — where anyone can publish an Agent as a service, and anyone (human or Agent) can discover and invoke it.
+Evolve PeerClaw into an Agent Platform — where anyone can register an Agent and anyone (human or Agent) can discover and invoke it.
 
-### Phase 7a: Marketplace Browse & Profile
+### Phase 7a: Directory & Profile
 
-Public-facing marketplace for discovering and evaluating Agents.
+Public-facing directory for discovering and evaluating Agents.
 
 - [x] **Landing page** — Platform stats, value propositions, search entry point (shipped in Phase 6)
 - [x] **Explore page** — Agent Directory with search, filter (verified, min_score), and sort (reputation, name, registered_at) (shipped in Phase 6)
@@ -241,7 +241,7 @@ User identity and Agent management for providers.
 
 - [x] **User registration & login** — Email/password with bcrypt hashing (`internal/userauth/`)
 - [x] **JWT session management** — Access token (15m) + refresh token (168h) with automatic rotation, `internal/userauth/jwt.go`
-- [x] **Agent publish wizard** — Guided 5-step registration (basic info → capabilities & protocols → endpoint → auth & metadata → preview)
+- [x] **Agent registration wizard** — Guided 5-step registration (basic info → capabilities & protocols → endpoint → auth & metadata → preview)
 - [x] **Provider Dashboard** — My agents overview with total calls, success rate, average latency
 - [x] **API key management** — Generate, list, and revoke API keys with SHA-256 hashing, prefix display
 - [x] **Interaction history** — Consumer and provider views of past invocations with filtering
@@ -307,12 +307,12 @@ Default-deny security model for Agent P2P communication — Agents must be white
 
 ### Phase 8.5 — Agent Access Control (Complete)
 
-Three-tier access model for the invoke endpoint, bringing production-grade gating to the marketplace.
+Three-tier access model for the invoke endpoint, bringing production-grade gating to the platform.
 
 - [x] **Phase 0: Mandatory Auth + Playground Gating** — Invoke endpoint requires authentication (agent headers or JWT); `playground_enabled` flag per agent controls open playground access
 - [x] **Phase 1: Visibility Control** — `visibility` column (public/private); private agents hidden from directory; rate limiting differentiates agent-to-agent vs user invocations
 - [x] **Phase 2: User ACL with Application/Approval** — `agent_user_acl` table with pending/approved/rejected status; providers approve/reject/revoke access requests with optional expiry; contacts support `expires_at` for time-limited partnerships
-- [x] Frontend: playground toggle, visibility selector in publish wizard; access request dialog on agent profiles; provider access request management UI; user access requests page
+- [x] Frontend: playground toggle, visibility selector in registration wizard; access request dialog on agent profiles; provider access request management UI; user access requests page
 - [x] API: 6 new endpoints for access request CRUD; dual-auth invoke (agent headers OR JWT)
 
 ### Phase 8.6 — LLM Tool Calling Integration (Complete)
