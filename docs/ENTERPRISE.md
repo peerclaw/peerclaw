@@ -72,8 +72,7 @@ agent.New(agent.Options{
 
 All other options use safe defaults:
 - **Auto-generated Ed25519 keypair** (no key file management needed)
-- **Server-only mode** — no Nostr relays, no STUN/TURN
-- **No serverless** — relies on the central peerclaw-server
+- **Server-only mode** — no Nostr relays, no STUN/TURN, server-based discovery and signaling
 
 ### Pre-provisioned Trust with `ImportContacts`
 

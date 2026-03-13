@@ -197,8 +197,6 @@ The Provider registers their Agent once. Consumers discover it through the platf
 │  │   Agent API  │  │  Discovery   │  │     Signaling        │ │
 │  │              │  │  (Interface) │  │     (Interface)      │ │
 │  │              │  │ Registry     │  │  WebSocket Client    │ │
-│  │              │  │ Composite    │  │  NostrSignaling      │ │
-│  │              │  │              │  │  Composite           │ │
 │  └──────────────┘  └──────────────┘  └──────────────────────┘ │
 │  ┌──────────────┐  ┌──────────────────────────────────────┐   │
 │  │ Peer Manager │  │            Security                  │   │
@@ -207,7 +205,7 @@ The Provider registers their Agent once. Consumers discover it through the platf
 │  └──────────────┘  └──────────────────────────────────────┘   │
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │                      Identity                           │  │
-│  │  IdentityAnchor + NostrAnchor + Domain Verify + Recovery│  │
+│  │  IdentityAnchor + NostrAnchor                           │  │
 │  └──────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────────────────────┐   │
 │  │                    Transport                           │   │
@@ -377,17 +375,6 @@ Middleware chain (per request):
               [ DNS SRV Discovery ]            [ DNS SRV Discovery ]
 ```
 
-### Serverless Mode (Phase 5 -- Implemented)
-
-```
-[ Agent A ]                                    [ Agent B ]
-     │  1. Nostr Signaling (kind 20006)              │
-     │──────────────►  Nostr Relays  ◄──────────────│
-     │  2. WebRTC P2P Direct Connection              │
-     │◄════════════ DataChannel ═══════════════════►│
-     │  3. Offline Message Cache (MessageCache)      │
-```
-
 ## Reputation Model (Phase 5)
 
 | Property | Description |
@@ -403,11 +390,9 @@ Middleware chain (per request):
 
 | Property | Description |
 |----------|-------------|
-| Interface | IdentityAnchor (Publish/Verify/Resolve/RecoveryKeys) |
+| Interface | IdentityAnchor (Publish/Verify/Resolve) |
 | Primary Implementation | Nostr kind 10078 replaceable event |
 | Key Binding | Bidirectional: Ed25519 signs Nostr key + Nostr key signs Ed25519 key |
-| Domain Verification | DNS TXT record peerclaw-verify=<fingerprint> |
-| Identity Recovery | threshold-of-n multisig recovery keys |
 
 ## Product Evolution
 

@@ -127,11 +127,11 @@ Stability, observability, and operational capabilities for production environmen
 
 ## Phase 5: Decentralized Evolution (Complete)
 
-Evolve toward full decentralization, enabling serverless agent communication.
+Evolve toward decentralization with federation, reputation, and identity anchoring.
 
 - [x] **Interface abstractions + Agent Card extensions**
-  - Discovery interface (RegistryClient / CompositeDiscovery)
-  - SignalingClient interface (WebSocket / NostrSignaling / CompositeSignaling)
+  - Discovery interface (RegistryClient)
+  - SignalingClient interface (WebSocket)
   - Agent struct refactored to use interfaces (backward-compatible)
   - PeerClawExtension new fields (nostr_pubkey / reputation_score / nostr_relays / identity_anchor)
   - New signaling message types (federation_forward)
@@ -149,17 +149,12 @@ Evolve toward full decentralization, enabling serverless agent communication.
   - TrustStore integration (SetReputationStore / IsAllowedWithReputation)
   - Reputation gossip (Nostr kind 30078, second-hand reputation weighted at 0.3x, only accepts peers at TrustVerified+)
   - JSON file persistence
-- [x] **Serverless pure P2P mode**
-  - NostrSignaling (event kind 20006, NIP-44 encryption)
-  - CompositeSignaling (WebSocket-first + Nostr fallback)
+- [x] **Offline message buffering**
   - MessageCache for offline message buffering (per-destination queues, TTL expiration, JSON persistence)
   - OnPeerAdded callback (flushes cached queue when a new peer connects)
-  - Serverless mode Options (Serverless / ICEServers / MessageCachePath)
-- [x] **On-chain identity anchoring (optional)**
-  - IdentityAnchor interface (Publish / Verify / Resolve / RecoveryKeys)
+- [x] **Nostr identity anchoring (optional)**
+  - IdentityAnchor interface (Publish / Verify / Resolve)
   - NostrAnchor implementation (Nostr kind 10078 replaceable event, bidirectional key binding)
-  - Domain binding verification (DNS TXT record peerclaw-verify=<fingerprint>)
-  - Multi-sig recovery (threshold-of-n recovery keys)
 - [x] **CLI Phase 5 commands**
   - `peerclaw federation status|peers`
   - `peerclaw reputation show|list`
@@ -342,7 +337,7 @@ Enable agents to serve requests from other agents with capability-based routing.
 Lower the barrier for enterprise intranet deployments.
 
 - [x] **`agent.NewSimple()`** — Simplified constructor (Name, ServerURL, Capabilities variadic)
-  - Auto-configures: Serverless=false, no Nostr, no STUN/TURN
+  - Auto-configures: server-only discovery and signaling, no STUN/TURN
   - Auto-generates Ed25519 keypair, server-only discovery and signaling
 - [x] **`agent.ImportContacts()`** — Bulk import of verified contacts for managed environments
   - Sets all imported agent IDs to TrustVerified level

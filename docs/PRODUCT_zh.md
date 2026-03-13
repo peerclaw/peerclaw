@@ -193,8 +193,6 @@ Provider 只需注册一次 Agent。Consumer 通过平台发现它，借助 Peer
 │  │   Agent API  │  │  Discovery   │  │     Signaling        │ │
 │  │              │  │  (接口)       │  │     (接口)           │ │
 │  │              │  │ Registry     │  │  WebSocket Client    │ │
-│  │              │  │ Composite    │  │  NostrSignaling      │ │
-│  │              │  │              │  │  Composite           │ │
 │  └──────────────┘  └──────────────┘  └──────────────────────┘ │
 │  ┌──────────────┐  ┌──────────────────────────────────────┐   │
 │  │ Peer Manager │  │            Security                  │   │
@@ -203,7 +201,7 @@ Provider 只需注册一次 Agent。Consumer 通过平台发现它，借助 Peer
 │  └──────────────┘  └──────────────────────────────────────┘   │
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │                      Identity                           │  │
-│  │  IdentityAnchor + NostrAnchor + Domain Verify + Recovery│  │
+│  │  IdentityAnchor + NostrAnchor                           │  │
 │  └──────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────────────────────┐   │
 │  │                    Transport                           │   │
@@ -362,17 +360,6 @@ Middleware chain (per request):
               [ DNS SRV 发现 ]                 [ DNS SRV 发现 ]
 ```
 
-### 无 Server 模式（Phase 5 已实现）
-
-```
-[ Agent A ]                                    [ Agent B ]
-     │  1. Nostr 信令 (kind 20006)                   │
-     │──────────────►  Nostr Relays  ◄──────────────│
-     │  2. WebRTC P2P 直连                           │
-     │◄════════════ DataChannel ═══════════════════►│
-     │  3. 离线消息缓存 (MessageCache)                │
-```
-
 ## 信誉模型（Phase 5）
 
 | 属性 | 说明 |
@@ -388,11 +375,9 @@ Middleware chain (per request):
 
 | 属性 | 说明 |
 |------|------|
-| 接口 | IdentityAnchor (Publish/Verify/Resolve/RecoveryKeys) |
+| 接口 | IdentityAnchor (Publish/Verify/Resolve) |
 | 首选实现 | Nostr kind 10078 replaceable event |
 | 密钥绑定 | 双向：Ed25519 签 Nostr key + Nostr key 签 Ed25519 key |
-| 域名验证 | DNS TXT 记录 peerclaw-verify=<fingerprint> |
-| 身份恢复 | threshold-of-n 多签 recovery keys |
 
 ## 产品演进
 

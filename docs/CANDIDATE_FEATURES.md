@@ -99,4 +99,43 @@ Each entry records the idea, rationale for deferral, and conditions under which 
 
 ---
 
+## Serverless Mode (Nostr Signaling + Composite Signaling)
+
+**What:** Enable agents to establish new WebRTC P2P connections without any central server, using Nostr relays (kind 20006, NIP-44 encrypted) for signaling negotiation. A CompositeSignaling client wraps WebSocket (primary) + Nostr (fallback), so agents automatically fall back to decentralized signaling when the server is unreachable.
+
+**Was prototyped?** Yes — full implementation existed: `NostrSignaling` (525 lines, NIP-44 encryption, multi-relay management, exponential backoff, event dedup) and `CompositeSignaling` (137 lines, primary/fallback with merged inbox). Both had complete test coverage. Removed during dead code cleanup.
+
+**Why deferred:**
+- PeerClaw's core value (discovery, trust, bridging) requires the server — serverless operation without discovery has very limited utility
+- Current Nostr mailbox transport already covers offline message delivery when the server is down
+- The only gap is establishing NEW WebRTC connections when the server is down, which is a narrow edge case
+- Untested in production, adds maintenance burden for a scenario no user has requested
+- MessageCache (offline message buffering) is retained independently
+
+**Reconsider when:**
+- Users need high-availability P2P connections that survive server outages
+- Censorship-resistant signaling becomes a hard requirement
+- PeerClaw is deployed in environments where server uptime cannot be guaranteed
+
+**Architecture note:** If re-implemented, wire `CompositeSignaling(WebSocketClient, NostrSignaling)` into `agent.go` when `opts.NostrRelays` is configured, replacing the current WebSocket-only default.
+
+---
+
+## DNS Identity Verification
+
+**What:** Verify agent ownership of a domain via DNS TXT records (`peerclaw-verify=<fingerprint>`), enabling domain-based identity proof similar to DKIM for email.
+
+**Was prototyped?** Yes — a `DomainVerifier` existed in the agent SDK with `Verify()` and `ExpectedTXTRecord()` functions. Never integrated into the agent lifecycle or server API.
+
+**Why deferred:**
+- Nostr-based identity anchoring already provides decentralized verification
+- DNS TXT records add operational complexity for agent operators
+- No user demand for domain-based identity proof
+
+**Reconsider when:**
+- Enterprise customers need domain-verified agent identity (similar to verified email senders)
+- Cross-organization trust establishment requires domain-level proof
+
+---
+
 *Last updated: 2026-03-13*

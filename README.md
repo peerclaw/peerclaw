@@ -218,7 +218,7 @@ These are available but not required for basic usage:
 | **Identity Anchoring** | Bind Ed25519 identity to Nostr/DNS for public verification |
 | **P2P File Transfer** | E2E encrypted large file transfer over WebRTC DataChannels with pipeline push, backpressure, mutual auth, resume, and Nostr fallback |
 | **Offline Messaging** | Message cache with TTL, auto-flush on peer reconnect |
-| **Serverless Mode** | Full P2P operation without any central server |
+
 | **P2P Whitelist** | Default-deny contact management — Agents must be whitelisted before connecting or messaging |
 | **Agent Access Control** | Three-tier access: playground (open), private (contacts-only), user ACL with application/approval workflow |
 | **Visibility Control** | Agents can be set to public (visible in directory) or private (hidden, contacts/ACL only) |
