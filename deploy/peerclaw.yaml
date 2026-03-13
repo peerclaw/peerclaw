@@ -47,6 +47,13 @@ audit_log:
   enabled: true
   output: "stdout"
 
+# retention:                          # Data retention auto-cleanup
+#   enabled: true                     # default true
+#   reputation_events_days: 90        # prune reputation events older than 90 days
+#   invocations_days: 30              # prune invocation records older than 30 days
+#   abuse_reports_days: 365           # prune resolved abuse reports older than 365 days
+#   cleanup_interval: "1h"            # how often to run cleanup
+
 logging:
   level: "info"
   format: "json"
