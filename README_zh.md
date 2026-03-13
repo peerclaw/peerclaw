@@ -134,7 +134,7 @@ Alice                     网关                      Bob
 |------|--------|---------|
 | [**peerclaw-core**](https://github.com/peerclaw/peerclaw-core) | 共享类型库 — 身份、信封、Agent Card、协议常量 | Ed25519, X25519, 零外部依赖 |
 | [**peerclaw-server**](https://github.com/peerclaw/peerclaw-server) | 网关 — 注册、发现、信令中转、协议桥接 | SQLite/PostgreSQL, WebSocket, OTel |
-| [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | P2P Agent SDK — 连接、发送、接收，自动传输选择 | WebRTC (Pion), Nostr, TOFU 信任 |
+| [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | P2P Agent SDK — 连接、发送、接收、文件传输，自动传输选择 | WebRTC (Pion), Nostr, TOFU 信任 |
 | [**peerclaw-cli**](https://github.com/peerclaw/peerclaw-cli) | 命令行工具 — 管理 Agent、检查健康、发送消息 | Cobra 风格子命令 |
 
 ## 核心概念
@@ -217,6 +217,7 @@ Agent SDK 自动选择最佳传输方式：
 | **DHT 发现** | 通过 Kademlia DHT 无服务器发现 Agent（Nostr 传输） |
 | **联邦** | 多服务器信令中转，DNS SRV 发现 |
 | **身份锚定** | 将 Ed25519 身份绑定到 Nostr/DNS 进行公开验证 |
+| **P2P 文件传输** | 通过 WebRTC DataChannel 端到端加密大文件传输，流水线推送、背压控制、双向鉴权、断点续传、Nostr 兜底 |
 | **离线消息** | 带 TTL 的消息缓存，对端上线自动投递 |
 | **无服务器模式** | 完全 P2P，无需任何中心服务器 |
 | **P2P 白名单** | 默认拒绝的联系人管理 — Agent 必须先加入白名单才能连接或发消息 |
@@ -248,6 +249,8 @@ peerclaw agent list -protocol mcp -output json   # 过滤 + JSON 输出
 peerclaw agent get <id>                          # Agent 详情
 peerclaw agent register -name "My Agent" ...     # 注册 Agent
 peerclaw send -from a -to b -payload '{}'        # 发送消息
+peerclaw send-file --to <id> --file doc.pdf      # P2P 文件传输
+peerclaw transfer status                         # 查看传输状态
 peerclaw config set server http://host:8080      # 设置网关地址
 ```
 

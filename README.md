@@ -134,7 +134,7 @@ Alice                    Gateway                     Bob
 |--------|-------------|----------|
 | [**peerclaw-core**](https://github.com/peerclaw/peerclaw-core) | Shared type library — identity, envelope, agent card, protocol constants | Ed25519, X25519, zero external deps |
 | [**peerclaw-server**](https://github.com/peerclaw/peerclaw-server) | The gateway — registration, discovery, signaling relay, protocol bridging | SQLite/PostgreSQL, WebSocket, OTel |
-| [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | P2P agent SDK — connect, send, receive with automatic transport selection | WebRTC (Pion), Nostr, TOFU trust |
+| [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | P2P agent SDK — connect, send, receive, file transfer with automatic transport selection | WebRTC (Pion), Nostr, TOFU trust |
 | [**peerclaw-cli**](https://github.com/peerclaw/peerclaw-cli) | Command-line tool — manage agents, check health, send messages | Cobra-style subcommands |
 
 ## Core Concepts
@@ -217,6 +217,7 @@ These are available but not required for basic usage:
 | **DHT Discovery** | Serverless agent discovery via Kademlia DHT (Nostr transport) |
 | **Federation** | Multi-server signaling relay with DNS SRV discovery |
 | **Identity Anchoring** | Bind Ed25519 identity to Nostr/DNS for public verification |
+| **P2P File Transfer** | E2E encrypted large file transfer over WebRTC DataChannels with pipeline push, backpressure, mutual auth, resume, and Nostr fallback |
 | **Offline Messaging** | Message cache with TTL, auto-flush on peer reconnect |
 | **Serverless Mode** | Full P2P operation without any central server |
 | **P2P Whitelist** | Default-deny contact management — Agents must be whitelisted before connecting or messaging |
@@ -248,6 +249,8 @@ peerclaw agent list -protocol mcp -output json   # Filter + JSON output
 peerclaw agent get <id>                      # Agent details
 peerclaw agent register -name "My Agent" ... # Register an agent
 peerclaw send -from a -to b -payload '{}'    # Send a message
+peerclaw send-file --to <id> --file doc.pdf  # P2P file transfer
+peerclaw transfer status                     # Check transfer status
 peerclaw config set server http://host:8080  # Set gateway URL
 ```
 
