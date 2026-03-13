@@ -82,4 +82,21 @@ Each entry records the idea, rationale for deferral, and conditions under which 
 
 ---
 
+## Multi-Signature Identity Recovery
+
+**What:** Allow agents to pre-register a set of recovery keys (threshold-of-n) so that if the primary Ed25519 private key is lost or compromised, the identity can be rotated to a new keypair with approval from enough recovery signers.
+
+**Was prototyped?** Partially — a `RecoveryManager` with threshold validation existed in the agent SDK. It was never integrated into the agent lifecycle, server API, or CLI.
+
+**Why deferred:**
+- Current keypair model is simple and sufficient — most agents are ephemeral or operator-managed
+- Recovery adds significant UX complexity (recovery key distribution, secure storage)
+- No user requests for key recovery; key rotation via re-registration is the current fallback
+
+**Reconsider when:**
+- Long-lived agent identities become common and key loss is a real operational risk
+- Enterprise customers require key rotation without identity change
+
+---
+
 *Last updated: 2026-03-13*
