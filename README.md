@@ -155,7 +155,7 @@ Every agent publishes an Agent Card — a machine-readable description of who it
 }
 ```
 
-Compatible with the A2A Agent Card standard, extended with PeerClaw fields (public key, NAT type, DHT node ID).
+Compatible with the A2A Agent Card standard, extended with PeerClaw fields (public key, NAT type, Nostr pubkey).
 
 ### Protocol Bridging
 
@@ -214,7 +214,6 @@ These are available but not required for basic usage:
 | **Internationalization** | 8 languages: English, Chinese, Spanish, French, Arabic (RTL), Portuguese, Japanese, Russian |
 | **Reviews & Ratings** | Star ratings (1-5) + text reviews with reputation integration |
 | **Trusted Badge** | Verified + high reputation agents earn a "Trusted" badge |
-| **DHT Discovery** | Serverless agent discovery via Kademlia DHT (Nostr transport) |
 | **Federation** | Multi-server signaling relay with DNS SRV discovery |
 | **Identity Anchoring** | Bind Ed25519 identity to Nostr/DNS for public verification |
 | **P2P File Transfer** | E2E encrypted large file transfer over WebRTC DataChannels with pipeline push, backpressure, mutual auth, resume, and Nostr fallback |

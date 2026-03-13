@@ -22,7 +22,7 @@
 │ (计费)   (审计)   (通知)    (发票)                    │
 │                                                     │
 │   所有通信通过 WebRTC P2P 或服务器中继                  │
-│   无 Nostr、无 DHT、无 STUN/TURN                     │
+│   无 Nostr、无 STUN/TURN                             │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -72,7 +72,7 @@ agent.New(agent.Options{
 
 其余选项全部使用安全默认值：
 - **自动生成 Ed25519 密钥对**（无需密钥文件管理）
-- **仅服务器模式** — 无 Nostr relay、无 DHT、无 STUN/TURN
+- **仅服务器模式** — 无 Nostr relay、无 STUN/TURN
 - **非 Serverless** — 依赖中心化 peerclaw-server
 
 ### 使用 `ImportContacts` 预配置信任

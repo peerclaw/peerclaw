@@ -22,7 +22,7 @@ Deploy PeerClaw on your internal network for secure agent-to-agent communication
 │ (billing) (audit) (notify) (invoice)                │
 │                                                     │
 │   All communication via WebRTC P2P or               │
-│   server relay — no Nostr, no DHT, no STUN/TURN     │
+│   server relay — no Nostr, no STUN/TURN             │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -72,7 +72,7 @@ agent.New(agent.Options{
 
 All other options use safe defaults:
 - **Auto-generated Ed25519 keypair** (no key file management needed)
-- **Server-only mode** — no Nostr relays, no DHT, no STUN/TURN
+- **Server-only mode** — no Nostr relays, no STUN/TURN
 - **No serverless** — relies on the central peerclaw-server
 
 ### Pre-provisioned Trust with `ImportContacts`

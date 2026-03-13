@@ -130,18 +130,11 @@ Stability, observability, and operational capabilities for production environmen
 Evolve toward full decentralization, enabling serverless agent communication.
 
 - [x] **Interface abstractions + Agent Card extensions**
-  - Discovery interface (RegistryClient / DHTDiscovery / CompositeDiscovery)
+  - Discovery interface (RegistryClient / CompositeDiscovery)
   - SignalingClient interface (WebSocket / NostrSignaling / CompositeSignaling)
   - Agent struct refactored to use interfaces (backward-compatible)
-  - PeerClawExtension new fields (nostr_pubkey / dht_node_id / reputation_score / nostr_relays / identity_anchor)
-  - New signaling message types (federation_forward / dht_ping/store/find_node/find_value)
-- [x] **DHT-based decentralized discovery**
-  - Minimal Kademlia DHT (160-bit NodeID, K=20 k-bucket routing table)
-  - DHT protocol messages (Ping / Store / FindNode / FindValue RPC)
-  - DHT transport layer (Nostr event kind 20005 + InMemory test transport)
-  - DHT coordinator (Bootstrap / Put / Get / FindNode / bucket refresh / data republish)
-  - DHTDiscovery implementing Discovery interface (primary key + capability index)
-  - CompositeDiscovery (Server-first + DHT fallback)
+  - PeerClawExtension new fields (nostr_pubkey / reputation_score / nostr_relays / identity_anchor)
+  - New signaling message types (federation_forward)
 - [x] **Multi-node signaling federation**
   - FederationConfig (static configuration + DNS SRV discovery)
   - FederationService (connect to peers, ForwardSignal, QueryAgents)
@@ -161,23 +154,19 @@ Evolve toward full decentralization, enabling serverless agent communication.
   - CompositeSignaling (WebSocket-first + Nostr fallback)
   - MessageCache for offline message buffering (per-destination queues, TTL expiration, JSON persistence)
   - OnPeerAdded callback (flushes cached queue when a new peer connects)
-  - Serverless mode Options (DHTEnabled / Serverless / ICEServers / MessageCachePath)
+  - Serverless mode Options (Serverless / ICEServers / MessageCachePath)
 - [x] **On-chain identity anchoring (optional)**
   - IdentityAnchor interface (Publish / Verify / Resolve / RecoveryKeys)
   - NostrAnchor implementation (Nostr kind 10078 replaceable event, bidirectional key binding)
   - Domain binding verification (DNS TXT record peerclaw-verify=<fingerprint>)
   - Multi-sig recovery (threshold-of-n recovery keys)
 - [x] **CLI Phase 5 commands**
-  - `peerclaw dht bootstrap|lookup`
   - `peerclaw federation status|peers`
   - `peerclaw reputation show|list`
   - `peerclaw identity anchor|verify`
 - [x] **Integration tests**
-  - DHT-only discovery and communication (no server)
-  - Server + DHT hybrid mode with fallback
   - Malicious behavior triggering reputation isolation
   - Reputation gossip propagation across peers
-  - DHT Agent Card storage and retrieval
   - Offline message cache delivery
 
 ## Phase 6: Agent Identity & Trust Platform (Complete)
@@ -353,7 +342,7 @@ Enable agents to serve requests from other agents with capability-based routing.
 Lower the barrier for enterprise intranet deployments.
 
 - [x] **`agent.NewSimple()`** — Simplified constructor (Name, ServerURL, Capabilities variadic)
-  - Auto-configures: Serverless=false, no Nostr, no DHT, no STUN/TURN
+  - Auto-configures: Serverless=false, no Nostr, no STUN/TURN
   - Auto-generates Ed25519 keypair, server-only discovery and signaling
 - [x] **`agent.ImportContacts()`** — Bulk import of verified contacts for managed environments
   - Sets all imported agent IDs to TrustVerified level

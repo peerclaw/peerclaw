@@ -155,7 +155,7 @@ Alice                     网关                      Bob
 }
 ```
 
-兼容 A2A Agent Card 标准，扩展了 PeerClaw 字段（公钥、NAT 类型、DHT 节点 ID）。
+兼容 A2A Agent Card 标准，扩展了 PeerClaw 字段（公钥、NAT 类型、Nostr 公钥）。
 
 ### 协议桥接
 
@@ -214,7 +214,6 @@ Agent SDK 自动选择最佳传输方式：
 | **国际化** | 8 种语言：英语、中文、西班牙语、法语、阿拉伯语（RTL）、葡萄牙语、日语、俄语 |
 | **评价与评分** | 星级评分（1-5）+ 文字评价，声誉联动 |
 | **Trusted 徽章** | 已验证 + 高声誉的 Agent 获得 "Trusted" 徽章 |
-| **DHT 发现** | 通过 Kademlia DHT 无服务器发现 Agent（Nostr 传输） |
 | **联邦** | 多服务器信令中转，DNS SRV 发现 |
 | **身份锚定** | 将 Ed25519 身份绑定到 Nostr/DNS 进行公开验证 |
 | **P2P 文件传输** | 通过 WebRTC DataChannel 端到端加密大文件传输，流水线推送、背压控制、双向鉴权、断点续传、Nostr 兜底 |
