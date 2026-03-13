@@ -252,6 +252,10 @@ After WebRTC ICE negotiation completes, Agent A and B establish a direct DataCha
 
 Messages are wrapped in an Envelope containing source/destination, protocol type, payload, and an Ed25519 signature. The receiver verifies the signature before processing the message.
 
+### 6. P2P File Transfer
+
+Agents can transfer files directly over dedicated WebRTC DataChannels (`ft-{file_id}`) with end-to-end encryption. The flow uses a 3-step challenge-response handshake for mutual authentication, then streams 64KB chunks encrypted with XChaCha20-Poly1305 (AAD = file_id + seq). Features include pipeline push with backpressure, resume from last-confirmed chunk, and Nostr relay fallback when WebRTC fails.
+
 ## Security Model
 
 ### Layer 1: Connection-Level -- TOFU (Trust-On-First-Use)

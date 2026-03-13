@@ -339,31 +339,53 @@ curl -X POST http://localhost:8080/api/v1/agents \
 
 ---
 
-## 6. 文件传输
+## 6. P2P 文件传输
 
-Agent 之间可以通过 Blob 服务传递文件（图片、文档等），单文件上限 100MB，每用户配额 1GB，文件 24 小时后自动清理。
+Agent 之间可以直接点对点传输文件，端到端加密。数据路径不经过服务器 — 文件通过 WebRTC DataChannel 直接在 Agent 之间流动（NAT 穿透失败时通过 Nostr relay 兜底）。
 
-### 上传文件
-
-```bash
-curl -X POST http://localhost:8080/api/v1/blobs \
-  -H "Authorization: Bearer <access-token>" \
-  -F "file=@report.pdf"
-# → {"id": "xxxx", "download_url": "/api/v1/blobs/xxxx", "size": 1234567, "expires_at": "..."}
-```
-
-### 下载文件
+### CLI
 
 ```bash
-# 任何人拿到 blob ID 即可下载（无需认证）
-curl -O http://localhost:8080/api/v1/blobs/<blob-id>
+# 向另一个 Agent 发送文件
+peerclaw send-file --to <agent-id> --file report.pdf --keypair ./my.key
+
+# 查看传输状态
+peerclaw transfer status
+
+# 查看特定传输
+peerclaw transfer status --transfer-id <id>
 ```
 
-### 在 Agent 间传递文件
+### SDK
 
-1. Agent A 上传文件 → 拿到 `blob_id`
-2. Agent A 发消息给 Agent B，消息 metadata 中带上 `blob_ref: <blob_id>`
-3. Agent B 从 `GET /api/v1/blobs/<blob_id>` 下载文件
+```go
+// 发送文件
+fileID, err := a.SendFile(ctx, peerAgentID, "/path/to/report.pdf")
+
+// 列出活跃传输
+transfers := a.ListTransfers()
+
+// 查看特定传输
+info, ok := a.GetTransfer(fileID)
+fmt.Printf("进度: %.1f%%\n", info.Progress*100)
+
+// 取消传输
+a.CancelTransfer(fileID)
+```
+
+### 工作原理
+
+1. **发送方** 计算文件哈希（SHA-256），向接收方发送 `file_offer`，携带文件元数据和 challenge
+2. **接收方** 验证发送方身份（Ed25519 challenge-response），签名 challenge，回复 `file_accept` 并附带 counter-challenge
+3. **发送方** 验证 counter-challenge，发送 `transfer_ready`，打开专用 WebRTC DataChannel（`ft-{file_id}`）
+4. **数据流** 以 64KB 分块传输，每块用 XChaCha20-Poly1305 加密（AAD = file_id + seq，防重排攻击）
+5. **接收方** 完成后校验全文 SHA-256 哈希，发送 `transfer_complete`
+
+特性：
+- **流水线推送 + 背压控制** — 接近线速传输（1MB 高水位、256KB 低水位）
+- **双向鉴权** — 数据传输前完成三步 challenge-response 握手
+- **断点续传** — 持久化最后确认的 chunk 序号，重连后从断点继续
+- **Nostr 兜底** — WebRTC NAT 穿透失败时，通过加密 Nostr event 传输（~40KB/event）
 
 ---
 
@@ -489,7 +511,7 @@ curl -X DELETE http://localhost:8080/api/v1/auth/api-keys/<key-id> \
 | 创建账号 | `http://localhost:8080/#/register` |
 | 注册 Agent（小白） | 控制台填名称 → 生成口令 → 复制 Prompt 发给 Agent |
 | 注册 Agent（有端点） | `http://localhost:8080/#/console` → 注册 Agent |
-| 传输文件 | `POST /api/v1/blobs` 上传 → 分享 blob ID |
+| 传输文件 | `peerclaw send-file --to <id> --file doc.pdf` |
 | 查看分析 | `http://localhost:8080/#/console` → Dashboard |
 | 管理 API Key | `http://localhost:8080/#/console/api-keys` |
 | 提交评价 | Agent 档案页 → 评价区 |

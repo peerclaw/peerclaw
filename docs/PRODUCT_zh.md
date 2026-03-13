@@ -246,6 +246,10 @@ WebRTC ICE 协商完成后，Agent A 和 B 建立 DataChannel 直连。如果 IC
 
 消息封装在 Envelope 中，包含源/目标、协议类型、Payload、Ed25519 签名。接收方验证签名后处理消息。
 
+### 6. P2P 文件传输
+
+Agent 之间可以通过专用 WebRTC DataChannel（`ft-{file_id}`）直接传输文件，端到端加密。流程采用三步 challenge-response 握手实现双向鉴权，然后以 64KB 分块流式传输，每块用 XChaCha20-Poly1305 加密（AAD = file_id + seq）。支持流水线推送 + 背压控制、断点续传、WebRTC 失败时 Nostr relay 兜底。
+
 ## 安全模型
 
 ### 第一层：连接级 — TOFU (Trust-On-First-Use)

@@ -455,3 +455,21 @@ ndJSON/stdio bridge enabling ACP-compatible agents (OpenClaw, Zed AI, Coder) to 
 - [x] **Lightweight ACP types** — JSON-compatible copies of server ACP types (Run, Message, MessagePart, AgentManifest) in CLI package, no server module dependency
 - [x] **Run caching** — Local sync.Map cache for created runs, reducing server round-trips on get_run
 - [x] **Tests** — 10 unit tests (ping, invalid JSON, unknown method, create_run, get_run, get_run cached, cancel_run, list_agents, get_agent, blank lines) + 2 command tests
+
+## Phase 16: P2P File Transfer (Complete)
+
+Pure peer-to-peer large file transfer with E2E encryption — zero server dependency in the data path.
+
+- [x] **WebRTC transport enhancement** — `CreateDataChannel()`, `RegisterDataChannelHandler()` for dedicated file transfer channels, backpressure control (1MB high-water, 256KB low-water) in `Send()`
+- [x] **File transfer message types** — `file_offer`, `file_accept`, `file_reject`, `transfer_ready`, `transfer_complete`, `chunk_ack`, `resume_request`, `file_chunk` in `core/envelope/filetransfer.go`
+- [x] **Binary frame protocol** — `[seq:4B][length:4B][flags:1B][encrypted_chunk]` with FlagData, FlagFIN, FlagACK; 64KB default chunk size
+- [x] **Transfer state machine** — `Idle → Offered → Accepted → Transferring → Completing → Done/Failed/Cancelled` with per-state timeouts
+- [x] **Challenge-response mutual auth** — 3-step Ed25519 handshake: FileOffer(challenge) → FileAccept(challenge_sig, counter_challenge) → TransferReady(counter_sig)
+- [x] **Pipeline push sender** — Dedicated `ft-{file_id}` DataChannel (ordered, reliable), per-chunk XChaCha20-Poly1305 encryption with AAD = `file_id|seq`, FIN frame on completion
+- [x] **Streaming receiver** — Binary frame decode → decrypt → write to file, periodic ChunkAck every 100 chunks, full-file SHA-256 verification on FIN
+- [x] **Resume support** — `SaveResumeState()` / `LoadResumeState()` persist last-confirmed sequence to disk, `ResumeRequest` continues from `last_seq + 1`
+- [x] **Nostr relay fallback** — When WebRTC ICE fails, chunks sent as encrypted Nostr events (~40KB/event) via standard `agent.Send()` path
+- [x] **Mailbox wakeup** — FileOffer via mailbox sends `MessageTypeMailboxWakeup` to trigger immediate `SyncInbox()` instead of waiting for poll interval
+- [x] **Agent integration** — `SendFile()`, `ListTransfers()`, `GetTransfer()`, `CancelTransfer()` public API; capability handler registered as `"file_transfer"`; `FileTransferDir` and `ResumeStatePath` options
+- [x] **CLI commands** — `peerclaw send-file --to <id> --file <path>` with progress polling; `peerclaw transfer status [--transfer-id <id>]` for transfer listing
+- [x] **Blob service removal** — Removed centralized `server/internal/blob/` package and all references; file transfer is now purely P2P

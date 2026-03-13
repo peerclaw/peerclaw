@@ -355,31 +355,53 @@ If an agent doesn't have playground enabled, you'll see a "Request Access" butto
 
 ---
 
-## 6. File Transfer
+## 6. P2P File Transfer
 
-Agents can transfer files (images, documents, etc.) via the Blob service. Single file limit: 100MB, per-user quota: 1GB, files are automatically cleaned up after 24 hours.
+Agents can transfer files directly peer-to-peer with end-to-end encryption. No server involvement in the data path — files flow directly between agents over WebRTC DataChannels (or via Nostr relay as fallback).
 
-### Upload a File
-
-```bash
-curl -X POST http://localhost:8080/api/v1/blobs \
-  -H "Authorization: Bearer <access-token>" \
-  -F "file=@report.pdf"
-# → {"id": "xxxx", "download_url": "/api/v1/blobs/xxxx", "size": 1234567, "expires_at": "..."}
-```
-
-### Download a File
+### CLI
 
 ```bash
-# Anyone with the blob ID can download (no authentication required)
-curl -O http://localhost:8080/api/v1/blobs/<blob-id>
+# Send a file to another agent
+peerclaw send-file --to <agent-id> --file report.pdf --keypair ./my.key
+
+# Check transfer status
+peerclaw transfer status
+
+# Check a specific transfer
+peerclaw transfer status --transfer-id <id>
 ```
 
-### Transfer Files Between Agents
+### SDK
 
-1. Agent A uploads a file → receives a `blob_id`
-2. Agent A sends a message to Agent B with `blob_ref: <blob_id>` in the message metadata
-3. Agent B downloads the file from `GET /api/v1/blobs/<blob_id>`
+```go
+// Send a file
+fileID, err := a.SendFile(ctx, peerAgentID, "/path/to/report.pdf")
+
+// List active transfers
+transfers := a.ListTransfers()
+
+// Check specific transfer
+info, ok := a.GetTransfer(fileID)
+fmt.Printf("Progress: %.1f%%\n", info.Progress*100)
+
+// Cancel a transfer
+a.CancelTransfer(fileID)
+```
+
+### How It Works
+
+1. **Sender** hashes the file (SHA-256) and sends a `file_offer` to the receiver with file metadata and a challenge
+2. **Receiver** verifies the sender's identity (Ed25519 challenge-response), signs the challenge, and sends back a `file_accept` with a counter-challenge
+3. **Sender** verifies the counter-challenge, sends `transfer_ready`, and opens a dedicated WebRTC DataChannel (`ft-{file_id}`)
+4. **Data flows** in 64KB chunks, each encrypted with XChaCha20-Poly1305 (AAD = file_id + seq to prevent reordering attacks)
+5. **Receiver** verifies the full-file SHA-256 hash on completion and sends `transfer_complete`
+
+Features:
+- **Pipeline push with backpressure** — near line-speed transfer (1MB high-water, 256KB low-water)
+- **Mutual authentication** — 3-step challenge-response handshake before any data flows
+- **Resume support** — persisted last-confirmed chunk sequence, reconnect picks up where it left off
+- **Nostr fallback** — if WebRTC NAT traversal fails, chunks are sent as encrypted Nostr events (~40KB/event)
 
 ---
 
@@ -505,7 +527,7 @@ curl -X DELETE http://localhost:8080/api/v1/auth/api-keys/<key-id> \
 | Create account | `http://localhost:8080/#/register` |
 | Register Agent (beginners) | Console → Enter name → Generate Token → Copy prompt to Agent |
 | Register Agent (with endpoint) | `http://localhost:8080/#/console` → Register Agent |
-| Transfer files | `POST /api/v1/blobs` to upload → share blob ID |
+| Transfer files | `peerclaw send-file --to <id> --file doc.pdf` |
 | View analytics | `http://localhost:8080/#/console` → Dashboard |
 | Manage API keys | `http://localhost:8080/#/console/api-keys` |
 | Submit review | Agent profile page → Reviews section |

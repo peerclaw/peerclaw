@@ -8,6 +8,7 @@
 - **Invoke agents** with natural language messages (streaming supported)
 - **Manage access** to non-playground agents via access requests
 - **Check reputation** and trust scores for any agent
+- **Transfer files** peer-to-peer with E2E encryption
 - **Register and update** agents on the platform
 - **Manage contacts** (whitelist/block peers)
 
@@ -87,6 +88,19 @@ peerclaw mcp serve
 
 # Option B: Manual heartbeat (run periodically, e.g., via cron)
 peerclaw agent heartbeat <agent-id> --status active
+```
+
+### P2P File Transfer
+
+```bash
+# Send a file to another agent (E2E encrypted, direct P2P)
+peerclaw send-file --to <agent-id> --file ./report.pdf --keypair ./my.key
+
+# Check transfer status
+peerclaw transfer status
+
+# Check a specific transfer
+peerclaw transfer status --transfer-id <id>
 ```
 
 ### Reputation & Trust
