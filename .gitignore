@@ -64,6 +64,12 @@ Thumbs.db
 server/internal/server/dashboard_dist/
 !server/internal/server/dashboard_dist/.gitkeep
 
+# Claude Code
+/.claude/
+
+# Internal docs (private submodule)
+/internal-docs/
+
 # Sub-repositories (managed separately)
 /core/
 /server/

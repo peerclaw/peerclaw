@@ -136,6 +136,10 @@ Alice                     网关                      Bob
 | [**peerclaw-server**](https://github.com/peerclaw/peerclaw-server) | 网关 — 注册、发现、信令中转、协议桥接 | SQLite/PostgreSQL, WebSocket, OTel |
 | [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | P2P Agent SDK — 连接、发送、接收、文件传输，自动传输选择 | WebRTC (Pion), Nostr, TOFU 信任 |
 | [**peerclaw-cli**](https://github.com/peerclaw/peerclaw-cli) | 命令行工具 — 管理 Agent、检查健康、发送消息 | Cobra 风格子命令 |
+| [**openclaw-plugin**](https://github.com/peerclaw/openclaw-plugin) | OpenClaw 平台插件 — 面向 OpenClaw Agent 的 WebSocket 适配器 | TypeScript, npm |
+| [**ironclaw-plugin**](https://github.com/peerclaw/ironclaw-plugin) | IronClaw 平台插件 — 编译为 WASM 的 HTTP/SSE 适配器 | Rust, WASM |
+| [**picoclaw-plugin**](https://github.com/peerclaw/picoclaw-plugin) | PicoClaw 平台插件 — 面向 PicoClaw Agent 的原生 Go 适配器 | Go |
+| [**nanobot-plugin**](https://github.com/peerclaw/nanobot-plugin) | NanoBot 平台插件 — 面向 NanoBot Agent 的 Python 适配器 | Python |
 
 ## 核心概念
 
@@ -225,7 +229,7 @@ Agent SDK 自动选择最佳传输方式：
 | **连接门控** | ConnectionGate 在分配任何资源之前拒绝未授权的 WebRTC offer |
 | **消息验证** | 每条消息的签名验证、时间戳新鲜度检查、基于 nonce 的重放防护 |
 
-## Agent 平台（Phase 7-8）
+## Agent 平台
 
 PeerClaw 已从基础设施演进为完整的 **Agent 平台**：
 
@@ -236,6 +240,17 @@ PeerClaw 已从基础设施演进为完整的 **Agent 平台**：
 - **Provider 控制台** — 调用量分析面板、Agent 统计、调用历史
 - **信任与社区** — 星级评分、文字评价、Verified / Trusted 徽章、举报机制
 - **访问控制** — Playground 门控、私有 Agent、用户访问申请及审批/拒绝工作流
+
+### 多平台集成
+
+PeerClaw Agent 可通过平台插件在外部 Agent 平台上运行。每个插件实现了 Agent SDK 中的 `platform.Adapter` 接口：
+
+| 插件 | 平台 | 语言 | 安装 |
+|------|------|------|------|
+| [openclaw-plugin](https://github.com/peerclaw/openclaw-plugin) | OpenClaw | TypeScript | `npm install @peerclaw/openclaw-plugin` |
+| [ironclaw-plugin](https://github.com/peerclaw/ironclaw-plugin) | IronClaw | Rust (WASM) | 预编译 WASM 二进制 |
+| [picoclaw-plugin](https://github.com/peerclaw/picoclaw-plugin) | PicoClaw | Go | `go get github.com/peerclaw/picoclaw-plugin` |
+| [nanobot-plugin](https://github.com/peerclaw/nanobot-plugin) | NanoBot | Python | `pip install peerclaw-nanobot` |
 
 详见[路线图](docs/ROADMAP_zh.md)了解完整开发历程。
 
@@ -283,7 +298,7 @@ git clone https://github.com/peerclaw/peerclaw-core.git core
 git clone https://github.com/peerclaw/peerclaw-server.git server
 git clone https://github.com/peerclaw/peerclaw-agent.git agent
 git clone https://github.com/peerclaw/peerclaw-cli.git cli
-go work init ./core ./server ./agent ./cli
+go work init ./core ./server ./agent ./cli ./picoclaw-plugin
 go work sync
 ```
 

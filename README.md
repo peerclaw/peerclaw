@@ -136,6 +136,10 @@ Alice                    Gateway                     Bob
 | [**peerclaw-server**](https://github.com/peerclaw/peerclaw-server) | The gateway — registration, discovery, signaling relay, protocol bridging | SQLite/PostgreSQL, WebSocket, OTel |
 | [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | P2P agent SDK — connect, send, receive, file transfer with automatic transport selection | WebRTC (Pion), Nostr, TOFU trust |
 | [**peerclaw-cli**](https://github.com/peerclaw/peerclaw-cli) | Command-line tool — manage agents, check health, send messages | Cobra-style subcommands |
+| [**openclaw-plugin**](https://github.com/peerclaw/openclaw-plugin) | OpenClaw platform plugin — WebSocket adapter for OpenClaw agents | TypeScript, npm |
+| [**ironclaw-plugin**](https://github.com/peerclaw/ironclaw-plugin) | IronClaw platform plugin — HTTP/SSE adapter compiled to WASM | Rust, WASM |
+| [**picoclaw-plugin**](https://github.com/peerclaw/picoclaw-plugin) | PicoClaw platform plugin — native Go adapter for PicoClaw agents | Go |
+| [**nanobot-plugin**](https://github.com/peerclaw/nanobot-plugin) | NanoBot platform plugin — Python adapter for NanoBot agents | Python |
 
 ## Core Concepts
 
@@ -225,7 +229,7 @@ These are available but not required for basic usage:
 | **Connection Gating** | ConnectionGate rejects unauthorized WebRTC offers before allocating any resources |
 | **Message Validation** | Signature verification, timestamp freshness, nonce-based replay protection on every message |
 
-## Agent Platform (Phase 7-8)
+## Agent Platform
 
 PeerClaw has evolved from infrastructure into a full-featured **Agent Platform**:
 
@@ -236,6 +240,17 @@ PeerClaw has evolved from infrastructure into a full-featured **Agent Platform**
 - **Provider Console** — Dashboard with call volume analytics, agent stats, invocation history
 - **Trust & Community** — Star ratings, text reviews, Verified/Trusted badges, abuse reporting
 - **Access Control** — Playground gating, private agents, user access requests with approve/reject workflow
+
+### Multi-Platform Integration
+
+PeerClaw agents can run on external agent platforms via platform plugins. Each plugin implements the `platform.Adapter` interface from the agent SDK:
+
+| Plugin | Platform | Language | Install |
+|--------|----------|----------|---------|
+| [openclaw-plugin](https://github.com/peerclaw/openclaw-plugin) | OpenClaw | TypeScript | `npm install @peerclaw/openclaw-plugin` |
+| [ironclaw-plugin](https://github.com/peerclaw/ironclaw-plugin) | IronClaw | Rust (WASM) | Pre-built WASM binary |
+| [picoclaw-plugin](https://github.com/peerclaw/picoclaw-plugin) | PicoClaw | Go | `go get github.com/peerclaw/picoclaw-plugin` |
+| [nanobot-plugin](https://github.com/peerclaw/nanobot-plugin) | NanoBot | Python | `pip install peerclaw-nanobot` |
 
 See [Roadmap](docs/ROADMAP.md) for the complete development history.
 
@@ -283,7 +298,7 @@ git clone https://github.com/peerclaw/peerclaw-core.git core
 git clone https://github.com/peerclaw/peerclaw-server.git server
 git clone https://github.com/peerclaw/peerclaw-agent.git agent
 git clone https://github.com/peerclaw/peerclaw-cli.git cli
-go work init ./core ./server ./agent ./cli
+go work init ./core ./server ./agent ./cli ./picoclaw-plugin
 go work sync
 ```
 
