@@ -393,15 +393,20 @@ Expose PeerClaw agents as standard A2A HTTP endpoints — any A2A client can dis
 - [x] **Rate limiting** — Per-IP rate limiting via `invokeRateLimiter` for A2A bridge requests
 - [x] **Task cleanup** — Background goroutine cleans expired tasks (1 hour TTL)
 
-## Phase 14: OpenClaw Channel Plugin (Deep Integration) (Complete)
+## Phase 14: Multi-Platform Channel Integration (Complete)
 
-PeerClaw as a native OpenClaw communication channel — like WhatsApp, Telegram, or Slack.
+PeerClaw as a native communication channel across AI orchestration platforms — platform adapter abstraction with plugins for 4 platforms.
 
-- [x] **Channel plugin** — OpenClaw channel plugin that connects to PeerClaw agent network
-- [x] **Bidirectional messaging** — Incoming P2P messages surfaced in OpenClaw; OpenClaw responses sent back via PeerClaw
-- [x] **WebSocket bridge** — PeerClaw agent maintains WebSocket connection to OpenClaw gateway (port 18789) for real-time event push
-- [x] **Agent identity binding** — OpenClaw instance's identity mapped to PeerClaw Ed25519 keypair
-- [x] **Notification forwarding** — Server notifications pushed via signaling to agent, forwarded to OpenClaw conversations
+- [x] **Platform Adapter interface** — `platform.Adapter` abstraction in agent SDK: `Connect()`, `SendChat()`, `InjectNotification()`, `SetOutboundHandler()` — platform-agnostic integration point
+- [x] **OpenClaw adapter** — WebSocket gateway client (`agent/platform/openclaw/`) with req/res/event frame protocol, connect handshake, auto-reconnect
+- [x] **IronClaw adapter** — HTTP/SSE gateway client (`agent/platform/ironclaw/`) with REST chat.send + SSE event streaming, bearer token auth
+- [x] **Bridge adapter** — Generic local WebSocket bridge (`agent/platform/bridge/`) with simple JSON protocol for platforms without external APIs
+- [x] **OpenClaw plugin** — TypeScript npm package (`@peerclaw/openclaw-plugin`) using `openclaw/plugin-sdk` external plugin API
+- [x] **IronClaw plugin** — Rust WASM component (`peerclaw-ironclaw-plugin`) implementing `sandboxed-channel` WIT interface
+- [x] **nanobot plugin** — Python pip package (`nanobot-channel-peerclaw`) implementing `BaseChannel` with entry-point auto-discovery
+- [x] **PicoClaw plugin** — Go module (`peerclaw/picoclaw-plugin`) with `channels.RegisterFactory()` + `init()` self-registration
+- [x] **Notification forwarding** — Server notifications pushed via signaling to agent, forwarded to platform conversations
+- [x] **Bidirectional messaging** — Incoming P2P messages forwarded to platform AI; AI responses routed back via P2P
 
 ## Phase 15c: ACP HTTP Bridge (Complete)
 

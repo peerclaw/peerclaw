@@ -70,3 +70,6 @@ server/internal/server/dashboard_dist/
 /agent/
 /cli/
 /openclaw-plugin/
+/ironclaw-plugin/
+/nanobot-plugin/
+/picoclaw-plugin/

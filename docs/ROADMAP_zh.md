@@ -393,15 +393,20 @@ MCP Server 集成到 CLI — 任何 MCP Host（Claude Code、VS Code Copilot、C
 - [x] **限速** — 通过 `invokeRateLimiter` 实现 A2A 桥接请求的 Per-IP 限速
 - [x] **任务清理** — 后台 goroutine 清理过期任务（1 小时 TTL）
 
-## Phase 14: OpenClaw Channel 插件（深度集成）（已完成）
+## Phase 14: 多平台 Channel 集成（已完成）
 
-PeerClaw 作为 OpenClaw 的原生通信渠道 — 如同 WhatsApp、Telegram 或 Slack。
+PeerClaw 作为多个 AI 编排平台的原生通信渠道 — 平台适配器抽象 + 4 个平台插件。
 
-- [x] **Channel 插件** — 连接 PeerClaw Agent 网络的 OpenClaw Channel 插件
-- [x] **双向消息** — 入站 P2P 消息在 OpenClaw 中展示；OpenClaw 的回复通过 PeerClaw 发回
-- [x] **WebSocket 桥接** — PeerClaw Agent 与 OpenClaw Gateway（端口 18789）保持 WebSocket 连接，实现实时事件推送
-- [x] **Agent 身份绑定** — OpenClaw 实例的身份映射到 PeerClaw Ed25519 密钥对
-- [x] **通知转发** — Server 通知通过 signaling 推送到 agent，转发到 OpenClaw 对话
+- [x] **Platform Adapter 接口** — Agent SDK 中的 `platform.Adapter` 抽象：`Connect()`、`SendChat()`、`InjectNotification()`、`SetOutboundHandler()` — 平台无关的集成点
+- [x] **OpenClaw 适配器** — WebSocket Gateway 客户端（`agent/platform/openclaw/`），req/res/event 帧协议，连接握手，自动重连
+- [x] **IronClaw 适配器** — HTTP/SSE Gateway 客户端（`agent/platform/ironclaw/`），REST chat.send + SSE 事件流，Bearer Token 认证
+- [x] **Bridge 适配器** — 通用本地 WebSocket 桥接（`agent/platform/bridge/`），简单 JSON 协议，用于无外部 API 的平台
+- [x] **OpenClaw 插件** — TypeScript npm 包（`@peerclaw/openclaw-plugin`），使用 `openclaw/plugin-sdk` 外部插件 API
+- [x] **IronClaw 插件** — Rust WASM 组件（`peerclaw-ironclaw-plugin`），实现 `sandboxed-channel` WIT 接口
+- [x] **nanobot 插件** — Python pip 包（`nanobot-channel-peerclaw`），实现 `BaseChannel`，entry-point 自动发现
+- [x] **PicoClaw 插件** — Go 模块（`peerclaw/picoclaw-plugin`），`channels.RegisterFactory()` + `init()` 自注册
+- [x] **通知转发** — Server 通知通过 signaling 推送到 agent，转发到平台对话
+- [x] **双向消息** — 入站 P2P 消息转发到平台 AI 处理；AI 回复通过 P2P 路由回去
 
 ## Phase 15c: ACP HTTP 桥接（已完成）
 
