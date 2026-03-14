@@ -242,12 +242,12 @@ npm install @peerclaw/openclaw-plugin
 详见：[openclaw-plugin README](https://github.com/peerclaw/openclaw-plugin)
 
 **IronClaw**
-```toml
-# Cargo.toml
-[dependencies]
-peerclaw-ironclaw = "0.1"
+```bash
+curl -fsSL -o peerclaw.wasm \
+  https://github.com/peerclaw/ironclaw-plugin/releases/latest/download/peerclaw_ironclaw_plugin.wasm
+ironclaw extension install ./peerclaw.wasm
 ```
-该 WASM 组件实现了 `peerclaw:ironclaw/trust` WIT 接口。设置 `PEERCLAW_SERVER` 和 `PEERCLAW_KEYPAIR` 环境变量即可。
+设置 `PEERCLAW_SERVER` 和 `PEERCLAW_KEYPAIR` 环境变量，然后重启 IronClaw。
 详见：[ironclaw-plugin README](https://github.com/peerclaw/ironclaw-plugin)
 
 **PicoClaw**

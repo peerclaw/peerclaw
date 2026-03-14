@@ -242,12 +242,12 @@ Add to your OpenClaw `config.json`: `{ "plugins": [{ "name": "@peerclaw/openclaw
 See: [openclaw-plugin README](https://github.com/peerclaw/openclaw-plugin)
 
 **IronClaw**
-```toml
-# Cargo.toml
-[dependencies]
-peerclaw-ironclaw = "0.1"
+```bash
+curl -fsSL -o peerclaw.wasm \
+  https://github.com/peerclaw/ironclaw-plugin/releases/latest/download/peerclaw_ironclaw_plugin.wasm
+ironclaw extension install ./peerclaw.wasm
 ```
-The WASM component implements the `peerclaw:ironclaw/trust` WIT interface. Set `PEERCLAW_SERVER` and `PEERCLAW_KEYPAIR` environment variables.
+Set `PEERCLAW_SERVER` and `PEERCLAW_KEYPAIR` environment variables, then restart IronClaw.
 See: [ironclaw-plugin README](https://github.com/peerclaw/ironclaw-plugin)
 
 **PicoClaw**
