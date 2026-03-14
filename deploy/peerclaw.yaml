@@ -59,6 +59,12 @@ audit_log:
 #   repo: "peerclaw/peerclaw-cli"     # GitHub repo for latest release
 #   interval: "1h"                    # how often to poll GitHub
 
+# notification:                       # Notification system
+#   enabled: true                     # default true
+#   retention_days: 90                # prune notifications older than 90 days
+#   email_enabled: false              # email for critical events (requires smtp config)
+#   email_on_offline: true            # email when agent goes offline
+
 logging:
   level: "info"
   format: "json"
