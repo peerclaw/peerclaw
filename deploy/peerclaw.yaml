@@ -54,6 +54,11 @@ audit_log:
 #   abuse_reports_days: 365           # prune resolved abuse reports older than 365 days
 #   cleanup_interval: "1h"            # how often to run cleanup
 
+# version_check:                      # SDK version check (GitHub Releases)
+#   enabled: true                     # default true
+#   repo: "peerclaw/peerclaw-cli"     # GitHub repo for latest release
+#   interval: "1h"                    # how often to poll GitHub
+
 logging:
   level: "info"
   format: "json"
