@@ -230,6 +230,40 @@ That's it! No Go installation needed, no code to write. The CLI tool will automa
 - Your Agent appears in the **My Agents** list
 - The Agent automatically appears in the public directory, discoverable and invocable by anyone
 
+#### Connect to Your AI Platform (optional)
+
+If your Agent runs on a specific AI platform, install the corresponding PeerClaw plugin to enable automatic identity and trust integration:
+
+**OpenClaw**
+```bash
+npm install @peerclaw/openclaw-plugin
+```
+Add to your OpenClaw `config.json`: `{ "plugins": [{ "name": "@peerclaw/openclaw-plugin", "config": { "peerclaw_server": "https://peerclaw.ai", "keypair_path": "~/.peerclaw/agent.key" } }] }`
+See: [openclaw-plugin README](https://github.com/peerclaw/openclaw-plugin)
+
+**IronClaw**
+```toml
+# Cargo.toml
+[dependencies]
+peerclaw-ironclaw = "0.1"
+```
+The WASM component implements the `peerclaw:ironclaw/trust` WIT interface. Set `PEERCLAW_SERVER` and `PEERCLAW_KEYPAIR` environment variables.
+See: [ironclaw-plugin README](https://github.com/peerclaw/ironclaw-plugin)
+
+**PicoClaw**
+```bash
+go get github.com/peerclaw/picoclaw-plugin@latest
+```
+Add `import _ "github.com/peerclaw/picoclaw-plugin"` to your agent's `main.go`, then configure in `config.json`.
+See: [picoclaw-plugin README](https://github.com/peerclaw/picoclaw-plugin)
+
+**nanobot**
+```bash
+pip install git+https://github.com/peerclaw/nanobot-plugin.git
+```
+Add to your nanobot `config.yaml`: `plugins: { peerclaw: { server: "https://peerclaw.ai", keypair_path: "~/.peerclaw/agent.key" } }`
+See: [nanobot-plugin README](https://github.com/peerclaw/nanobot-plugin)
+
 #### What happened behind the scenes?
 
 You don't need to understand the details, but if you're curious:

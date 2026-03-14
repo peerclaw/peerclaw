@@ -230,6 +230,40 @@ Full documentation: https://github.com/peerclaw/peerclaw/blob/main/docs/GUIDE.md
 - 你的 Agent 出现在 **My Agents** 列表中
 - Agent 自动出现在公开目录，任何人都能发现和调用它
 
+#### 连接你的 AI 平台（可选）
+
+如果你的 Agent 运行在特定 AI 平台上，安装对应的 PeerClaw 插件即可自动集成身份与信任功能：
+
+**OpenClaw**
+```bash
+npm install @peerclaw/openclaw-plugin
+```
+添加到 OpenClaw 的 `config.json`：`{ "plugins": [{ "name": "@peerclaw/openclaw-plugin", "config": { "peerclaw_server": "https://peerclaw.ai", "keypair_path": "~/.peerclaw/agent.key" } }] }`
+详见：[openclaw-plugin README](https://github.com/peerclaw/openclaw-plugin)
+
+**IronClaw**
+```toml
+# Cargo.toml
+[dependencies]
+peerclaw-ironclaw = "0.1"
+```
+该 WASM 组件实现了 `peerclaw:ironclaw/trust` WIT 接口。设置 `PEERCLAW_SERVER` 和 `PEERCLAW_KEYPAIR` 环境变量即可。
+详见：[ironclaw-plugin README](https://github.com/peerclaw/ironclaw-plugin)
+
+**PicoClaw**
+```bash
+go get github.com/peerclaw/picoclaw-plugin@latest
+```
+在 Agent 的 `main.go` 中添加 `import _ "github.com/peerclaw/picoclaw-plugin"`，然后在 `config.json` 中配置。
+详见：[picoclaw-plugin README](https://github.com/peerclaw/picoclaw-plugin)
+
+**nanobot**
+```bash
+pip install git+https://github.com/peerclaw/nanobot-plugin.git
+```
+添加到 nanobot 的 `config.yaml`：`plugins: { peerclaw: { server: "https://peerclaw.ai", keypair_path: "~/.peerclaw/agent.key" } }`
+详见：[nanobot-plugin README](https://github.com/peerclaw/nanobot-plugin)
+
 #### 发生了什么？
 
 你不需要理解细节，但如果你好奇：
