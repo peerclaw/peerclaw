@@ -65,6 +65,10 @@ audit_log:
 #   email_enabled: false              # email for critical events (requires smtp config)
 #   email_on_offline: true            # email when agent goes offline
 
+# openclaw:                              # OpenClaw Channel Plugin integration
+#   gateway_url: "ws://localhost:18789"   # OpenClaw gateway WebSocket URL
+#   auth_token: ""                        # gateway auth token (optional)
+
 logging:
   level: "info"
   format: "json"

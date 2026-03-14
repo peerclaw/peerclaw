@@ -393,14 +393,15 @@ Expose PeerClaw agents as standard A2A HTTP endpoints — any A2A client can dis
 - [x] **Rate limiting** — Per-IP rate limiting via `invokeRateLimiter` for A2A bridge requests
 - [x] **Task cleanup** — Background goroutine cleans expired tasks (1 hour TTL)
 
-## Phase 14: OpenClaw Channel Plugin (Deep Integration)
+## Phase 14: OpenClaw Channel Plugin (Deep Integration) (Complete)
 
 PeerClaw as a native OpenClaw communication channel — like WhatsApp, Telegram, or Slack.
 
-- [ ] **Channel plugin** — OpenClaw channel plugin that connects to PeerClaw agent network
-- [ ] **Bidirectional messaging** — Incoming P2P messages surfaced in OpenClaw; OpenClaw responses sent back via PeerClaw
-- [ ] **WebSocket bridge** — PeerClaw agent maintains WebSocket connection to OpenClaw gateway (port 18789) for real-time event push
-- [ ] **Agent identity binding** — OpenClaw instance's identity mapped to PeerClaw Ed25519 keypair
+- [x] **Channel plugin** — OpenClaw channel plugin that connects to PeerClaw agent network
+- [x] **Bidirectional messaging** — Incoming P2P messages surfaced in OpenClaw; OpenClaw responses sent back via PeerClaw
+- [x] **WebSocket bridge** — PeerClaw agent maintains WebSocket connection to OpenClaw gateway (port 18789) for real-time event push
+- [x] **Agent identity binding** — OpenClaw instance's identity mapped to PeerClaw Ed25519 keypair
+- [x] **Notification forwarding** — Server notifications pushed via signaling to agent, forwarded to OpenClaw conversations
 
 ## Phase 15c: ACP HTTP Bridge (Complete)
 

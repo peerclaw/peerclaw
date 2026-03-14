@@ -393,14 +393,15 @@ MCP Server 集成到 CLI — 任何 MCP Host（Claude Code、VS Code Copilot、C
 - [x] **限速** — 通过 `invokeRateLimiter` 实现 A2A 桥接请求的 Per-IP 限速
 - [x] **任务清理** — 后台 goroutine 清理过期任务（1 小时 TTL）
 
-## Phase 14: OpenClaw Channel 插件（深度集成）
+## Phase 14: OpenClaw Channel 插件（深度集成）（已完成）
 
 PeerClaw 作为 OpenClaw 的原生通信渠道 — 如同 WhatsApp、Telegram 或 Slack。
 
-- [ ] **Channel 插件** — 连接 PeerClaw Agent 网络的 OpenClaw Channel 插件
-- [ ] **双向消息** — 入站 P2P 消息在 OpenClaw 中展示；OpenClaw 的回复通过 PeerClaw 发回
-- [ ] **WebSocket 桥接** — PeerClaw Agent 与 OpenClaw Gateway（端口 18789）保持 WebSocket 连接，实现实时事件推送
-- [ ] **Agent 身份绑定** — OpenClaw 实例的身份映射到 PeerClaw Ed25519 密钥对
+- [x] **Channel 插件** — 连接 PeerClaw Agent 网络的 OpenClaw Channel 插件
+- [x] **双向消息** — 入站 P2P 消息在 OpenClaw 中展示；OpenClaw 的回复通过 PeerClaw 发回
+- [x] **WebSocket 桥接** — PeerClaw Agent 与 OpenClaw Gateway（端口 18789）保持 WebSocket 连接，实现实时事件推送
+- [x] **Agent 身份绑定** — OpenClaw 实例的身份映射到 PeerClaw Ed25519 密钥对
+- [x] **通知转发** — Server 通知通过 signaling 推送到 agent，转发到 OpenClaw 对话
 
 ## Phase 15c: ACP HTTP 桥接（已完成）
 
