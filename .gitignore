@@ -69,3 +69,4 @@ server/internal/server/dashboard_dist/
 /server/
 /agent/
 /cli/
+/openclaw-plugin/
