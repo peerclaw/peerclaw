@@ -463,3 +463,33 @@ Pure peer-to-peer large file transfer with E2E encryption — zero server depend
 - [x] **Agent integration** — `SendFile()`, `ListTransfers()`, `GetTransfer()`, `CancelTransfer()` public API; capability handler registered as `"file_transfer"`; `FileTransferDir` and `ResumeStatePath` options
 - [x] **CLI commands** — `peerclaw send-file --to <id> --file <path>` with progress polling; `peerclaw transfer status [--transfer-id <id>]` for transfer listing
 - [x] **Blob service removal** — Removed centralized `server/internal/blob/` package and all references; file transfer is now purely P2P
+
+## Phase 17: Hardening & Developer Experience
+
+Security hardening, error handling consistency, and developer experience improvements based on security audit findings.
+
+### Security Hardening
+
+- [ ] **Proof-of-Possession registration** — Require agents to sign a challenge during `POST /agents` registration, preventing public key squatting where an attacker registers someone else's public key before the real owner
+- [ ] **Forward secrecy / session rekeying** — Implement periodic X25519 key rotation within long-lived P2P sessions; derive per-message keys via HKDF ratchet so compromise of a single session key does not expose past or future traffic
+- [ ] **Encrypted trust store** — Encrypt the local trust database at rest (XChaCha20-Poly1305 with a key derived from the agent's Ed25519 seed), protecting trust decisions if the host filesystem is compromised
+- [ ] **Test coverage targets** — Establish minimum coverage: core 80%+, agent/server/cli 70%+; add coverage gates to CI pipelines
+
+### Error Handling & API Quality
+
+- [ ] **Unified error types** — Define structured error types per module (`core/errors`, `agent/errors`, `server/errors`) with error codes, replacing raw `fmt.Errorf` strings to enable programmatic error handling across module boundaries
+- [ ] **Card.Validate() method** — Add a `Validate() error` method to `core/discovery.Card` that checks required fields (ID, PublicKey, Endpoint), key format, and endpoint URL validity; call from registration and discovery flows
+
+### CLI & Developer Experience
+
+- [ ] **Flag consistency audit** — Standardize flag names across all CLI commands: `--agent-id` (not `--id`/`--agent`), `--server-url` (not `--server`/`--url`), `--output` (not `--format`); add deprecation aliases for renamed flags
+- [ ] **Shell completion** — Generate and install shell completion scripts for bash, zsh, fish, and PowerShell via `peerclaw completion <shell>`
+
+### Reputation Transparency
+
+- [ ] **Public reputation thresholds** — Document the EWMA score brackets (e.g. 0.0–0.3 = low, 0.3–0.7 = medium, 0.7–1.0 = high) in both code constants and user-facing docs, so agent operators understand how trust scores affect routing
+- [ ] **Reputation sorting & filtering** — Add `sort=reputation` and `min_reputation=<float>` query parameters to `GET /agents` directory listing, enabling agents to discover only sufficiently trusted peers
+
+### Plugin Ecosystem
+
+- [ ] **Plugin consolidation** — Prioritize Go (`picoclaw-plugin`) and TypeScript (`openclaw-plugin`) as Tier 1 supported plugins with full test coverage and CI; move Rust WASM (`ironclaw-plugin`) and Python (`nanobot-plugin`) to community-maintained status with clear contribution guidelines
