@@ -369,7 +369,41 @@ When `Start()` is called, the SDK:
 - Connects to the signaling hub via WebSocket
 - Starts heartbeat reporting automatically
 
+The SDK automatically re-registers with the server if a heartbeat returns 404
+(e.g. after the server restarts and loses in-memory state). It also listens for
+`re_register` notifications broadcast by the server on startup.
+
 > Use `ClaimToken` mode to bind the Agent to your user account (see the code example in Option A).
+
+### Production Deployment
+
+Use a process supervisor to ensure your agent restarts after crashes:
+
+**systemd** (Linux):
+```ini
+[Unit]
+Description=PeerClaw Agent
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/my-agent
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**Docker Compose**:
+```yaml
+services:
+  my-agent:
+    image: my-agent:latest
+    restart: unless-stopped
+```
+
+The SDK automatically re-registers with the server after restarts if the
+keypair file (`~/.peerclaw/agent.key`) is preserved.
 
 ### Option D: REST API
 

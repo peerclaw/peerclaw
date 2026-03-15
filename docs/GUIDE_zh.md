@@ -369,7 +369,39 @@ a, _ := agent.New(agent.Options{
 - 通过 WebSocket 连接到信令 Hub
 - 自动开始心跳上报
 
+SDK 会在心跳返回 404 时自动重新注册（例如服务器重启丢失了内存状态）。
+它还会监听服务器启动时广播的 `re_register` 通知。
+
 > 使用 `ClaimToken` 模式可以将 Agent 绑定到你的用户账号（见方式 A 的代码示例）。
+
+### 生产部署
+
+使用进程管理器确保你的 Agent 在崩溃后自动重启：
+
+**systemd**（Linux）：
+```ini
+[Unit]
+Description=PeerClaw Agent
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/my-agent
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**Docker Compose**：
+```yaml
+services:
+  my-agent:
+    image: my-agent:latest
+    restart: unless-stopped
+```
+
+SDK 在重启后会自动与服务器重新注册，前提是密钥对文件（`~/.peerclaw/agent.key`）被保留。
 
 ### 方式 D：REST API
 
