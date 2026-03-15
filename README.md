@@ -1,249 +1,183 @@
-**English** | [中文](README_zh.md)
+<p align="center">
+  <img src="docs/logo.jpg" alt="PeerClaw" width="200" />
+</p>
 
-# PeerClaw
+<h1 align="center">PeerClaw</h1>
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+<p align="center">
+  <strong>The Identity & Trust Layer for AI Agents</strong>
+</p>
 
-**The open-source identity & trust platform for AI Agents — where any Agent becomes a discoverable, trustable, invocable service.**
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License" /></a>&nbsp;
+  <img src="https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white" alt="Go 1.26" />&nbsp;
+  <img src="https://img.shields.io/badge/Protocols-A2A%20%7C%20MCP%20%7C%20ACP-8B5CF6" alt="Protocols" />&nbsp;
+  <img src="https://img.shields.io/badge/Transport-WebRTC%20%7C%20Nostr-F97316" alt="Transport" />&nbsp;
+  <img src="https://img.shields.io/badge/i18n-8%20Languages-10B981" alt="i18n" />
+</p>
 
-In a world flooding with fake AI agents, there's no way to know which ones are real. Directories list thousands of "agents" with no proof they exist, no verification they work, and no accountability when they don't.
+<p align="center">
+  <a href="README_zh.md">中文</a> · <a href="docs/GUIDE.md">Guide</a> · <a href="docs/PRODUCT.md">Product Doc</a> · <a href="docs/ROADMAP.md">Roadmap</a>
+</p>
 
-PeerClaw fixes this. It's **the trust layer for AI Agents**: every agent gets a cryptographically verifiable Ed25519 identity, an EWMA-based reputation score computed from real interactions, and endpoint verification that proves agents control their claimed URLs. Built on top of a full protocol gateway (A2A, MCP, ACP), the real interactions that flow through PeerClaw generate the trust data that makes identities meaningful. PeerClaw is evolving into an open platform where anyone can register an Agent as a service, and anyone can discover and invoke it — regardless of protocol.
+---
 
-## What PeerClaw Does
+AI agents are everywhere — but there's no way to know which ones are real. No proof they exist, no verification they work, no accountability when they don't.
+
+**PeerClaw is the trust layer that fixes this.** Every agent gets an unforgeable Ed25519 cryptographic identity, earns reputation through real interactions (EWMA scoring), and communicates peer-to-peer with end-to-end encryption — across any protocol.
+
+## How It Works
+
+Agents use the **PeerClaw SDK** to register, discover peers, and communicate directly — P2P first, server only for coordination.
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│ Your MCP Agent          PeerClaw Gateway       A2A Agent    │
-│                                                             │
-│   "I need an agent   →  Registry: here are   → "I can do   │
-│    that can search"      3 matches               search"    │
-│                                                             │
-│   Send MCP request   →  Bridge: translate    → Receive A2A  │
-│                          MCP → A2A               message    │
-│                                                             │
-│   Get MCP response   ←  Bridge: translate    ← Send A2A     │
-│                          A2A → MCP               response   │
-└─────────────────────────────────────────────────────────────┘
+                          ┌──────────────────────┐
+                          │    PeerClaw Server    │
+                          │                      │
+                          │  Registry · Signaling │
+                          │  Reputation · Bridge  │
+                          └───────┬──────┬───────┘
+                        register/ │      │ signaling
+                        discover  │      │ relay
+                    ┌─────────────┘      └─────────────┐
+                    ▼                                   ▼
+          ┌──────────────────┐                ┌──────────────────┐
+          │  Agent (SDK)     │  ◄══ P2P ══►   │  Agent (SDK)     │
+          │                  │   encrypted    │                  │
+          │  Ed25519 ID      │   WebRTC /     │  Ed25519 ID      │
+          │  A2A + MCP + ACP │   Nostr        │  A2A + MCP + ACP │
+          └──────────────────┘                └──────────────────┘
 ```
 
-**In plain terms:**
+**The server never sees your messages.** It handles registration, discovery, and signaling relay for WebRTC handshakes — actual data flows P2P between agents, encrypted with XChaCha20-Poly1305 and signed with Ed25519.
 
-1. **Register** — Your agent tells PeerClaw what it can do (capabilities, protocols, endpoint)
-2. **Verify** — Challenge-response endpoint verification proves your agent controls its URL
-3. **Earn Trust** — Every interaction (heartbeats, bridge messages, verifications) feeds into an EWMA reputation score
-4. **Discover** — Anyone can browse the public agent directory, filtered by reputation, capability, and verification status
-5. **Bridge** — Agents using different protocols (A2A, MCP, ACP) communicate seamlessly through automatic translation
-6. **Trust** — Every agent has an Ed25519 cryptographic identity. Messages are encrypted then signed (encrypt-then-sign) for pre-authentication. No impersonation, no tampering.
+### The Flow
+
+```
+Alice (SDK)                  Server                    Bob (SDK)
+  │                            │                          │
+  ├─ Register ────────────────►│                          │
+  │                            │◄──────────── Register ───┤
+  │                            │                          │
+  ├─ Discover("search") ─────►│                          │
+  │◄─ [{Bob, pubkey, caps}] ──│                          │
+  │                            │                          │
+  ├─ WebRTC offer + X25519 ──►│──── relay ──────────────►│
+  │◄── WebRTC answer + X25519 ─│◄─── relay ──────────────┤
+  │                            │                          │
+  │◄══════════════ P2P encrypted channel ═══════════════►│
+  │        Ed25519 signed · XChaCha20 encrypted          │
+  │        A2A tasks · MCP tools · ACP runs              │
+```
+
+## Key Features
+
+<table>
+<tr>
+<td width="50%">
+
+### Cryptographic Identity
+Every agent owns an Ed25519 keypair — the public key **is** the identity. No passwords, no usernames, just math. Registration proves key ownership, every message is signed, and identities are unforgeable.
+
+### P2P Communication
+Agents talk directly via WebRTC DataChannels with automatic Nostr relay fallback. The server is only used for discovery and signaling — it never sees message content.
+
+### Multi-Protocol SDK
+The agent SDK natively supports **A2A** (Google), **MCP** (Anthropic), and **ACP** (IBM). Agents can communicate across any protocol through the universal Envelope format.
+
+</td>
+<td width="50%">
+
+### EWMA Reputation
+Trust scores computed from real interactions using Exponentially Weighted Moving Average. Recent behavior matters more, rewarding consistently reliable agents.
+
+### End-to-End Encryption
+X25519 ECDH key exchange, XChaCha20-Poly1305 payload encryption, encrypt-then-sign for pre-authentication. Nostr fallback uses NIP-44 encryption.
+
+### Agent Platform
+Full-featured web platform: public directory, playground to try agents live, user accounts, reviews & ratings, provider analytics, access control — in 8 languages.
+
+</td>
+</tr>
+</table>
 
 ## Quick Start
 
 Get two agents talking in under 5 minutes:
 
 ```bash
-# Clone and build the gateway
+# Terminal 1 — Start the gateway
 git clone https://github.com/peerclaw/peerclaw-server.git
-cd peerclaw-server
-go build -o peerclawd ./cmd/peerclawd
-
-# Clone and build the agent SDK (in another directory)
-git clone https://github.com/peerclaw/peerclaw-agent.git
-cd peerclaw-agent
-go build -o echo ./examples/echo
-```
-
-```bash
-# Terminal 1: Start the gateway
+cd peerclaw-server && go build -o peerclawd ./cmd/peerclawd
 ./peerclawd
 # → PeerClaw gateway started  http=:8080
 
-# Terminal 2: Start agent Alice
+# Terminal 2 — Start agent Alice
+git clone https://github.com/peerclaw/peerclaw-agent.git
+cd peerclaw-agent && go build -o echo ./examples/echo
 ./echo -name alice -server http://localhost:8080
 
-# Terminal 3: Start agent Bob
+# Terminal 3 — Start agent Bob
 ./echo -name bob -server http://localhost:8080
+```
 
-# Terminal 4: See who's online (install CLI separately)
+Alice and Bob will automatically register, discover each other, and establish an encrypted P2P connection.
+
+```bash
+# Check who's online
 git clone https://github.com/peerclaw/peerclaw-cli.git
 cd peerclaw-cli && go build -o peerclaw ./cmd/peerclaw
 ./peerclaw agent list
 ```
 
-Alice and Bob will automatically register, discover each other, and establish an encrypted P2P connection.
-
 ## Architecture
 
-PeerClaw is composed of four modules that work together:
-
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│                     peerclaw-server (Gateway)                    │
-│                                                                  │
-│  ┌────────────┐   ┌───────────────┐   ┌───────────────────────┐ │
-│  │  Registry  │   │   Signaling   │   │    Bridge Manager     │ │
-│  │  Agent     │   │   Hub         │   │                       │ │
-│  │  discovery │   │   WebSocket   │   │  ┌─────┬─────┬─────┐ │ │
-│  │  by caps   │   │   relay for   │   │  │ A2A │ MCP │ ACP │ │ │
-│  └────────────┘   │   WebRTC      │   │  └─────┴─────┴─────┘ │ │
-│                   └───────────────┘   └───────────────────────┘ │
-│  ┌────────────┐   ┌───────────────┐   ┌───────────────────────┐ │
-│  │  Auth      │   │   Rate Limit  │   │   Observability       │ │
-│  │  Ed25519 + │   │   Per-IP      │   │   OpenTelemetry       │ │
-│  │  API Key   │   │   throttling  │   │   traces + metrics    │ │
-│  └────────────┘   └───────────────┘   └───────────────────────┘ │
-│                                                                  │
-│  Storage: SQLite (default) or PostgreSQL                         │
-│  Scaling: Redis Pub/Sub for multi-node signaling                 │
-└──────────────────────────────────────────────────────────────────┘
-        │ REST API              │ WebSocket             │ Protocol
-        │ register/discover     │ signaling             │ endpoints
-        ▼                       ▼                       ▼
-┌──────────────────┐    ┌──────────────────┐    ┌──────────────┐
-│  peerclaw-agent  │    │  peerclaw-agent  │    │  External    │
-│  (Go SDK)        │◄══►│  (Go SDK)        │    │  A2A/MCP/ACP │
-│                  │P2P │                  │    │  Agent       │
-│  WebRTC primary  │    │  WebRTC primary  │    │              │
-│  Nostr fallback  │    │  Nostr fallback  │    │              │
-└──────────────────┘    └──────────────────┘    └──────────────┘
-        │                       │
-        └───── peerclaw-core ───┘
-              (shared types: identity, envelope, protocol)
-```
-
-### How Agents Communicate
-
-```
-Alice                    Gateway                     Bob
-  │                        │                          │
-  ├─ POST /agents ────────►│  Register Alice          │
-  │                        │◄──────── POST /agents ───┤  Register Bob
-  │                        │                          │
-  ├─ POST /discover ──────►│  "who can search?"       │
-  │◄── [{Bob, caps:search}]│                          │
-  │                        │                          │
-  ├─ WS: offer + X25519 ─►│──── relay ──────────────►│
-  │◄─── WS: answer + X25519│◄─── relay ──────────────┤
-  │                        │                          │
-  │◄═══════════ WebRTC P2P (encrypted) ══════════════►│
-  │         Ed25519 signed + XChaCha20 encrypted      │
+┌───────────────────────────────────────────────────────────────────┐
+│                      peerclaw-server (Gateway)                    │
+│                                                                   │
+│  ┌────────────┐  ┌──────────────┐  ┌───────────┐  ┌───────────┐ │
+│  │  Registry  │  │  Signaling   │  │  Bridge   │  │ Reputation│ │
+│  │  discover  │  │  Hub         │  │  Manager  │  │  Engine   │ │
+│  │  by caps   │  │  WebSocket   │  │  ┌─────┐  │  │  EWMA     │ │
+│  │  heartbeat │  │  relay for   │  │  │A2A  │  │  │  scoring  │ │
+│  │  federated │  │  WebRTC      │  │  │MCP  │  │  │           │ │
+│  └────────────┘  └──────────────┘  │  │ACP  │  │  └───────────┘ │
+│                                    │  └─────┘  │                 │
+│  ┌────────────┐  ┌──────────────┐  └───────────┘  ┌───────────┐ │
+│  │  Auth      │  │  Rate Limit  │                  │  Platform │ │
+│  │  Ed25519   │  │  Per-IP      │  ┌───────────┐  │  Web UI   │ │
+│  │  JWT + API │  │  throttling  │  │ Observ.   │  │  8 langs  │ │
+│  └────────────┘  └──────────────┘  │ OTel      │  └───────────┘ │
+│                                    └───────────┘                 │
+│  Storage: SQLite | PostgreSQL    Scaling: Redis Pub/Sub           │
+└───────────────────────────────────────────────────────────────────┘
+         │ REST API          │ WebSocket           │ A2A/MCP/ACP
+         ▼                   ▼                     ▼
+┌──────────────────┐  ┌──────────────────┐  ┌──────────────┐
+│  Agent (SDK)     │  │  Agent (SDK)     │  │  External    │
+│                  │  │                  │  │  Agent       │
+│  Ed25519 ID      │◄═╪══ WebRTC P2P ══►│  │  (via Bridge)│
+│  Trust Store     │  │  Nostr fallback  │  │              │
+│  A2A / MCP / ACP │  │  File transfer   │  │              │
+└──────────────────┘  └──────────────────┘  └──────────────┘
+         │                    │
+         └── peerclaw-core ───┘
+             shared types: identity, envelope, signaling
 ```
 
 ## Project Structure
 
-| Module | What it does | Key tech |
-|--------|-------------|----------|
-| [**peerclaw-core**](https://github.com/peerclaw/peerclaw-core) | Shared type library — identity, envelope, agent card, protocol constants | Ed25519, X25519, zero external deps |
-| [**peerclaw-server**](https://github.com/peerclaw/peerclaw-server) | The gateway — registration, discovery, signaling relay, protocol bridging | SQLite/PostgreSQL, WebSocket, OTel |
-| [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | P2P agent SDK — connect, send, receive, file transfer with automatic transport selection | WebRTC (Pion), Nostr, TOFU trust |
-| [**peerclaw-cli**](https://github.com/peerclaw/peerclaw-cli) | Command-line tool — manage agents, check health, send messages | Cobra-style subcommands |
-| [**openclaw-plugin**](https://github.com/peerclaw/openclaw-plugin) | OpenClaw platform plugin — WebSocket adapter for OpenClaw agents | TypeScript, npm |
-| [**ironclaw-plugin**](https://github.com/peerclaw/ironclaw-plugin) | IronClaw platform plugin — HTTP/SSE adapter compiled to WASM | Rust, WASM |
-| [**picoclaw-plugin**](https://github.com/peerclaw/picoclaw-plugin) | PicoClaw platform plugin — native Go adapter for PicoClaw agents | Go |
-| [**nanobot-plugin**](https://github.com/peerclaw/nanobot-plugin) | NanoBot platform plugin — Python adapter for NanoBot agents | Python |
+| Module | Description | Tech |
+|--------|-------------|------|
+| [**peerclaw-core**](https://github.com/peerclaw/peerclaw-core) | Shared types — identity, envelope, agent card, protocol constants | Ed25519, X25519 |
+| [**peerclaw-server**](https://github.com/peerclaw/peerclaw-server) | Gateway — registration, discovery, signaling, bridging, web platform | SQLite/PG, WebSocket, OTel |
+| [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | P2P agent SDK — connect, communicate, file transfer across A2A/MCP/ACP | WebRTC (Pion), Nostr |
+| [**peerclaw-cli**](https://github.com/peerclaw/peerclaw-cli) | CLI — manage agents, invoke, send messages, MCP server mode | Cobra |
 
-## Core Concepts
+### Platform Plugins
 
-### Agent Card
-
-Every agent publishes an Agent Card — a machine-readable description of who it is and what it can do:
-
-```json
-{
-  "name": "search-agent",
-  "public_key": "base64-ed25519-pubkey",
-  "capabilities": ["web-search", "summarize"],
-  "protocols": ["a2a", "mcp"],
-  "endpoint": { "url": "https://my-agent.example.com", "port": 443 },
-  "skills": [{ "id": "search", "name": "Web Search" }],
-  "tools": [{ "name": "search", "description": "Search the web" }]
-}
-```
-
-Compatible with the A2A Agent Card standard, extended with PeerClaw fields (public key, NAT type, Nostr pubkey).
-
-### Protocol Bridging
-
-PeerClaw translates between protocols using a universal **Envelope** format:
-
-```
-A2A Agent ──► A2A Adapter ──► Envelope ──► MCP Adapter ──► MCP Agent
-                                │
-                           unified format:
-                           source, destination,
-                           protocol, payload,
-                           signature, trace_id
-```
-
-| Protocol | What it's for | PeerClaw support |
-|----------|--------------|------------------|
-| **A2A** (Google) | Task-based agent collaboration | Full: tasks, artifacts, streaming |
-| **MCP** (Anthropic) | Tool/resource access | Full: tools, resources, prompts |
-| **ACP** (IBM) | Enterprise agent runs | Full: runs, sessions, manifests |
-
-### Cryptographic Identity
-
-Every agent owns an Ed25519 keypair. The public key **is** the identity.
-
-- **Registration**: agent proves ownership by signing the request
-- **Messages**: every envelope is signed — receiver verifies origin
-- **Encryption**: X25519 keys derived from Ed25519, XChaCha20-Poly1305 for payloads
-- **Trust**: TOFU (Trust-On-First-Use) model with 5 levels: Unknown → TOFU → Verified → Pinned → Blocked
-
-### Transport Fallback
-
-The agent SDK automatically picks the best transport:
-
-```
-1. WebRTC DataChannel (preferred — low latency, P2P)
-       │ fails (strict NAT)?
-       ▼
-2. Nostr relay (fallback — NIP-44 encrypted, multi-relay)
-       │ WebRTC recovers?
-       ▼
-3. Auto-upgrade back to WebRTC
-```
-
-## Advanced Features
-
-These are available but not required for basic usage:
-
-| Feature | Description |
-|---------|-------------|
-| **Reputation Engine** | Server-side EWMA reputation scoring from real interaction events |
-| **Endpoint Verification** | Challenge-response proof that agents control their claimed URLs |
-| **Public Directory** | Browse and search agents by reputation, capability, category, and verification status |
-| **Agent Playground** | Try any agent live via chat UI with SSE streaming, rate-limited anonymous access |
-| **User Auth & JWT** | Email/password registration, JWT sessions, API key management, profile editing |
-| **Provider Console** | Register agents, view analytics, manage invocations and API keys |
-| **Internationalization** | 8 languages: English, Chinese, Spanish, French, Arabic (RTL), Portuguese, Japanese, Russian |
-| **Reviews & Ratings** | Star ratings (1-5) + text reviews with reputation integration |
-| **Trusted Badge** | Verified + high reputation agents earn a "Trusted" badge |
-| **Federation** | Multi-server signaling relay with DNS SRV discovery |
-| **Identity Anchoring** | Bind Ed25519 identity to Nostr/DNS for public verification |
-| **P2P File Transfer** | E2E encrypted large file transfer over WebRTC DataChannels with pipeline push, backpressure, mutual auth, resume, and Nostr fallback |
-| **Offline Messaging** | Message cache with TTL, auto-flush on peer reconnect |
-
-| **P2P Whitelist** | Default-deny contact management — Agents must be whitelisted before connecting or messaging |
-| **Agent Access Control** | Three-tier access: playground (open), private (contacts-only), user ACL with application/approval workflow |
-| **Visibility Control** | Agents can be set to public (visible in directory) or private (hidden, contacts/ACL only) |
-| **Connection Gating** | ConnectionGate rejects unauthorized WebRTC offers before allocating any resources |
-| **Message Validation** | Signature verification, timestamp freshness, nonce-based replay protection on every message |
-
-## Agent Platform
-
-PeerClaw has evolved from infrastructure into a full-featured **Agent Platform**:
-
-- **Browse & Discover** — Landing page, explore page, agent profiles with trust info, category filtering
-- **Playground** — Try any Agent live through a protocol-agnostic chat interface with SSE streaming
-- **User Accounts** — Register/login with JWT auth, profile management (email, password, bio), register agents via guided wizard, manage API keys
-- **Internationalization** — 8 languages with full coverage, RTL support for Arabic
-- **Provider Console** — Dashboard with call volume analytics, agent stats, invocation history
-- **Trust & Community** — Star ratings, text reviews, Verified/Trusted badges, abuse reporting
-- **Access Control** — Playground gating, private agents, user access requests with approve/reject workflow
-
-### Multi-Platform Integration
-
-PeerClaw agents can run on external agent platforms via platform plugins. Each plugin implements the `platform.Adapter` interface from the agent SDK:
+Run PeerClaw agents on external AI platforms via `platform.Adapter`:
 
 | Plugin | Platform | Language | Install |
 |--------|----------|----------|---------|
@@ -252,9 +186,64 @@ PeerClaw agents can run on external agent platforms via platform plugins. Each p
 | [picoclaw-plugin](https://github.com/peerclaw/picoclaw-plugin) | PicoClaw | Go | `go get github.com/peerclaw/picoclaw-plugin` |
 | [nanobot-plugin](https://github.com/peerclaw/nanobot-plugin) | NanoBot | Python | `pip install peerclaw-nanobot` |
 
-See [Roadmap](docs/ROADMAP.md) for the complete development history.
+## Core Concepts
 
-## CLI Reference
+### Protocol Support
+
+The SDK supports all three major agent protocols through the universal **Envelope** format:
+
+| Protocol | What it's for | Support |
+|----------|--------------|---------|
+| **A2A** (Google) | Task-based agent collaboration | Tasks, artifacts, streaming |
+| **MCP** (Anthropic) | Tool and resource access | Tools, resources, prompts |
+| **ACP** (IBM) | Enterprise agent orchestration | Runs, sessions, manifests |
+
+The server also provides HTTP bridge endpoints (`/a2a/{id}`, `/mcp/{id}`, `/acp/{id}`) for external agents that don't use the SDK.
+
+### Trust Model
+
+| Layer | Mechanism | Purpose |
+|-------|-----------|---------|
+| **Identity** | Ed25519 keypair | Unforgeable agent identity |
+| **Signing** | Every message signed | No tampering, no impersonation |
+| **Encryption** | X25519 + XChaCha20-Poly1305 | E2E encrypted payloads |
+| **Trust** | TOFU → Verified → Pinned → Blocked | Progressive trust levels |
+| **Reputation** | EWMA scoring (0.0 – 1.0) | Earned through real interactions |
+| **Whitelist** | Default-deny contacts | Explicit opt-in communication |
+| **Gating** | ConnectionGate rejects unauthorized peers | Zero resource allocation |
+
+### Transport
+
+The SDK automatically picks the best transport:
+
+```
+WebRTC DataChannel (preferred — low latency, P2P)
+       │ fails (strict NAT)?
+       ▼
+Nostr relay (fallback — NIP-44 encrypted, multi-relay)
+       │ WebRTC recovers?
+       ▼
+Auto-upgrade back to WebRTC
+```
+
+## Platform Features
+
+PeerClaw includes a full web platform built on its trust infrastructure:
+
+| Feature | Description |
+|---------|-------------|
+| **Public Directory** | Browse agents by reputation, capability, category, verification status |
+| **Agent Playground** | Try any agent live via chat UI with SSE streaming |
+| **User Accounts** | Email/password, JWT sessions, API key management |
+| **Provider Console** | Agent analytics, invocation history, access request management |
+| **Reviews & Ratings** | Star ratings + text reviews with reputation integration |
+| **Trusted Badge** | Verified + high reputation agents earn a "Trusted" badge |
+| **Access Control** | Playground (open), private (contacts-only), user ACL with approval workflow |
+| **i18n** | English, Chinese, Spanish, French, Arabic (RTL), Portuguese, Japanese, Russian |
+
+Additional infrastructure features: federation (multi-server, DNS SRV), identity anchoring (Nostr/DNS), P2P file transfer (E2E encrypted, resume, backpressure), offline messaging (Nostr mailbox).
+
+## CLI
 
 ```bash
 peerclaw health                              # Check gateway status
@@ -262,16 +251,16 @@ peerclaw agent list                          # List all agents
 peerclaw agent list -protocol mcp -output json   # Filter + JSON output
 peerclaw agent get <id>                      # Agent details
 peerclaw agent register -name "My Agent" ... # Register an agent
-peerclaw send -from a -to b -payload '{}'    # Send a message
+peerclaw invoke <agent-id> --message "Hi"    # Invoke an agent
+peerclaw send -from a -to b -payload '{}'    # Send P2P message
 peerclaw send-file --to <id> --file doc.pdf  # P2P file transfer
-peerclaw transfer status                     # Check transfer status
-peerclaw config set server http://host:8080  # Set gateway URL
+peerclaw mcp serve                           # Run as MCP server
 ```
 
 ## Development
 
 ```bash
-# Each module is a separate repository. Build and test individually:
+# Each module is a separate repo. Build and test individually:
 
 # peerclaw-core
 git clone https://github.com/peerclaw/peerclaw-core.git
@@ -290,7 +279,7 @@ git clone https://github.com/peerclaw/peerclaw-cli.git
 cd peerclaw-cli && go build ./... && go test ./...
 ```
 
-For local multi-module development, you can use a [Go workspace](https://go.dev/doc/tutorial/workspaces):
+For local multi-module development, use a [Go workspace](https://go.dev/doc/tutorial/workspaces):
 
 ```bash
 mkdir peerclaw && cd peerclaw
@@ -304,7 +293,7 @@ go work sync
 
 ## Documentation
 
-- [User Guide](docs/GUIDE.md) — Browse, try, register, and manage Agents on PeerClaw
+- [User Guide](docs/GUIDE.md) — Browse, try, register, and manage Agents
 - [Product Document](docs/PRODUCT.md) — Detailed product design and security model
 - [Roadmap](docs/ROADMAP.md) — Development phases and milestones
 
@@ -317,8 +306,6 @@ PeerClaw is in active development. We welcome contributions:
 - **Discussions** — Ideas about the future of agent communication
 
 ## License
-
-Licensed under the [Apache License 2.0](LICENSE).
 
 | Module | License |
 |--------|---------|
