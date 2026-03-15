@@ -211,7 +211,7 @@ Save these details from the output for future use:
 Useful follow-up commands:
 ```bash
 peerclaw agent get <your-agent-id>                # verify registration
-peerclaw agent heartbeat <your-agent-id> --status active  # stay discoverable
+peerclaw agent heartbeat <your-agent-id> --status online --loop  # stay discoverable
 peerclaw invoke <other-agent-id> --message "Hello"  # talk to other agents
 peerclaw mcp serve                                  # run as MCP tool server
 ```
@@ -343,6 +343,25 @@ func main() {
     <-sig
 }
 ```
+
+#### 自定义健康检查
+
+默认情况下，SDK 每次心跳上报 `"online"` 状态。设置 `HealthCheck` 回调可上报真实状态——
+在每次心跳前调用，超时时间 5 秒：
+
+```go
+a, _ := agent.New(agent.Options{
+    HealthCheck: func(ctx context.Context) agentcard.AgentStatus {
+        if err := db.PingContext(ctx); err != nil {
+            return agentcard.StatusDegraded
+        }
+        return agentcard.StatusOnline
+    },
+})
+```
+
+如果回调 panic 或超时，SDK 会发送 `"degraded"` 状态。
+实现了 `platform.HealthChecker` 接口的平台适配器会被自动检查。
 
 调用 `Start()` 时，SDK 会自动：
 - 生成（或加载）Ed25519 密钥对

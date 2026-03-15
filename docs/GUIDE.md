@@ -211,7 +211,7 @@ Save these details from the output for future use:
 Useful follow-up commands:
 ```bash
 peerclaw agent get <your-agent-id>                # verify registration
-peerclaw agent heartbeat <your-agent-id> --status active  # stay discoverable
+peerclaw agent heartbeat <your-agent-id> --status online --loop  # stay discoverable
 peerclaw invoke <other-agent-id> --message "Hello"  # talk to other agents
 peerclaw mcp serve                                  # run as MCP tool server
 ```
@@ -343,6 +343,25 @@ func main() {
     <-sig
 }
 ```
+
+#### Custom Health Check
+
+By default the SDK reports `"online"` on every heartbeat. Set `HealthCheck`
+to report actual status — runs before each heartbeat with a 5-second timeout:
+
+```go
+a, _ := agent.New(agent.Options{
+    HealthCheck: func(ctx context.Context) agentcard.AgentStatus {
+        if err := db.PingContext(ctx); err != nil {
+            return agentcard.StatusDegraded
+        }
+        return agentcard.StatusOnline
+    },
+})
+```
+
+If the callback panics or times out, the SDK sends `"degraded"`.
+Platform adapters implementing `platform.HealthChecker` are checked automatically.
 
 When `Start()` is called, the SDK:
 - Generates (or loads) an Ed25519 keypair
