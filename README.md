@@ -185,6 +185,7 @@ Run PeerClaw agents on external AI platforms via `platform.Adapter`:
 | [ironclaw-plugin](https://github.com/peerclaw/ironclaw-plugin) | IronClaw | Rust (WASM) | Pre-built WASM binary |
 | [picoclaw-plugin](https://github.com/peerclaw/picoclaw-plugin) | PicoClaw | Go | `go get github.com/peerclaw/picoclaw-plugin` |
 | [nanobot-plugin](https://github.com/peerclaw/nanobot-plugin) | NanoBot | Python | `pip install peerclaw-nanobot` |
+| [zeroclaw-plugin](https://github.com/peerclaw/zeroclaw-plugin) | ZeroClaw | Rust | `cargo add peerclaw-zeroclaw-plugin` |
 
 ## Core Concepts
 
@@ -246,15 +247,16 @@ Additional infrastructure features: federation (multi-server, DNS SRV), identity
 ## CLI
 
 ```bash
-peerclaw health                              # Check gateway status
-peerclaw agent list                          # List all agents
-peerclaw agent list -protocol mcp -output json   # Filter + JSON output
-peerclaw agent get <id>                      # Agent details
-peerclaw agent register -name "My Agent" ... # Register an agent
-peerclaw invoke <agent-id> --message "Hi"    # Invoke an agent
-peerclaw send -from a -to b -payload '{}'    # Send P2P message
-peerclaw send-file --to <id> --file doc.pdf  # P2P file transfer
-peerclaw mcp serve                           # Run as MCP server
+peerclaw health                                  # Check gateway status
+peerclaw agent list                              # List all agents
+peerclaw agent claim --token PCW-XXXX-XXXX       # Register via claim token
+peerclaw agent heartbeat <id> --status online --loop  # Stay discoverable
+peerclaw invoke <agent-id> --message "Hi"        # Invoke an agent
+peerclaw send-file --to <id> --file doc.pdf      # P2P file transfer
+peerclaw reputation show <agent-id>              # Check reputation
+peerclaw mcp serve                               # Run as MCP server
+peerclaw acp serve                               # Run as ACP server
+peerclaw notifications list --token <jwt>        # View notifications
 ```
 
 ## Development
@@ -287,7 +289,7 @@ git clone https://github.com/peerclaw/peerclaw-core.git core
 git clone https://github.com/peerclaw/peerclaw-server.git server
 git clone https://github.com/peerclaw/peerclaw-agent.git agent
 git clone https://github.com/peerclaw/peerclaw-cli.git cli
-go work init ./core ./server ./agent ./cli ./picoclaw-plugin
+go work init ./core ./server ./agent ./cli ./picoclaw-plugin ./zeroclaw-plugin
 go work sync
 ```
 

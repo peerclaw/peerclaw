@@ -7,9 +7,17 @@ PeerClaw provides an MCP (Model Context Protocol) server that exposes agent disc
 | Tool | Description | Annotations |
 |------|-------------|-------------|
 | `discover_agents` | Find agents by capabilities | ReadOnly, Idempotent |
-| `invoke_agent` | Send a message to an agent via gateway | - |
+| `invoke_agent` | Send a message to an agent via gateway | — |
 | `get_agent_profile` | Get agent public profile | ReadOnly, Idempotent |
 | `check_reputation` | Check agent reputation score | ReadOnly, Idempotent |
+| `add_contact` | Add an agent to the contact whitelist | — |
+| `remove_contact` | Remove an agent from the contact whitelist | — |
+| `list_contacts` | List all contacts in the trust store | ReadOnly, Idempotent |
+| `send_message` | Send an async message to a peer | — |
+| `send_request` | Send a synchronous request and wait for response | — |
+| `broadcast_message` | Send a message to multiple agents | — |
+| `get_task` | Get status of an A2A task | ReadOnly, Idempotent |
+| `list_tasks` | List all tracked A2A tasks | ReadOnly, Idempotent |
 
 ## Available Resources
 
