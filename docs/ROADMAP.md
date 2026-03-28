@@ -507,3 +507,65 @@ Plugin tier classification:
 - [x] **openclaw-plugin tests** — vitest suite for config schema validation and account resolution
 - [x] **ironclaw-plugin tests** — Unit tests for frame parsing, peer ID extraction, serialization
 - [x] **Community plugin labels** — picoclaw and nanobot plugins marked as community maintained with CONTRIBUTING.md
+
+## Phase 18: Web Dashboard Foundation (Complete)
+
+Full-featured admin dashboard for the PeerClaw server with i18n support across 8 languages.
+
+- [x] **Dashboard SPA** — React + TypeScript + Tailwind + shadcn/ui, embedded into server binary
+- [x] **Admin panel** — Overview, users, agents, reports, categories, analytics, invocations pages
+- [x] **Provider console** — Dashboard, agent management, discover, invocation history, API keys, notifications, profile
+- [x] **Public pages** — Landing, directory, agent profiles, playground, about, login/register/forgot-password
+- [x] **i18n** — 8 languages (en, zh, es, fr, ja, pt, ru, ar) with complete translation coverage
+- [x] **Data export** — CSV/JSON export for admin tables
+- [x] **Sortable tables** — Column sorting with sortable headers and loading skeletons
+- [x] **Accessibility** — Skip-to-content, ARIA labels, keyboard navigation
+
+## Phase 19-22: Dashboard Enhancements (Complete)
+
+### Phase 19: Bulk Actions
+- [x] **Bulk endpoints** — `POST /admin/{agents,reports,users}/bulk` with action-based dispatch
+- [x] **SelectableTable** — Reusable component with checkbox selection and floating action bar
+- [x] **Admin pages** — AgentsPage (verify/delete), UsersPage (delete), ReportsPage (review/dismiss/delete)
+
+### Phase 20: Profile & Auth Improvements
+- [x] **PasswordStrength** — 4-segment visual bar with requirements checklist, applied to register/profile/forgot-password
+- [x] **Auto-dismiss** — Success messages on ProfilePage auto-dismiss after 3 seconds
+- [x] **AboutPage** — Updated roadmap to Phase 4, added GitHub roadmap link
+
+### Phase 21: Admin Audit Log
+- [x] **adminaudit package** — Store/SQLite/Postgres/Service/Factory pattern, `admin_audit_log` table with indexes
+- [x] **Audit recording** — All admin mutations logged (user.delete, agent.verify, report.update, category.create, etc.)
+- [x] **AuditLogPage** — Filters (admin, action, target type, date range), pagination, sidebar nav item
+
+### Phase 22: Advanced Dashboard
+- [x] **Clickable stat cards** — Overview cards navigate to respective admin pages
+- [x] **Recent Activity feed** — Last 10 audit events on overview dashboard
+- [x] **Provider time range** — 7d/30d/All selector with backend `since` parameter support
+
+## Phase 23-26: Security Hardening & Code Quality (Complete)
+
+Systematic remediation of findings from the 2026-03-28 full project code audit.
+
+### Phase 23: Critical Security Hardening
+- [x] **SEC-C01** — Sanitize 90+ error message leaks across 13 handler files; zero 500-level leaks remain
+- [x] **SEC-C02** — Fix X-Forwarded-For IP spoofing via `BridgeClientIP()` proxy trust validation
+- [x] **SEC-H04** — CLI config file permissions restricted from 0644 to 0600
+- [x] **SEC-M06** — Nil public key check added to `Verify()` to prevent panic
+
+### Phase 24: Auth & Access Control Hardening
+- [x] **SEC-H01** — Agent ID auth bypass closed (AgentExists registry check on pubKey fallback)
+- [x] **SEC-H03** — owner_user_id IDOR prevention (strip from metadata in handleRegister)
+- [x] **SEC-M01** — OTP strengthened from 6 to 8 digits + brute-force lockout (5 failures → 15min block)
+- [x] **SEC-M03** — `decodeJSON()` helper with 64KB limit on all 11 auth endpoints
+
+### Phase 25: Risk Code & Stability
+- [x] **RISK-01** — A2A Bridge TOCTOU race fixed (atomic CompareAndSwap loop)
+- [x] **RISK-02** — WebSocket read loop panic recovery (defer/recover)
+- [x] **SEC-M05** — React ErrorBoundary wrapping all 3 route groups
+
+### Phase 26: Code Quality & DRY
+- [x] **DUP-05** — Shared status badge utility (`lib/status.ts`)
+- [x] **DUP-04** — `useAsyncAction` hook for consistent async error handling
+- [x] **DEAD-04** — Envelope `WithTTL()` and `GenerateNonce()` methods implemented
+- [x] **Performance** — Admin routes lazy-loaded via React.lazy (6 pages code-split, -47KB main bundle)

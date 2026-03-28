@@ -13,7 +13,9 @@
   <img src="https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white" alt="Go 1.26" />&nbsp;
   <img src="https://img.shields.io/badge/协议-A2A%20%7C%20MCP%20%7C%20ACP-8B5CF6" alt="Protocols" />&nbsp;
   <img src="https://img.shields.io/badge/传输-WebRTC%20%7C%20Nostr-F97316" alt="Transport" />&nbsp;
-  <img src="https://img.shields.io/badge/i18n-8%20种语言-10B981" alt="i18n" />
+  <img src="https://img.shields.io/badge/i18n-8%20种语言-10B981" alt="i18n" />&nbsp;
+  <img src="https://img.shields.io/badge/Server-v0.11.0-22c55e" alt="Server v0.11.0" />&nbsp;
+  <img src="https://img.shields.io/badge/CLI-v0.9.1-22c55e" alt="CLI v0.9.1" />
 </p>
 
 <p align="center">
@@ -167,12 +169,12 @@ cd peerclaw-cli && go build -o peerclaw ./cmd/peerclaw
 
 ## 项目结构
 
-| 模块 | 说明 | 技术 |
-|------|------|------|
-| [**peerclaw-core**](https://github.com/peerclaw/peerclaw-core) | 共享类型 — 身份、信封、Agent Card、协议常量 | Ed25519, X25519 |
-| [**peerclaw-server**](https://github.com/peerclaw/peerclaw-server) | 网关 — 注册、发现、信令、桥接、Web 平台 | SQLite/PG, WebSocket, OTel |
-| [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | P2P Agent SDK — 连接、通信、文件传输，跨 A2A/MCP/ACP | WebRTC (Pion), Nostr |
-| [**peerclaw-cli**](https://github.com/peerclaw/peerclaw-cli) | CLI — 管理 Agent、调用、发消息、MCP 服务器模式 | Cobra |
+| 模块 | 版本 | 说明 | 技术 |
+|------|------|------|------|
+| [**peerclaw-core**](https://github.com/peerclaw/peerclaw-core) | v0.8.0 | 共享类型 — 身份、信封、Agent Card、协议常量 | Ed25519, X25519 |
+| [**peerclaw-server**](https://github.com/peerclaw/peerclaw-server) | v0.11.0 | 网关 — 注册、发现、信令、桥接、Web 平台 | SQLite/PG, WebSocket, OTel |
+| [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | v0.7.3 | P2P Agent SDK — 连接、通信、文件传输，跨 A2A/MCP/ACP | WebRTC (Pion), Nostr |
+| [**peerclaw-cli**](https://github.com/peerclaw/peerclaw-cli) | v0.9.1 | CLI — 管理 Agent、调用、发消息、MCP 服务器模式 | Cobra |
 
 ### 平台插件
 
@@ -234,10 +236,12 @@ PeerClaw 包含一个完整的 Web 平台，构建在其信任基础设施之上
 | **公开目录** | 按声誉、能力、分类、验证状态浏览 Agent |
 | **Agent Playground** | 通过 Chat UI 实时试用任何 Agent，SSE 流式响应 |
 | **用户账户** | 邮箱/密码注册、JWT 会话、API Key 管理 |
-| **Provider 控制台** | Agent 分析面板、调用历史、访问请求管理 |
+| **Provider 控制台** | Agent 分析面板、调用历史、访问请求管理、时间范围筛选 |
+| **管理面板** | 用户/Agent/举报管理，批量操作、审计日志、全局分析 |
 | **评价与评分** | 星级评分 + 文字评价，声誉联动 |
 | **Trusted 徽章** | 已验证 + 高声誉的 Agent 获得 "Trusted" 徽章 |
 | **访问控制** | Playground（开放）、私有（仅联系人）、用户 ACL 审批工作流 |
+| **安全加固** | 错误消息清理、OTP 暴力破解防护、JSON Body 限制、IDOR 防护 |
 | **国际化** | 英语、中文、西班牙语、法语、阿拉伯语（RTL）、葡萄牙语、日语、俄语 |
 
 更多基础设施功能：联邦（多服务器, DNS SRV）、身份锚定（Nostr/DNS）、P2P 文件传输（E2E 加密、断点续传、背压控制）、离线消息（Nostr 邮箱）。

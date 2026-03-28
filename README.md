@@ -13,7 +13,9 @@
   <img src="https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white" alt="Go 1.26" />&nbsp;
   <img src="https://img.shields.io/badge/Protocols-A2A%20%7C%20MCP%20%7C%20ACP-8B5CF6" alt="Protocols" />&nbsp;
   <img src="https://img.shields.io/badge/Transport-WebRTC%20%7C%20Nostr-F97316" alt="Transport" />&nbsp;
-  <img src="https://img.shields.io/badge/i18n-8%20Languages-10B981" alt="i18n" />
+  <img src="https://img.shields.io/badge/i18n-8%20Languages-10B981" alt="i18n" />&nbsp;
+  <img src="https://img.shields.io/badge/Server-v0.11.0-22c55e" alt="Server v0.11.0" />&nbsp;
+  <img src="https://img.shields.io/badge/CLI-v0.9.1-22c55e" alt="CLI v0.9.1" />
 </p>
 
 <p align="center">
@@ -168,12 +170,12 @@ cd peerclaw-cli && go build -o peerclaw ./cmd/peerclaw
 
 ## Project Structure
 
-| Module | Description | Tech |
-|--------|-------------|------|
-| [**peerclaw-core**](https://github.com/peerclaw/peerclaw-core) | Shared types — identity, envelope, agent card, protocol constants | Ed25519, X25519 |
-| [**peerclaw-server**](https://github.com/peerclaw/peerclaw-server) | Gateway — registration, discovery, signaling, bridging, web platform | SQLite/PG, WebSocket, OTel |
-| [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | P2P agent SDK — connect, communicate, file transfer across A2A/MCP/ACP | WebRTC (Pion), Nostr |
-| [**peerclaw-cli**](https://github.com/peerclaw/peerclaw-cli) | CLI — manage agents, invoke, send messages, MCP server mode | Cobra |
+| Module | Version | Description | Tech |
+|--------|---------|-------------|------|
+| [**peerclaw-core**](https://github.com/peerclaw/peerclaw-core) | v0.8.0 | Shared types — identity, envelope, agent card, protocol constants | Ed25519, X25519 |
+| [**peerclaw-server**](https://github.com/peerclaw/peerclaw-server) | v0.11.0 | Gateway — registration, discovery, signaling, bridging, web platform | SQLite/PG, WebSocket, OTel |
+| [**peerclaw-agent**](https://github.com/peerclaw/peerclaw-agent) | v0.7.3 | P2P agent SDK — connect, communicate, file transfer across A2A/MCP/ACP | WebRTC (Pion), Nostr |
+| [**peerclaw-cli**](https://github.com/peerclaw/peerclaw-cli) | v0.9.1 | CLI — manage agents, invoke, send messages, MCP server mode | Cobra |
 
 ### Platform Plugins
 
@@ -236,10 +238,12 @@ PeerClaw includes a full web platform built on its trust infrastructure:
 | **Public Directory** | Browse agents by reputation, capability, category, verification status |
 | **Agent Playground** | Try any agent live via chat UI with SSE streaming |
 | **User Accounts** | Email/password, JWT sessions, API key management |
-| **Provider Console** | Agent analytics, invocation history, access request management |
+| **Provider Console** | Agent analytics, invocation history, access request management, time range filters |
+| **Admin Panel** | User/agent/report management with bulk actions, audit log, global analytics |
 | **Reviews & Ratings** | Star ratings + text reviews with reputation integration |
 | **Trusted Badge** | Verified + high reputation agents earn a "Trusted" badge |
 | **Access Control** | Playground (open), private (contacts-only), user ACL with approval workflow |
+| **Security** | Error sanitization, OTP brute-force protection, JSON body limits, IDOR prevention |
 | **i18n** | English, Chinese, Spanish, French, Arabic (RTL), Portuguese, Japanese, Russian |
 
 Additional infrastructure features: federation (multi-server, DNS SRV), identity anchoring (Nostr/DNS), P2P file transfer (E2E encrypted, resume, backpressure), offline messaging (Nostr mailbox).
